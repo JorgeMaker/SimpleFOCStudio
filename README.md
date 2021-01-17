@@ -5,7 +5,8 @@ A GIU application developed  with Python/PyQt5 to manage and configure any [Simp
 
 ![SimpleFOCStudio](DOC/SimpleFOCStudio.gif?raw=true)
 
-####Installation and Usage
+
+#### Installation and Usage
 
 - Clone the repo or download the zip
 - cd to the folder

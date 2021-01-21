@@ -38,7 +38,7 @@ class SimpleFOCDevice():
         self.initialTarget = initial_target
         self.connectionID = conn_id
         self.serialPortName = port
-        self.serialRate = 11520
+        self.serialRate = 115200
         self.serialByteSize = byte_size
         self.serialParity = parity
         self.stopBits = stop_bits

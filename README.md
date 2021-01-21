@@ -10,7 +10,7 @@ A GIU application developed  with Python/PyQt5 to manage and configure any [Simp
 
 - Clone the repo or download the zip
 - cd to the folder
-- run: pip -install -r "requirements.txt"
+- run: pip install -r "requirements.txt"
 - run: python simpleFOCStudio.py
 
 On the arduino side you must have the SimpleFOC device executing the motor.monitor () function

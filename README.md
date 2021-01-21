@@ -11,7 +11,7 @@ A GIU application developed  with Python/PyQt5 to manage and configure any [Simp
 - Clone the repo or download the zip
 - cd to the folder
 - run: pip install -r "requirements.txt"
-- Open your preferred python IDE and make sure to include gui folder ource roots  
+- Open your preferred python IDE and make sure to include gui folder source roots  
    Example whith PyCharm:  https://www.jetbrains.com/help/pycharm/configuring-project-structure.html
 - run:  simpleFOCStudio.py
 

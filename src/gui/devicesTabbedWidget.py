@@ -1,9 +1,9 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
 from PyQt5 import QtWidgets, QtCore
-from gui.sharedcomponets import GUIToolKit
-from gui.deviceConfigTool import DeviceConfigurationWidget
-from simpleFOCConnector import SimpleFOCDevice
+from src.gui.sharedcomponets import GUIToolKit
+from src.gui.deviceConfigTool import DeviceConfigurationWidget
+from src.simpleFOCConnector import SimpleFOCDevice
 import json
 
 class DevicesTabbedWidget(QtWidgets.QTabWidget):

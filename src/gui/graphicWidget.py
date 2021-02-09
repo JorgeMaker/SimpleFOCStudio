@@ -3,10 +3,10 @@
 from PyQt5 import QtWidgets
 import pyqtgraph as pg
 import numpy as np
-from sharedcomponets import GUIToolKit
+from src.gui.sharedcomponets import GUIToolKit
 import logging
 
-from simpleFOCConnector import SimpleFOCDevice
+from src.simpleFOCConnector import SimpleFOCDevice
 
 class SimpleFOCGraphicWidget(QtWidgets.QGroupBox):
 

@@ -1,7 +1,7 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
 from PyQt5 import QtGui, QtCore, QtWidgets
-from gui.sharedcomponets import GUIToolKit
+from src.gui.sharedcomponets import GUIToolKit
 
 class CommandLineGroupBox(QtWidgets.QGroupBox):
 

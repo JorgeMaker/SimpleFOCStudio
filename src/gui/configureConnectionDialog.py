@@ -1,8 +1,8 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
-from PyQt5 import QtCore, QtGui, QtWidgets
 import serial
-
+from PyQt5 import QtCore, QtGui, QtWidgets
+from src.gui.sharedcomponets import SerialPortComboBox
 
 class ConfigureSerailConnectionDialog(QtWidgets.QDialog):
     def __init__(self, device=None, parent=None):
@@ -21,9 +21,10 @@ class ConfigureSerailConnectionDialog(QtWidgets.QDialog):
         self.portNameLabel.setObjectName("portNameLabel")
         self.gridLayout.addWidget(self.portNameLabel, 0, 0, 1, 1)
 
-        self.portNameLineEdit = QtWidgets.QLineEdit(self)
-        self.portNameLineEdit.setObjectName("lineEdit")
-        self.gridLayout.addWidget(self.portNameLineEdit, 0, 1, 1, 1)
+        self.portNameComboBox = SerialPortComboBox(self)
+        self.portNameComboBox.setObjectName("portNameComboBox")
+        self.portNameComboBox.setMinimumWidth(250)
+        self.gridLayout.addWidget(self.portNameComboBox, 0, 1, 1, 1)
 
         self.bitRateLabel = QtWidgets.QLabel(self)
         self.bitRateLabel.setObjectName("bitRateLabel")
@@ -103,7 +104,7 @@ class ConfigureSerailConnectionDialog(QtWidgets.QDialog):
 
     def fillForm(self, deviceConnector):
         self.connectionIDlineEdit.setText(deviceConnector.connectionID)
-        self.portNameLineEdit.setText(deviceConnector.serialPortName)
+        self.portNameComboBox.setCurrentText(deviceConnector.serialPortName)
         self.bitRatelineEdit.setText(str(deviceConnector.serialRate))
         self.stopBitsComboBox.setCurrentText(str(deviceConnector.stopBits))
         self.byteSizeComboBox.setCurrentText(str(deviceConnector.serialByteSize))
@@ -112,7 +113,7 @@ class ConfigureSerailConnectionDialog(QtWidgets.QDialog):
     def getConfigValues(self):
         values = {
             "connectionID": self.connectionIDlineEdit.text(),
-            "serialPortName": self.portNameLineEdit.text(),
+            "serialPortName": self.portNameComboBox.currentText(),
             "serialRate": self.bitRatelineEdit.text(),
             "stopBits": self.stopBitsExtractor(self.stopBitsComboBox.currentText()),
             "serialByteSize": int(str(self.byteSizeComboBox.currentText())),

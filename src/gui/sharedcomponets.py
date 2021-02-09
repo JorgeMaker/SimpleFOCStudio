@@ -1,7 +1,9 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
 from PyQt5 import QtGui, QtWidgets, QtCore
+from serial.tools import list_ports
 import os
+
 class GUIToolKit(object):
     """ This class is used to provide icons for the rest of the application
         hiding the location of the resources
@@ -56,3 +58,26 @@ class ConfigQLineEdit(QtWidgets.QLineEdit):
             self.updateValue.emit()
         else:
             super().keyPressEvent(event)
+
+class SerialPortComboBox(QtWidgets.QComboBox):
+    def __init__(self, parent=None, snifer=None):
+        """Constructor for ToolsWidget"""
+        super().__init__(parent)
+        self.addItems(self.getAvailableSerialPortNames())
+
+    def getAvailableSerialPortNames(self):
+        portNames = []
+        for port in list_ports.comports():
+            if port[2] != 'n/a':
+                portNames.append(port[0])
+
+        return portNames
+
+    def showPopup(self):
+        selectedItem = self.currentText()
+        super().clear()
+        availableSerialPortNames = self.getAvailableSerialPortNames()
+        self.addItems(availableSerialPortNames)
+        if selectedItem in availableSerialPortNames:
+            self.setCurrentText(selectedItem)
+        super().showPopup()

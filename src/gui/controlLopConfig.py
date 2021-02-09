@@ -1,7 +1,7 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
 from PyQt5 import QtWidgets
-from simpleFOCConnector import SimpleFOCDevice
+from src.simpleFOCConnector import SimpleFOCDevice
 
 class ControlLoopGroupBox(QtWidgets.QGroupBox):
     def __init__(self, parent=None,simpleFocConn=None):

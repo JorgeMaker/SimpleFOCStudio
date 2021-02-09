@@ -1,7 +1,7 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
 from PyQt5 import QtGui, QtWidgets, QtCore
-from sharedcomponets import ConfigQLineEdit
+from src.gui.sharedcomponets import ConfigQLineEdit
 
 class PidGroupBox(QtWidgets.QGroupBox):
 

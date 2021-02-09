@@ -1,8 +1,8 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
 from PyQt5 import QtWidgets, QtCore
-from gui.sharedcomponets import GUIToolKit
-from gui.configureConnectionDialog import ConfigureSerailConnectionDialog
+from src.gui.sharedcomponets import GUIToolKit
+from src.gui.configureConnectionDialog import ConfigureSerailConnectionDialog
 
 class ConnectionControlGroupBox(QtWidgets.QGroupBox):
 

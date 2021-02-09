@@ -2,14 +2,14 @@
 # -*- coding: utf-8 -*-
 from PyQt5 import QtGui, QtWidgets
 
-from gui.controlLopConfig import ControlLoopGroupBox
-from gui.generalSettingsWidget import GeneralSettingsGroupBox
-from gui.connectionControl import ConnectionControlGroupBox
-from gui.droDisplayWidget import DROGroupBox
-from gui.commandLineInterface import CommandLineGroupBox
-from gui.pidConfiguration import PidGroupBox
-from gui.graphicWidget import SimpleFOCGraphicWidget
-from simpleFOCConnector import SimpleFOCDevice
+from src.gui.controlLopConfig import ControlLoopGroupBox
+from src.gui.generalSettingsWidget import GeneralSettingsGroupBox
+from src.gui.connectionControl import ConnectionControlGroupBox
+from src.gui.droDisplayWidget import DROGroupBox
+from src.gui.commandLineInterface import CommandLineGroupBox
+from src.gui.pidConfiguration import PidGroupBox
+from src.gui.graphicWidget import SimpleFOCGraphicWidget
+from src.simpleFOCConnector import SimpleFOCDevice
 
 class DeviceConfigurationWidget(QtWidgets.QWidget):
 

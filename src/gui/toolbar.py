@@ -1,7 +1,7 @@
 # !/usr/bin/env python
 # -*- coding: utf-8 -*-
 from PyQt5 import QtWidgets
-from gui.sharedcomponets import GUIToolKit
+from src.gui.sharedcomponets import GUIToolKit
 
 class SimpleFOCConfigToolBar(QtWidgets.QToolBar):
     """ This class is used to create a tool bar to launch a tool to manage each

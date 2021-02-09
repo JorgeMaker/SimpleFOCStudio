@@ -1,7 +1,7 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
 from PyQt5 import QtGui, QtWidgets, QtCore
-from sharedcomponets import ConfigQLineEdit
+from src.gui.sharedcomponets import ConfigQLineEdit
 
 class GeneralSettingsGroupBox(QtWidgets.QGroupBox):
     def __init__(self, parent=None,simpleFocConn=None):
@@ -167,7 +167,3 @@ class GeneralSettingsGroupBox(QtWidgets.QGroupBox):
         elif "LPF velocity| Tf:" in comandResponse:
             self.lpfLineEdit.setText(
                 comandResponse.replace("LPF velocity| Tf:", ""))
-
-
-
-

@@ -1,9 +1,9 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
 from PyQt5 import QtGui, QtWidgets, QtCore
-from sharedcomponets import GUIToolKit
+from src.gui.sharedcomponets import GUIToolKit
 import logging
-from simpleFOCConnector import SimpleFOCDevice
+from src.simpleFOCConnector import SimpleFOCDevice
 
 class DROGroupBox(QtWidgets.QGroupBox):
 

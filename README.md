@@ -13,7 +13,7 @@ A GIU application developed  with Python/PyQt5 to manage and configure any [Simp
 - run: pip install -r "requirements.txt"
 - run: python simpleFOCStudio.py
 - Once in the application add a device (+) and configure serial port settings
-- Connected to the serial port you have to have a SimpleDOC device that 
+- Connect to the serial port you have to have a SimpleDOC device that 
 attends to the command as explained in [this example](https://docs.simplefoc.com/communication)
 - Start playing  and have fun :)
 

@@ -1,14 +1,14 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
-from PyQt5 import QtGui, QtWidgets
+from PyQt5 import QtWidgets
 
-from src.gui.controlLopConfig import ControlLoopGroupBox
-from src.gui.generalSettingsWidget import GeneralSettingsGroupBox
-from src.gui.connectionControl import ConnectionControlGroupBox
-from src.gui.droDisplayWidget import DROGroupBox
-from src.gui.commandLineInterface import CommandLineGroupBox
-from src.gui.pidConfiguration import PidGroupBox
-from src.gui.graphicWidget import SimpleFOCGraphicWidget
+from src.gui.configtool.controlLopConfig import ControlLoopGroupBox
+from src.gui.configtool.generalSettingsWidget import GeneralSettingsGroupBox
+from src.gui.configtool.connectionControl import ConnectionControlGroupBox
+from src.gui.configtool.droDisplayWidget import DROGroupBox
+from src.gui.configtool.commandLineInterface import CommandLineGroupBox
+from src.gui.configtool.pidConfiguration import PidGroupBox
+from src.gui.configtool.graphicWidget import SimpleFOCGraphicWidget
 from src.simpleFOCConnector import SimpleFOCDevice
 
 class DeviceConfigurationWidget(QtWidgets.QWidget):

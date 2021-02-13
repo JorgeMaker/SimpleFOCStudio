@@ -2,7 +2,7 @@
 # -*- coding: utf-8 -*-
 from PyQt5 import QtCore, QtWidgets
 from src.gui.toolbar import SimpleFOCConfigToolBar
-from src.gui.devicesTabbedWidget import DevicesTabbedWidget
+from src.gui.configtool.devicesTabbedWidget import DevicesTabbedWidget
 
 class UserInteractionMainWindow(object):
     """This class creates athe main window for the application  """

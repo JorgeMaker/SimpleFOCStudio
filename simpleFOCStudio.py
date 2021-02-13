@@ -6,7 +6,6 @@
 """
 from PyQt5 import QtWidgets
 from src.gui.mainWindow import UserInteractionMainWindow
-
 import sys
 
 if __name__ == "__main__":

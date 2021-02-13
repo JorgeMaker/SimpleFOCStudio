@@ -1,8 +1,8 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
-from PyQt5 import QtWidgets, QtCore
+from PyQt5 import QtWidgets
 from src.gui.sharedcomponets import GUIToolKit
-from src.gui.deviceConfigTool import DeviceConfigurationWidget
+from src.gui.configtool.deviceConfigTool import DeviceConfigurationWidget
 from src.simpleFOCConnector import SimpleFOCDevice
 import json
 
@@ -47,7 +47,7 @@ class DevicesTabbedWidget(QtWidgets.QTabWidget):
                     customerManagementTool = DeviceConfigurationWidget(simpleFocConn=sfd)
                     self.devicesConfiguratorsList.append(customerManagementTool)
                     tabName ="Device"
-                    if sfd.connectionID is not '':
+                    if sfd.connectionID != '':
                         tabName = sfd.connectionID
                     self.addTab(customerManagementTool,
                                 GUIToolKit.getIconByName("motor"), tabName)

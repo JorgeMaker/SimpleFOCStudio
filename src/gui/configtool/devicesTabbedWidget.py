@@ -82,8 +82,3 @@ class DevicesTabbedWidget(QtWidgets.QTabWidget):
         else:
             with open(file, 'w', encoding='utf-8') as f:
                 f.write(json.dumps(deviceToSave.toJSON()))
-
-
-    def statisticsDevice(self):
-        dlg = StatisticsInspectorDialog()
-        dlg.exec_()

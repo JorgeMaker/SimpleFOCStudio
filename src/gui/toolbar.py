@@ -29,3 +29,5 @@ class SimpleFOCConfigToolBar(QtWidgets.QToolBar):
         self.addAction(self.saveDeviceAction)
 
         self.addSeparator()
+
+

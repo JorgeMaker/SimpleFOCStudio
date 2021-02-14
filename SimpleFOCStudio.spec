@@ -31,6 +31,7 @@ a.datas += [('src/gui/resources/start.png', 'src/gui/resources/start.png', 'DATA
 a.datas += [('src/gui/resources/statistics.png', 'src/gui/resources/statistics.png', 'DATA'),]
 a.datas += [('src/gui/resources/stop.png', 'src/gui/resources/stop.png', 'DATA'),]
 a.datas += [('src/gui/resources/zoomall.png', 'src/gui/resources/zoomall.png', 'DATA'),]
+a.datas += [('src/gui/resources/consoletool.png', 'src/gui/resources/consoletool.png', 'DATA'),]
 exe = EXE(pyz,
           a.scripts,
           a.binaries,

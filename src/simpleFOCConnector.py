@@ -8,7 +8,6 @@ import logging
 
 class SimpleFOCDevice():
 
-
     VOLTAGE_CONTROL = 0
     VELOCITY_CONTROL = 1
     ANGLE_CONTROL = 2
@@ -125,7 +124,6 @@ class SimpleFOCDevice():
         self.commProvider.start()
 
     def __closeCommunication(self):
-        # self.responseThread.stop()
         self.serialPort.close()
 
     def connect(self):
@@ -141,8 +139,8 @@ class SimpleFOCDevice():
 
             msgBox = QtWidgets.QMessageBox()
             msgBox.setIcon(QtWidgets.QMessageBox.Warning)
-            msgBox.setText("Error while trying to open serial port")
-            msgBox.setWindowTitle("SimpleFOC ConfigTool")
+            msgBox.setText('Error while trying to open serial port')
+            msgBox.setWindowTitle('SimpleFOC ConfigTool')
             msgBox.setStandardButtons(QtWidgets.QMessageBox.Ok)
             msgBox.exec()
             return False
@@ -154,8 +152,9 @@ class SimpleFOCDevice():
             return True
 
     def disConnect(self):
-        self.__closeCommunication()
+        #self.commProvider.stop()
         self.isConnected = False
+        self.__closeCommunication()
         for listener in self.connectionStateListenerList:
             listener.deviceConnected(False)
 
@@ -246,6 +245,7 @@ class SerialPortReceiveHandler(QtCore.QThread):
 
     telemetryDataReceived = QtCore.pyqtSignal(float, float, float)
     commandDataReceived = QtCore.pyqtSignal(str)
+    rawDataReceived = QtCore.pyqtSignal(str)
 
     def __init__(self, serial_port=None, *args, **kwargs):
         super(SerialPortReceiveHandler, self).__init__(*args, **kwargs)
@@ -254,24 +254,25 @@ class SerialPortReceiveHandler(QtCore.QThread):
         self.serialComm = serial_port
 
     def handle_received_data(self, data):
-        if self.isCommandResposedata(data):
-            self.commandDataReceived.emit(data.rstrip())
-        else:
+        if self.isDataReceivedTelementry(data):
             try:
                 v = data.rstrip().split('\t', 3)
                 self.telemetryDataReceived.emit(float(v[2]), float(v[1]), float(v[0]))
             except ValueError as error:
                 logging.error(error, exc_info=True)
-                logging.error("data ="+str(data), exc_info=True)
+                logging.error('data ='+str(data), exc_info=True)
             except IndexError as error:
                 logging.error(error, exc_info=True)
-                logging.error("data ="+str(data), exc_info=True)
-
-    def isCommandResposedata(self, data):
-        if data[0].isdigit() or data[0] == '-':
-            return False
+                logging.error('data ='+str(data), exc_info=True)
         else:
+            self.commandDataReceived.emit(data.rstrip())
+        self.rawDataReceived.emit(data.rstrip())
+
+    def isDataReceivedTelementry(self, data):
+        if data[0].isdigit() or data[0] == '-':
             return True
+        else:
+            return False
 
     def run(self):
         try:

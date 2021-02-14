@@ -1,52 +1,51 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
-from PyQt5 import QtGui, QtWidgets, QtCore
-from src.gui.sharedcomponets import GUIToolKit
+from PyQt5 import QtGui, QtWidgets
+from src.gui.sharedcomnponets.sharedcomponets import GUIToolKit
 import logging
 from src.simpleFOCConnector import SimpleFOCDevice
 
 class DROGroupBox(QtWidgets.QGroupBox):
 
     def __init__(self, parent=None, simpleFocConn=None):
-        """Constructor for ToolsWidget"""
         super().__init__(parent)
 
         self.device = simpleFocConn
 
-        self.setTitle("Simple FOC Digital Read Out")
-        self.setObjectName("digitalReadOutGroupBox")
+        self.setTitle('Simple FOC Digital Read Out')
+        self.setObjectName('digitalReadOutGroupBox')
 
         self.droHorizontalLayout = QtWidgets.QHBoxLayout(self)
-        self.droHorizontalLayout.setObjectName("droHorizontalLayout")
+        self.droHorizontalLayout.setObjectName('droHorizontalLayout')
 
         self.signal0Label = QtWidgets.QLabel(self)
-        self.signal0Label.setObjectName("signal0Label")
-        self.signal0Label.setText("Signal 0")
+        self.signal0Label.setObjectName('signal0Label')
+        self.signal0Label.setText('Signal 0')
         self.droHorizontalLayout.addWidget(self.signal0Label)
 
         self.signal0LCDNumber = QtWidgets.QLCDNumber(self)
         self.putStyleToLCDNumber(self.signal0LCDNumber)
-        self.signal0LCDNumber.setObjectName("signal0LCDNumber")
+        self.signal0LCDNumber.setObjectName('signal0LCDNumber')
         self.droHorizontalLayout.addWidget(self.signal0LCDNumber)
 
         self.signal1Label = QtWidgets.QLabel(self)
-        self.signal1Label.setObjectName("signal1Label")
-        self.signal1Label.setText("Signal 1")
+        self.signal1Label.setObjectName('signal1Label')
+        self.signal1Label.setText('Signal 1')
         self.droHorizontalLayout.addWidget(self.signal1Label)
 
         self.signal1LCDNumber = QtWidgets.QLCDNumber(self)
         self.putStyleToLCDNumber(self.signal1LCDNumber)
-        self.signal1LCDNumber.setObjectName("signal1LCDNumber")
+        self.signal1LCDNumber.setObjectName('signal1LCDNumber')
         self.droHorizontalLayout.addWidget(self.signal1LCDNumber)
 
         self.signal2Label = QtWidgets.QLabel(self)
-        self.signal2Label.setObjectName("voltageLable")
-        self.signal2Label.setText("Signal 2")
+        self.signal2Label.setObjectName('voltageLable')
+        self.signal2Label.setText('Signal 2')
         self.droHorizontalLayout.addWidget(self.signal2Label)
 
         self.signal2LCDNumber = QtWidgets.QLCDNumber(self)
         self.putStyleToLCDNumber(self.signal2LCDNumber)
-        self.signal2LCDNumber.setObjectName("signal2LCDNumber")
+        self.signal2LCDNumber.setObjectName('signal2LCDNumber')
         self.droHorizontalLayout.addWidget(self.signal2LCDNumber)
 
         self.device.commProvider.telemetryDataReceived.connect(self.updateDRO)
@@ -83,7 +82,7 @@ class DROGroupBox(QtWidgets.QGroupBox):
         self.signal2LCDNumber.display(0.0)
 
     def putStyleToLCDNumber(self, lcdNumber):
-        lcdNumber.setStyleSheet("""QLCDNumber {background-color: white;}""")
+        lcdNumber.setStyleSheet('''QLCDNumber {background-color: white;}''')
         palette = self.setColor(lcdNumber.palette(),GUIToolKit.RED_COLOR)
         lcdNumber.setPalette(palette)
 
@@ -95,9 +94,9 @@ class DROGroupBox(QtWidgets.QGroupBox):
         palette.setColor(palette.WindowText, QtGui.QColor(R,G,B))
         # background color
         palette.setColor(palette.Background, QtGui.QColor(R,G,B))
-        # "light" border
+        # 'light' border
         palette.setColor(palette.Light, QtGui.QColor(R,G,B))
-        # "dark" border
+        # 'dark' border
         palette.setColor(palette.Dark, QtGui.QColor(R,G,B))
         return palette
 

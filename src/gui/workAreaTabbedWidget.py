@@ -34,6 +34,10 @@ class WorkAreaTabbedWidget(QtWidgets.QTabWidget):
             self.cmdLineTool = None
         if type(self.currentWidget()) == DeviceConfigurationWidget:
             self.configTool = None
+        if self.configTool == None and self.cmdLineTool == None:
+            if self.device.isConnected:
+                self.device.disConnect()
+
         self.activeToolsList.pop(index)
         self.removeTab(index)
 

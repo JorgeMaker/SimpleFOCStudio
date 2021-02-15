@@ -15,18 +15,24 @@ class CommandLineConsoleTool(WorkAreaTabWidget):
         self.verticalLayout = QtWidgets.QVBoxLayout(self)
         self.verticalLayout.setObjectName('verticalLayout')
 
-        self.configureConnectionWidget = ConfigureConnection(simpleFOCConn=self.device)
-        self.verticalLayout.addWidget(self.configureConnectionWidget)
+        self.configureConnection = ConfigureConnection(simpleFOCConn=self.device)
+        self.verticalLayout.addWidget(self.configureConnection)
 
         self.commandLineInterface = CommandLineGroupBox(simpleFocConn=self.device)
         self.verticalLayout.addWidget(self.commandLineInterface)
 
-        self.device.commProvider.rawDataReceived.connect(
-            self.commandLineInterface.publishCommandResponseData)
-
+        self.device.addConnectionStateListener(self.commandLineInterface)
+        self.device.commProvider.rawDataReceived.connect(self.commandLineInterface.publishCommandResponseData)
 
     def getTabIcon(self):
         return GUIToolKit.getIconByName('consoletool')
 
     def getTabName(self):
         return self.device.connectionID
+
+    def connectionStateChanged(self, isConnectedFlag):
+        self.configureConnection.connectionStateChanged(isConnectedFlag)
+        if isConnectedFlag:
+            self.commandLineInterface.setEnabled(True)
+        else:
+            self.commandLineInterface.setEnabled(False)

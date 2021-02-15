@@ -56,6 +56,7 @@ class DeviceConfigurationTool(WorkAreaTabWidget):
         self.bottomHorizontalLayout.addWidget(self.commandLine)
         self.verticalLayout.addWidget(self.bottomWidget)
 
+        self.device.addConnectionStateListener(self.commandLine)
         self.device.commProvider.commandDataReceived.connect(self.commandLine.publishCommandResponseData)
 
     def getTabIcon(self):

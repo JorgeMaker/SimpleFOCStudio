@@ -62,8 +62,8 @@ class DROGroupBox(QtWidgets.QGroupBox):
         self.signal1Label.setText(label1)
         self.signal2Label.setText(label2)
 
-    def deviceConnected(self, deviceConnected):
-        if deviceConnected is True:
+    def connectionStateChanged(self, isConnectedFlag):
+        if isConnectedFlag is True:
             self.enabeUI()
             self.initDiplay()
         else:

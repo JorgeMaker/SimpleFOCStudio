@@ -109,8 +109,18 @@ class ConfigureConnection(QtWidgets.QGroupBox):
         else:
             return int(self.stopBitsComboBox.currentText())
 
-    def deviceConnected(self, isConnected):
-        if isConnected:
+    # def deviceConnected(self, isConnected):
+    #     if isConnected:
+    #         self.connectDisconnectButton.setText('Disconnect')
+    #         self.connectDisconnectButton.setIcon(
+    #             GUIToolKit.getIconByName('disconnect'))
+    #     else:
+    #         self.connectDisconnectButton.setText('Connect')
+    #         self.connectDisconnectButton.setIcon(
+    #             GUIToolKit.getIconByName('connect'))
+
+    def connectionStateChanged(self, isConnectedFlag):
+        if isConnectedFlag:
             self.connectDisconnectButton.setText('Disconnect')
             self.connectDisconnectButton.setIcon(
                 GUIToolKit.getIconByName('disconnect'))

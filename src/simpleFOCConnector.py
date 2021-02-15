@@ -151,7 +151,7 @@ class SimpleFOCDevice():
         else:
             self.isConnected = True
             for listener in self.connectionStateListenerList:
-                listener.deviceConnected(True)
+                listener.connectionStateChanged(True)
             if connectionMode == SimpleFOCDevice.PULL_CONFIG_ON_CONNECT:
                 self.pullConfiguration()
             elif connectionMode == SimpleFOCDevice.PUSH_CONFG_ON_CONNECT:
@@ -164,7 +164,7 @@ class SimpleFOCDevice():
         self.isConnected = False
         self.__closeCommunication()
         for listener in self.connectionStateListenerList:
-            listener.deviceConnected(False)
+            listener.connectionStateChanged(False)
 
     def addConnectionStateListener(self, listener):
         self.connectionStateListenerList.append(listener)

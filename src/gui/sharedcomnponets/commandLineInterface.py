@@ -52,9 +52,8 @@ class CommandLineGroupBox(QtWidgets.QGroupBox):
         self.cmlVerticalLayout.addWidget(self.cmlWidget)
 
         self.setEnabled(False)
-        self.device.addConnectionStateListener(self)
 
-    def deviceConnected(self, deviceConnected):
+    def connectionStateChanged(self, deviceConnected):
         if deviceConnected is True:
             self.enabeUI()
             self.publishCommandResponseData('Connected ...')

@@ -104,7 +104,7 @@ class PidGroupBox(QtWidgets.QGroupBox):
         self.disableUI()
         self.device.addConnectionStateListener(self)
 
-    def deviceConnected(self, deviceConnected):
+    def connectionStateChanged(self, deviceConnected):
         if deviceConnected is True:
             self.enabeUI()
         else:

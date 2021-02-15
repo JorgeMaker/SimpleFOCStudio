@@ -107,7 +107,7 @@ class GeneralSettingsGroupBox(QtWidgets.QGroupBox):
 
         self.device.addConnectionStateListener(self)
 
-    def deviceConnected(self, deviceConnected):
+    def connectionStateChanged(self, deviceConnected):
         if deviceConnected is True:
             self.enabeUI()
         else:

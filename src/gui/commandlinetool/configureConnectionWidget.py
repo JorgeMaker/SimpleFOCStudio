@@ -1,7 +1,7 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
 import serial
-from PyQt5 import (QtGui, QtWidgets)
+from PyQt5 import (QtGui,QtCore,QtWidgets)
 from src.gui.sharedcomnponets.sharedcomponets import SerialPortComboBox
 from src.gui.sharedcomnponets.sharedcomponets import GUIToolKit
 
@@ -36,7 +36,7 @@ class ConfigureConnection(QtWidgets.QGroupBox):
 
         self.bitRatelineEdit = QtWidgets.QLineEdit(self)
         self.bitRatelineEdit.setObjectName('bitRatelineEdit')
-        self.bitRatelineEdit.setValidator(QtGui.QIntValidator())
+        self.bitRatelineEdit.setValidator(QtGui.QRegExpValidator(QtCore.QRegExp("^[0-9]*$")))
         self.bitRatelineEdit.setText('115200')
         self.configCoonLayout.addWidget(self.bitRatelineEdit)
 

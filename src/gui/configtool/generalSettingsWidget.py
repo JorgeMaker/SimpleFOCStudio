@@ -10,7 +10,8 @@ class GeneralSettingsGroupBox(QtWidgets.QGroupBox):
 
         self.setMaximumWidth(300)
 
-        onlyFloat = QtGui.QDoubleValidator(0.0, 5.0, 2)
+        onlyFloat = QtGui.QRegExpValidator(
+            QtCore.QRegExp("[+-]?([0-9]*[.])?[0-9]+"))
 
         self.device = simpleFocConn
 

@@ -10,7 +10,8 @@ class PidGroupBox(QtWidgets.QGroupBox):
         super().__init__(parent)
         self.setMaximumWidth(300)
 
-        onlyFloatInputValidator = QtGui.QDoubleValidator(0.0, 5.0, 2)
+        onlyFloatInputValidator = QtGui.QRegExpValidator(
+            QtCore.QRegExp("[+-]?([0-9]*[.])?[0-9]+"))
 
         self.device = simpleFocConn
 

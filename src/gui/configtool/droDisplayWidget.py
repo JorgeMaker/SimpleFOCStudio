@@ -7,10 +7,10 @@ from src.simpleFOCConnector import SimpleFOCDevice
 
 class DROGroupBox(QtWidgets.QGroupBox):
 
-    def __init__(self, parent=None, simpleFocConn=None):
+    def __init__(self, parent=None):
         super().__init__(parent)
 
-        self.device = simpleFocConn
+        self.device = SimpleFOCDevice.getInstance()
 
         self.setTitle('Simple FOC Digital Read Out')
         self.setObjectName('digitalReadOut')
@@ -56,9 +56,10 @@ class DROGroupBox(QtWidgets.QGroupBox):
         self.initDiplay()
         self.disableUI()
 
-        # self.device.addControlLoopModeListener(self)
         self.device.addConnectionStateListener(self)
         self.device.addCommandResponseListener(self)
+
+        self.connectionStateChanged(self.device.isConnected)
 
     def updateLabels(self, label0, label1, label2):
         self.signal0Label.setText(label0)

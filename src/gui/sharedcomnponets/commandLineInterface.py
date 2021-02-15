@@ -2,13 +2,14 @@
 # -*- coding: utf-8 -*-
 from PyQt5 import QtGui, QtWidgets
 from src.gui.sharedcomnponets.sharedcomponets import GUIToolKit
+from src.simpleFOCConnector import SimpleFOCDevice
 
 class CommandLineWidget(QtWidgets.QGroupBox):
 
-    def __init__(self, parent=None, simpleFocConn=None):
+    def __init__(self, parent=None):
         super().__init__(parent)
 
-        self.device = simpleFocConn
+        self.device = SimpleFOCDevice.getInstance()
 
         self.setObjectName('groupBox')
         self.setTitle('Command Line interface')

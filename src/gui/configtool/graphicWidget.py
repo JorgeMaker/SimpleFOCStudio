@@ -15,14 +15,14 @@ class SimpleFOCGraphicWidget(QtWidgets.QGroupBox):
     connectedPausedState = 2
     connectedPlottingStartedState = 3
 
-    def __init__(self, parent=None, simpleFocConn=None):
+    def __init__(self, parent=None):
 
         super().__init__(parent)
 
         self.setObjectName('plotWidget')
         self.setTitle('Real time motor variables: ')
         self.horizontalLayout = QtWidgets.QVBoxLayout(self)
-        self.device = simpleFocConn
+        self.device = SimpleFOCDevice.getInstance()
 
 
 
@@ -55,7 +55,7 @@ class SimpleFOCGraphicWidget(QtWidgets.QGroupBox):
 
         self.horizontalLayout.addWidget(self.plotWidget)
 
-        self.controlPlotWidget = ControlPlotPanel(controllePlotWidget=self, simpleFocConn=self.device)
+        self.controlPlotWidget = ControlPlotPanel(controllePlotWidget=self)
         self.horizontalLayout.addWidget(self.controlPlotWidget)
 
         self.signal0PlotFlag = True
@@ -78,9 +78,9 @@ class SimpleFOCGraphicWidget(QtWidgets.QGroupBox):
 
         self.controlPlotWidget.controlTypeChonged(self.device.controlType)
 
-        self.disableUI()
         self.device.addConnectionStateListener(self)
-        #self.device.addControlLoopModeListener(self.controlPlotWidget)
+
+        self.connectionStateChanged(self.device.isConnected)
 
     def connectionStateChanged(self, deviceConnected):
         if deviceConnected is True:
@@ -179,11 +179,11 @@ class SimpleFOCGraphicWidget(QtWidgets.QGroupBox):
 
 class ControlPlotPanel(QtWidgets.QWidget):
 
-    def __init__(self , parent=None,controllePlotWidget=None, simpleFocConn=None):
+    def __init__(self , parent=None,controllePlotWidget=None):
         '''Constructor for ToolsWidget'''
         super().__init__(parent)
 
-        self.device = simpleFocConn
+        self.device = SimpleFOCDevice.getInstance()
         self.controlledPlot = controllePlotWidget
         self.horizontalLayout = QtWidgets.QHBoxLayout(self)
         self.horizontalLayout.setObjectName('horizontalLayout')

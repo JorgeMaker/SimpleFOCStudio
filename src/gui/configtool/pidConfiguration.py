@@ -2,10 +2,11 @@
 # -*- coding: utf-8 -*-
 from PyQt5 import QtGui, QtWidgets, QtCore
 from src.gui.sharedcomnponets.sharedcomponets import ConfigQLineEdit
+from src.simpleFOCConnector import SimpleFOCDevice
 
 class PidGroupBox(QtWidgets.QGroupBox):
 
-    def __init__(self, parent=None,simpleFocConn=None):
+    def __init__(self, parent=None):
 
         super().__init__(parent)
         self.setMaximumWidth(300)
@@ -13,7 +14,7 @@ class PidGroupBox(QtWidgets.QGroupBox):
         onlyFloatInputValidator = QtGui.QRegExpValidator(
             QtCore.QRegExp("[+-]?([0-9]*[.])?[0-9]+"))
 
-        self.device = simpleFocConn
+        self.device = SimpleFOCDevice.getInstance()
 
         self.setObjectName('pidConfigurator')
         self.setTitle('PID Controller configuration')
@@ -101,7 +102,7 @@ class PidGroupBox(QtWidgets.QGroupBox):
         # self.device.commProvider.commandDataReceived.connect(
         #     self.comandResposeReceivedAction)
 
-        self.disableUI()
+        self.connectionStateChanged(self.device.isConnected)
         self.device.addConnectionStateListener(self)
         self.device.addCommandResponseListener(self)
 

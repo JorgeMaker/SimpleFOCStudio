@@ -17,7 +17,7 @@ class WorkAreaTabbedWidget(QtWidgets.QTabWidget):
         self.setMovable(True)
         self.setObjectName('devicesTabWidget')
 
-        self.device = SimpleFOCDevice()
+        self.device = SimpleFOCDevice.getInstance()
 
         self.cmdLineTool = None
         self.configTool = None
@@ -59,7 +59,8 @@ class WorkAreaTabbedWidget(QtWidgets.QTabWidget):
                 try:
                     with open(filenames[0]) as json_file:
                         configurationInfo = json.load(json_file)
-                        sfd = SimpleFOCDevice.fromJSON(configurationInfo)
+                        sfd = SimpleFOCDevice.getInstance()
+                        sfd.configueDevice(configurationInfo)
                         self.configTool = DeviceConfigurationTool(simpleFocConn=sfd)
                         self.configTool.connectionControl.connectionModeComboBox.setCurrentText(SimpleFOCDevice.PUSH_CONFG_ON_CONNECT)
 
@@ -105,7 +106,7 @@ class WorkAreaTabbedWidget(QtWidgets.QTabWidget):
 
     def openConsoleTool(self):
         if self.cmdLineTool is None:
-            self.cmdLineTool = CommandLineConsoleTool(simpleFocConn=self.device)
+            self.cmdLineTool = CommandLineConsoleTool()
             self.activeToolsList.append(self.cmdLineTool)
             self.addTab(self.cmdLineTool,
                         self.cmdLineTool.getTabIcon(), 'Cmd Line')

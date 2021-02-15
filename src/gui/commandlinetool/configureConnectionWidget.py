@@ -8,10 +8,10 @@ from src.simpleFOCConnector import SimpleFOCDevice
 
 class ConfigureConnection(QtWidgets.QGroupBox):
 
-    def __init__(self, parent=None, simpleFOCConn=None):
+    def __init__(self, parent=None):
         super().__init__(parent)
 
-        self.device = simpleFOCConn
+        self.device = SimpleFOCDevice.getInstance()
 
         self.setTitle('Configure serial connection')
         self.setObjectName('configureConnection')
@@ -110,25 +110,7 @@ class ConfigureConnection(QtWidgets.QGroupBox):
         else:
             return int(self.stopBitsComboBox.currentText())
 
-    # def deviceConnected(self, isConnected):
-    #     if isConnected:
-    #         self.connectDisconnectButton.setText('Disconnect')
-    #         self.connectDisconnectButton.setIcon(
-    #             GUIToolKit.getIconByName('disconnect'))
-    #     else:
-    #         self.connectDisconnectButton.setText('Connect')
-    #         self.connectDisconnectButton.setIcon(
-    #             GUIToolKit.getIconByName('connect'))
-
     def connectionStateChanged(self, isConnectedFlag):
-        # if isConnectedFlag:
-        #     self.connectDisconnectButton.setText('Disconnect')
-        #     self.connectDisconnectButton.setIcon(
-        #         GUIToolKit.getIconByName('disconnect'))
-        # else:
-        #     self.connectDisconnectButton.setText('Connect')
-        #     self.connectDisconnectButton.setIcon(
-        #         GUIToolKit.getIconByName('connect'))
         if isConnectedFlag:
             self.connectDisconnectButton.setText('Disconnect')
             self.connectDisconnectButton.setIcon(
@@ -149,29 +131,6 @@ class ConfigureConnection(QtWidgets.QGroupBox):
         self.stopBitsLabel.setEnabled(not isConnectedFlag)
         self.stopBitsComboBox.setEnabled(not isConnectedFlag)
 
-
-
-    # def setUIState(self, connectedFlag):
-    #     if connectedFlag:
-    #         self.connectDisconnectButton.setText('Disconnect')
-    #         self.connectDisconnectButton.setIcon(
-    #             GUIToolKit.getIconByName('disconnect'))
-    #     else:
-    #         self.connectDisconnectButton.setText('Connect')
-    #         self.connectDisconnectButton.setIcon(
-    #             GUIToolKit.getIconByName('connect'))
-    #
-    #     self.portNameLabel.setEnabled(not connectedFlag)
-    #     self.portNameComboBox.setEnabled(not connectedFlag)
-    #     self.bitRateLabel.setEnabled(not connectedFlag)
-    #     self.bitRatelineEdit.setEnabled(not connectedFlag)
-    #     self.parityLabel.setEnabled(not connectedFlag)
-    #     self.parityComboBox.setEnabled(not connectedFlag)
-    #     self.byteSizeLabel.setEnabled(not connectedFlag)
-    #     self.byteSizeComboBox.setEnabled(not connectedFlag)
-    #     self.stopBitsLabel.setEnabled(not connectedFlag)
-    #     self.stopBitsComboBox.setEnabled(not connectedFlag)
-
     def connectDisconnectDeviceAction(self):
         if self.device.isConnected:
             self.disConnectAction()
@@ -180,7 +139,7 @@ class ConfigureConnection(QtWidgets.QGroupBox):
 
     def connectAction(self):
         deviceConfig = self.getConfigValues()
-        self.device.configureDevice(deviceConfig)
+        self.device.configureConnection(deviceConfig)
         self.device.connect(SimpleFOCDevice.ONLY_CONNECT)
 
     def disConnectAction(self):

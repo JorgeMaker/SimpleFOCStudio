@@ -2,9 +2,11 @@
 # -*- coding: utf-8 -*-
 from PyQt5 import QtGui, QtWidgets, QtCore
 from src.gui.sharedcomnponets.sharedcomponets import ConfigQLineEdit
+from src.simpleFOCConnector import SimpleFOCDevice
 
 class GeneralSettingsGroupBox(QtWidgets.QGroupBox):
-    def __init__(self, parent=None,simpleFocConn=None):
+
+    def __init__(self, parent=None):
 
         super().__init__(parent)
 
@@ -13,7 +15,7 @@ class GeneralSettingsGroupBox(QtWidgets.QGroupBox):
         onlyFloat = QtGui.QRegExpValidator(
             QtCore.QRegExp("[+-]?([0-9]*[.])?[0-9]+"))
 
-        self.device = simpleFocConn
+        self.device = SimpleFOCDevice.getInstance()
 
         self.setTitle('General device settings')
 
@@ -99,14 +101,10 @@ class GeneralSettingsGroupBox(QtWidgets.QGroupBox):
         self.setVelLimit(self.device.velocityLimit)
         self.setVoltageLimit(self.device.voltageLimit)
 
-        self.disableUI()
-
-        # self.device.commProvider.commandDataReceived.connect(
-        #     self.comandResposeReceivedAction)
-
-
         self.device.addConnectionStateListener(self)
         self.device.addCommandResponseListener(self)
+
+        self.connectionStateChanged(self.device.isConnected)
 
     def connectionStateChanged(self, deviceConnected):
         if deviceConnected is True:

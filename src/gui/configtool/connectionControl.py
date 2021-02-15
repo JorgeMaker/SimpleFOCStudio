@@ -7,10 +7,10 @@ from src.gui.configtool.configureConnectionDialog import ConfigureSerailConnecti
 
 class ConnectionControlGroupBox(QtWidgets.QGroupBox):
 
-    def __init__(self, parent=None,simpleFocConn=None):
+    def __init__(self, parent=None):
         super().__init__(parent)
 
-        self.device = simpleFocConn
+        self.device = SimpleFOCDevice.getInstance()
 
         self.setObjectName('connectionControl')
         self.setTitle('Connection control')
@@ -20,7 +20,7 @@ class ConnectionControlGroupBox(QtWidgets.QGroupBox):
 
         self.connectionModeComboBox = QtWidgets.QComboBox()
         self.connectionModeComboBox.setObjectName('connectDeviceButton')
-        self.connectionModeComboBox.addItems([SimpleFOCDevice.PULL_CONFIG_ON_CONNECT,SimpleFOCDevice.PUSH_CONFG_ON_CONNECT])
+        self.connectionModeComboBox.addItems([SimpleFOCDevice.PULL_CONFIG_ON_CONNECT, SimpleFOCDevice.PUSH_CONFG_ON_CONNECT])
 
         self.horizontalLayout.addWidget(self.connectionModeComboBox)
 
@@ -39,26 +39,29 @@ class ConnectionControlGroupBox(QtWidgets.QGroupBox):
         self.configureDeviceButton.clicked.connect(self.configureDeviceAction)
         self.horizontalLayout.addWidget(self.configureDeviceButton)
 
-    def connectDisconnectDeviceAction(self):
+        self.device.addConnectionStateListener(self)
+        self.connectionStateChanged(self.device.isConnected)
 
+    def connectDisconnectDeviceAction(self):
         if self.device.isConnected:
             self.device.disConnect()
+        else:
+            connectionMode  = self.connectionModeComboBox.currentText()
+            self.device.connect(connectionMode)
+
+    def connectionStateChanged(self, isConnected):
+        if isConnected:
+            self.connectDisconnectButton.setIcon(
+                GUIToolKit.getIconByName('disconnect'))
+            self.connectDisconnectButton.setText('Disconnect')
+        else:
             self.connectDisconnectButton.setIcon(
                 GUIToolKit.getIconByName('connect'))
             self.connectDisconnectButton.setText('Connect')
 
-        else:
-            connectionMode  = self.connectionModeComboBox.currentText()
-            hasBeenConnected  = self.device.connect(connectionMode)
-            if hasBeenConnected:
-                self.connectDisconnectButton.setIcon(
-                    GUIToolKit.getIconByName('disconnect'))
-                self.connectDisconnectButton.setText('Disconnect')
-
-
     def configureDeviceAction(self):
-        dialog = ConfigureSerailConnectionDialog(self.device)
+        dialog = ConfigureSerailConnectionDialog()
         result = dialog.exec_()
         if result:
             deviceConfig = dialog.getConfigValues()
-            self.device.configureDevice(deviceConfig)
+            self.device.configureConnection(deviceConfig)

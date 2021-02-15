@@ -3,11 +3,13 @@
 import serial
 from PyQt5 import QtCore, QtGui, QtWidgets
 from src.gui.sharedcomnponets.sharedcomponets import SerialPortComboBox
+from src.simpleFOCConnector import SimpleFOCDevice
 
 class ConfigureSerailConnectionDialog(QtWidgets.QDialog):
-    def __init__(self, device=None, parent=None):
+    def __init__(self, parent=None):
         super().__init__(parent)
-        self.setupUi(device)
+
+        self.setupUi(SimpleFOCDevice.getInstance())
 
     def setupUi(self, device=None):
         self.setObjectName('Dialog')

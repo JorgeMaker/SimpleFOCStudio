@@ -4,10 +4,10 @@ from PyQt5 import QtWidgets
 from src.simpleFOCConnector import SimpleFOCDevice
 
 class ControlLoopGroupBox(QtWidgets.QGroupBox):
-    def __init__(self, parent=None,simpleFocConn=None):
+    def __init__(self, parent=None):
         super().__init__(parent)
 
-        self.device = simpleFocConn
+        self.device = SimpleFOCDevice.getInstance()
 
         self.setObjectName('controlLoop')
         self.setTitle('Control Loop Mode')
@@ -38,6 +38,9 @@ class ControlLoopGroupBox(QtWidgets.QGroupBox):
         self.disableUI()
         self.device.addConnectionStateListener(self)
         self.device.addCommandResponseListener(self)
+
+        self.connectionStateChanged(self.device.isConnected)
+
 
     def connectionStateChanged(self, deviceConnected):
         if deviceConnected is True:

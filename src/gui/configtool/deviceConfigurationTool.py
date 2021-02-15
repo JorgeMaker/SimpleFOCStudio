@@ -10,13 +10,14 @@ from src.gui.sharedcomnponets.commandLineInterface import CommandLineWidget
 from src.gui.configtool.pidConfiguration import PidGroupBox
 from src.gui.configtool.graphicWidget import SimpleFOCGraphicWidget
 from src.gui.sharedcomnponets.sharedcomponets import (WorkAreaTabWidget, GUIToolKit)
+from src.simpleFOCConnector import SimpleFOCDevice
 
 class DeviceConfigurationTool(WorkAreaTabWidget):
 
     def __init__(self, parent=None,simpleFocConn=None):
         super().__init__(parent)
 
-        self.device = simpleFocConn
+        self.device = SimpleFOCDevice.getInstance()
 
         self.setObjectName('DeviceConfigurationTool')
 
@@ -27,17 +28,17 @@ class DeviceConfigurationTool(WorkAreaTabWidget):
         self.counterWidget.setObjectName('counterWidget')
         self.horizontalLayout = QtWidgets.QHBoxLayout(self.counterWidget)
         self.horizontalLayout.setObjectName('horizontalLayout')
-        self.digitalReadOut = DROGroupBox(self.counterWidget, simpleFocConn=self.device)
+        self.digitalReadOut = DROGroupBox(self.counterWidget)
         self.horizontalLayout.addWidget(self.digitalReadOut)
 
-        self.controlLoop = ControlLoopGroupBox(self.counterWidget, simpleFocConn=self.device)
+        self.controlLoop = ControlLoopGroupBox(self.counterWidget)
         self.horizontalLayout.addWidget(self.controlLoop)
 
-        self.connectionControl = ConnectionControlGroupBox(self.counterWidget, simpleFocConn=self.device)
+        self.connectionControl = ConnectionControlGroupBox(self.counterWidget)
         self.horizontalLayout.addWidget(self.connectionControl)
         self.verticalLayout.addWidget(self.counterWidget)
 
-        self.graphicWidget = SimpleFOCGraphicWidget(simpleFocConn=self.device)
+        self.graphicWidget = SimpleFOCGraphicWidget()
         self.verticalLayout.addWidget(self.graphicWidget)
 
         self.bottomWidget = QtWidgets.QWidget(self)
@@ -46,13 +47,13 @@ class DeviceConfigurationTool(WorkAreaTabWidget):
         self.bottomHorizontalLayout = QtWidgets.QHBoxLayout(self.bottomWidget)
         self.bottomHorizontalLayout.setObjectName('configureHorizontalLayout')
 
-        self.pidConfigurator = PidGroupBox(self.bottomWidget, simpleFocConn=self.device)
+        self.pidConfigurator = PidGroupBox(self.bottomWidget)
         self.bottomHorizontalLayout.addWidget(self.pidConfigurator)
 
-        self.generalDeviceSettings = GeneralSettingsGroupBox(self.bottomWidget, simpleFocConn=self.device)
+        self.generalDeviceSettings = GeneralSettingsGroupBox(self.bottomWidget)
         self.bottomHorizontalLayout.addWidget(self.generalDeviceSettings)
 
-        self.commandLine = CommandLineWidget(self, simpleFocConn=self.device)
+        self.commandLine = CommandLineWidget(self)
         self.bottomHorizontalLayout.addWidget(self.commandLine)
         self.verticalLayout.addWidget(self.bottomWidget)
 

@@ -56,29 +56,28 @@ class WorkAreaTabbedWidget(QtWidgets.QTabWidget):
             filenames = None
             if dlg.exec_():
                 filenames = dlg.selectedFiles()
-                # try:
-                with open(filenames[0]) as json_file:
-                    configurationInfo = json.load(json_file)
-                    sfd = SimpleFOCDevice.fromJSON(configurationInfo)
-                    self.configTool = DeviceConfigurationTool(simpleFocConn=sfd)
-                    self.configTool.connectionControl.connectionModeComboBox.setCurrentText(SimpleFOCDevice.PUSH_CONFG_ON_CONNECT)
+                try:
+                    with open(filenames[0]) as json_file:
+                        configurationInfo = json.load(json_file)
+                        sfd = SimpleFOCDevice.fromJSON(configurationInfo)
+                        self.configTool = DeviceConfigurationTool(simpleFocConn=sfd)
+                        self.configTool.connectionControl.connectionModeComboBox.setCurrentText(SimpleFOCDevice.PUSH_CONFG_ON_CONNECT)
 
-                    sfd.openedFile = filenames
-                    self.activeToolsList.append(self.configTool)
-                    tabName = self.configTool.getTabName()
-                    if tabName == '':
-                        tabName = 'Device'
-                    self.addTab(self.configTool,
-                         self.configTool.getTabIcon(), tabName)
-                    self.setCurrentIndex(self.currentIndex() + 1)
-
-                # except Exception as exception:
-                #     msgBox = QtWidgets.QMessageBox()
-                #     msgBox.setIcon(QtWidgets.QMessageBox.Warning)
-                #     msgBox.setText('Error while opening selected file')
-                #     msgBox.setWindowTitle('SimpleFOC ConfigTool')
-                #     msgBox.setStandardButtons(QtWidgets.QMessageBox.Ok)
-                #     msgBox.exec()
+                        sfd.openedFile = filenames
+                        self.activeToolsList.append(self.configTool)
+                        tabName = self.configTool.getTabName()
+                        if tabName == '':
+                            tabName = 'Device'
+                        self.addTab(self.configTool,
+                             self.configTool.getTabIcon(), tabName)
+                        self.setCurrentIndex(self.currentIndex() + 1)
+                except Exception as exception:
+                    msgBox = QtWidgets.QMessageBox()
+                    msgBox.setIcon(QtWidgets.QMessageBox.Warning)
+                    msgBox.setText('Error while opening selected file')
+                    msgBox.setWindowTitle('SimpleFOC ConfigTool')
+                    msgBox.setStandardButtons(QtWidgets.QMessageBox.Ok)
+                    msgBox.exec()
 
     def saveDevice(self):
         if len(self.activeToolsList) > 0:

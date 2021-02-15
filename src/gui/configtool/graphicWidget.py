@@ -55,7 +55,7 @@ class SimpleFOCGraphicWidget(QtWidgets.QGroupBox):
 
         self.horizontalLayout.addWidget(self.plotWidget)
 
-        self.controlPlotWidget = ControlPlotPanel(self, self.device)
+        self.controlPlotWidget = ControlPlotPanel(controllePlotWidget=self, simpleFocConn=self.device)
         self.horizontalLayout.addWidget(self.controlPlotWidget)
 
         self.signal0PlotFlag = True
@@ -179,11 +179,12 @@ class SimpleFOCGraphicWidget(QtWidgets.QGroupBox):
 
 class ControlPlotPanel(QtWidgets.QWidget):
 
-    def __init__(self , parent=None, simpleFocConn=None):
+    def __init__(self , parent=None,controllePlotWidget=None, simpleFocConn=None):
         '''Constructor for ToolsWidget'''
         super().__init__(parent)
 
         self.device = simpleFocConn
+        self.controlledPlot = controllePlotWidget
         self.horizontalLayout = QtWidgets.QHBoxLayout(self)
         self.horizontalLayout.setObjectName('horizontalLayout')
 

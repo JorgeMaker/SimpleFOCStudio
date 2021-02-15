@@ -9,7 +9,7 @@ class ControlLoopGroupBox(QtWidgets.QGroupBox):
 
         self.device = simpleFocConn
 
-        self.setObjectName('controlLoopGroupBox')
+        self.setObjectName('controlLoop')
         self.setTitle('Control Loop Mode')
 
         self.controlLoopHorizontalLayout = QtWidgets.QHBoxLayout(self)

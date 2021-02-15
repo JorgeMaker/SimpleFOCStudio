@@ -13,7 +13,7 @@ class DROGroupBox(QtWidgets.QGroupBox):
         self.device = simpleFocConn
 
         self.setTitle('Simple FOC Digital Read Out')
-        self.setObjectName('digitalReadOutGroupBox')
+        self.setObjectName('digitalReadOut')
 
         self.droHorizontalLayout = QtWidgets.QHBoxLayout(self)
         self.droHorizontalLayout.setObjectName('droHorizontalLayout')

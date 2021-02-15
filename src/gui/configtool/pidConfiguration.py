@@ -15,7 +15,7 @@ class PidGroupBox(QtWidgets.QGroupBox):
 
         self.device = simpleFocConn
 
-        self.setObjectName('pidGroupBox')
+        self.setObjectName('pidConfigurator')
         self.setTitle('PID Controller configuration')
 
         self.gridLayout = QtWidgets.QGridLayout(self)

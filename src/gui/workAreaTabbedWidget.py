@@ -4,7 +4,7 @@ import json
 
 from PyQt5 import QtWidgets
 
-from src.gui.configtool.deviceConfigTool import DeviceConfigurationWidget
+from src.gui.configtool.deviceConfigurationTool import DeviceConfigurationTool
 from src.gui.commandlinetool.commandlinetool import CommandLineConsoleTool
 from src.simpleFOCConnector import SimpleFOCDevice
 
@@ -32,7 +32,7 @@ class WorkAreaTabbedWidget(QtWidgets.QTabWidget):
     def removeTabHandler(self, index):
         if type(self.currentWidget()) == CommandLineConsoleTool:
             self.cmdLineTool = None
-        if type(self.currentWidget()) == DeviceConfigurationWidget:
+        if type(self.currentWidget()) == DeviceConfigurationTool:
             self.configTool = None
         if self.configTool == None and self.cmdLineTool == None:
             if self.device.isConnected:
@@ -43,7 +43,7 @@ class WorkAreaTabbedWidget(QtWidgets.QTabWidget):
 
     def addDevice(self):
         if self.configTool is None:
-            self.configTool = DeviceConfigurationWidget(simpleFocConn=self.device)
+            self.configTool = DeviceConfigurationTool(simpleFocConn=self.device)
             self.activeToolsList.append(self.configTool)
             self.addTab(self.configTool,
                         self.configTool.getTabIcon(), 'Device')
@@ -61,7 +61,9 @@ class WorkAreaTabbedWidget(QtWidgets.QTabWidget):
                         configurationInfo = json.load(json_file)
                         sfd = SimpleFOCDevice.fromJSON(configurationInfo)
                         sfd.openedFile = filenames
-                        self.configTool = DeviceConfigurationWidget(simpleFocConn=sfd)
+                        self.configTool = DeviceConfigurationTool(simpleFocConn=sfd)
+                        self.configTool.connectionControl.connectionModeComboBox.setCurrentText(SimpleFOCDevice.PUSH_CONFG_ON_CONNECT)
+
                         self.activeToolsList.append(self.configTool)
                         tabName = self.configTool.getTabName()
                         if tabName == '':

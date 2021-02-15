@@ -12,7 +12,7 @@ class ConnectionControlGroupBox(QtWidgets.QGroupBox):
 
         self.device = simpleFocConn
 
-        self.setObjectName('generalControlGroupBox')
+        self.setObjectName('connectionControl')
         self.setTitle('Connection control')
 
         self.horizontalLayout = QtWidgets.QHBoxLayout(self)

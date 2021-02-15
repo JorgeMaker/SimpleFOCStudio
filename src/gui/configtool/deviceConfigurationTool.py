@@ -11,7 +11,7 @@ from src.gui.configtool.pidConfiguration import PidGroupBox
 from src.gui.configtool.graphicWidget import SimpleFOCGraphicWidget
 from src.gui.sharedcomnponets.sharedcomponets import (WorkAreaTabWidget, GUIToolKit)
 
-class DeviceConfigurationWidget(WorkAreaTabWidget):
+class DeviceConfigurationTool(WorkAreaTabWidget):
 
     def __init__(self, parent=None,simpleFocConn=None):
         super().__init__(parent)
@@ -27,16 +27,14 @@ class DeviceConfigurationWidget(WorkAreaTabWidget):
         self.counterWidget.setObjectName('counterWidget')
         self.horizontalLayout = QtWidgets.QHBoxLayout(self.counterWidget)
         self.horizontalLayout.setObjectName('horizontalLayout')
+        self.digitalReadOut = DROGroupBox(self.counterWidget, simpleFocConn=self.device)
+        self.horizontalLayout.addWidget(self.digitalReadOut)
 
-        self.digitalReadOutGroupBox = DROGroupBox(self.counterWidget,
-                                                  simpleFocConn=self.device)
-        self.horizontalLayout.addWidget(self.digitalReadOutGroupBox)
+        self.controlLoop = ControlLoopGroupBox(self.counterWidget, simpleFocConn=self.device)
+        self.horizontalLayout.addWidget(self.controlLoop)
 
-        self.controlLoopGroupBox = ControlLoopGroupBox(self.counterWidget,simpleFocConn=self.device)
-        self.horizontalLayout.addWidget(self.controlLoopGroupBox)
-
-        self.generalControlGroupBox = ConnectionControlGroupBox(self.counterWidget, simpleFocConn=self.device)
-        self.horizontalLayout.addWidget(self.generalControlGroupBox)
+        self.connectionControl = ConnectionControlGroupBox(self.counterWidget, simpleFocConn=self.device)
+        self.horizontalLayout.addWidget(self.connectionControl)
         self.verticalLayout.addWidget(self.counterWidget)
 
         self.graphicWidget = SimpleFOCGraphicWidget(simpleFocConn=self.device)
@@ -48,28 +46,17 @@ class DeviceConfigurationWidget(WorkAreaTabWidget):
         self.bottomHorizontalLayout = QtWidgets.QHBoxLayout(self.bottomWidget)
         self.bottomHorizontalLayout.setObjectName('configureHorizontalLayout')
 
+        self.pidConfigurator = PidGroupBox(self.bottomWidget, simpleFocConn=self.device)
+        self.bottomHorizontalLayout.addWidget(self.pidConfigurator)
 
-        self.pidGroupBox = PidGroupBox(self.bottomWidget,simpleFocConn=self.device)
-        self.bottomHorizontalLayout.addWidget(self.pidGroupBox)
+        self.generalDeviceSettings = GeneralSettingsGroupBox(self.bottomWidget, simpleFocConn=self.device)
+        self.bottomHorizontalLayout.addWidget(self.generalDeviceSettings)
 
-        self.generalDeviceSettingsGroupBox = GeneralSettingsGroupBox(self.bottomWidget,simpleFocConn=self.device)
-        self.bottomHorizontalLayout.addWidget(self.generalDeviceSettingsGroupBox)
-
-        self.commandLineGroupBox = CommandLineGroupBox(self,simpleFocConn=self.device)
-
-        self.bottomHorizontalLayout.addWidget(self.commandLineGroupBox)
-
+        self.commandLine = CommandLineGroupBox(self, simpleFocConn=self.device)
+        self.bottomHorizontalLayout.addWidget(self.commandLine)
         self.verticalLayout.addWidget(self.bottomWidget)
 
-        self.device.commProvider.commandDataReceived.connect(self.commandLineGroupBox.publishCommandResponseData)
-
-
-
-    def connectDevice(self):
-        self.device.connect()
-
-    def disConnectDevice(self):
-        self.device.disConnect()
+        self.device.commProvider.commandDataReceived.connect(self.commandLine.publishCommandResponseData)
 
     def getTabIcon(self):
         return GUIToolKit.getIconByName('motor')
@@ -77,11 +64,9 @@ class DeviceConfigurationWidget(WorkAreaTabWidget):
     def getTabName(self):
         return self.device.connectionID
 
-
     def configureConnection(self, configvalues):
         self.device.serialPortName = configvalues['serialPortName']
         self.device.serialRate = configvalues['serialRate']
         self.device.stopBits = configvalues['stopBits']
         self.device.serialByteSize = configvalues['serialByteSize']
         self.device.serialParity = configvalues['serialParity']
-

@@ -17,7 +17,7 @@ class GeneralSettingsGroupBox(QtWidgets.QGroupBox):
 
         self.setTitle('General device settings')
 
-        self.setObjectName('generalDeviceSettingsGroupBox')
+        self.setObjectName('generalDeviceSettings')
 
         self.gcGridLayout = QtWidgets.QGridLayout(self)
         self.gcGridLayout.setObjectName('gcGridLayout')

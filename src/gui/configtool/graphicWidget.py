@@ -292,5 +292,4 @@ class ControlPlotPanel(QtWidgets.QWidget):
 
     def commandResponseReceived(self, cmdRespose):
         if 'Control: ' in cmdRespose:
-            print("DRO  --->"+cmdRespose.replace('Control: ', ''))
             self.controlTypeChonged(SimpleFOCDevice.getControlModeCode(cmdRespose.replace('Control: ', '')))

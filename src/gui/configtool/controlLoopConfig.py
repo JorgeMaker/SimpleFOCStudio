@@ -18,19 +18,19 @@ class ControlLoopGroupBox(QtWidgets.QGroupBox):
         self.angleRadioButton = QtWidgets.QRadioButton(self)
         self.angleRadioButton.setObjectName('angleRadioButton')
         self.angleRadioButton.setText('Angle')
-        self.angleRadioButton.toggled.connect(self.sendControlLopModeAngle)
+        self.angleRadioButton.clicked.connect(self.sendControlLopModeAngle)
         self.controlLoopHorizontalLayout.addWidget(self.angleRadioButton)
 
         self.velocityRadioButton = QtWidgets.QRadioButton(self)
         self.velocityRadioButton.setObjectName('velocityRadioButton')
         self.velocityRadioButton.setText('Velocity')
-        self.velocityRadioButton.toggled.connect(self.sendControlLopModeVelocity)
+        self.velocityRadioButton.clicked.connect(self.sendControlLopModeVelocity)
         self.controlLoopHorizontalLayout.addWidget(self.velocityRadioButton)
 
         self.voltageRadioButton = QtWidgets.QRadioButton(self)
         self.voltageRadioButton.setObjectName('voltageRadioButton')
         self.voltageRadioButton.setText('Voltage')
-        self.voltageRadioButton.toggled.connect(self.sendControlLopModeVoltage)
+        self.voltageRadioButton.clicked.connect(self.sendControlLopModeVoltage)
         self.controlLoopHorizontalLayout.addWidget(self.voltageRadioButton)
 
         self.setControlLopMode(self.device.controlType)
@@ -40,7 +40,6 @@ class ControlLoopGroupBox(QtWidgets.QGroupBox):
         self.device.addCommandResponseListener(self)
 
         self.connectionStateChanged(self.device.isConnected)
-
 
     def connectionStateChanged(self, deviceConnected):
         if deviceConnected is True:
@@ -63,13 +62,17 @@ class ControlLoopGroupBox(QtWidgets.QGroupBox):
             self.velocityRadioButton.toggle()
 
     def sendControlLopModeVelocity(self):
-        self.device.sendControlType(SimpleFOCDevice.VELOCITY_CONTROL)
-
+        if self.device.isConnected:
+            self.device.sendControlType(SimpleFOCDevice.VELOCITY_CONTROL)
     def sendControlLopModeAngle(self):
-        self.device.sendControlType(SimpleFOCDevice.ANGLE_CONTROL)
+        if self.device.isConnected:
+            self.device.sendControlType(SimpleFOCDevice.ANGLE_CONTROL)
 
     def sendControlLopModeVoltage(self):
-        self.device.sendControlType(SimpleFOCDevice.VOLTAGE_CONTROL)
+        if self.device.isConnected:
+            self.device.sendControlType(SimpleFOCDevice.VOLTAGE_CONTROL)
 
     def commandResponseReceived(self, cmdRespose):
-        print("Control loop Widget --->"+cmdRespose)
+        if 'Control: ' in cmdRespose:
+            self.setControlLopMode((SimpleFOCDevice.getControlModeCode(cmdRespose.replace('Control: ', ''))))
+            print("Received: " +cmdRespose.replace('Control: ', ''))

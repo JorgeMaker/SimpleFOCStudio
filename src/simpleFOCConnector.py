@@ -55,11 +55,7 @@ class SimpleFOCDevice:
             self.serialByteSize = serial.EIGHTBITS
             self.serialParity = serial.PARITY_NONE
             self.stopBits = serial.STOPBITS_ONE
-
             self.target = 0
-
-
-
             self.commProvider = SerialPortReceiveHandler(
                 self.commandResponseListenersList)
             SimpleFOCDevice.__instance = self

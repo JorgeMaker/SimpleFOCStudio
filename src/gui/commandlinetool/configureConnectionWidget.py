@@ -13,8 +13,6 @@ class ConfigureConnection(QtWidgets.QGroupBox):
 
         self.device = simpleFOCConn
 
-        self.device.addConnectionStateListener(self)
-
         self.setTitle('Configure serial connection')
         self.setObjectName('configureConnection')
 
@@ -92,6 +90,9 @@ class ConfigureConnection(QtWidgets.QGroupBox):
         self.byteSizeLabel.setText('Byte size')
         self.stopBitsLabel.setText('Stop bits')
 
+        self.device.addConnectionStateListener(self)
+        self.connectionStateChanged(self.device.isConnected)
+
     def getConfigValues(self):
         values = {
             'connectionID': '',
@@ -120,6 +121,14 @@ class ConfigureConnection(QtWidgets.QGroupBox):
     #             GUIToolKit.getIconByName('connect'))
 
     def connectionStateChanged(self, isConnectedFlag):
+        # if isConnectedFlag:
+        #     self.connectDisconnectButton.setText('Disconnect')
+        #     self.connectDisconnectButton.setIcon(
+        #         GUIToolKit.getIconByName('disconnect'))
+        # else:
+        #     self.connectDisconnectButton.setText('Connect')
+        #     self.connectDisconnectButton.setIcon(
+        #         GUIToolKit.getIconByName('connect'))
         if isConnectedFlag:
             self.connectDisconnectButton.setText('Disconnect')
             self.connectDisconnectButton.setIcon(
@@ -128,6 +137,40 @@ class ConfigureConnection(QtWidgets.QGroupBox):
             self.connectDisconnectButton.setText('Connect')
             self.connectDisconnectButton.setIcon(
                 GUIToolKit.getIconByName('connect'))
+
+        self.portNameLabel.setEnabled(not isConnectedFlag)
+        self.portNameComboBox.setEnabled(not isConnectedFlag)
+        self.bitRateLabel.setEnabled(not isConnectedFlag)
+        self.bitRatelineEdit.setEnabled(not isConnectedFlag)
+        self.parityLabel.setEnabled(not isConnectedFlag)
+        self.parityComboBox.setEnabled(not isConnectedFlag)
+        self.byteSizeLabel.setEnabled(not isConnectedFlag)
+        self.byteSizeComboBox.setEnabled(not isConnectedFlag)
+        self.stopBitsLabel.setEnabled(not isConnectedFlag)
+        self.stopBitsComboBox.setEnabled(not isConnectedFlag)
+
+
+
+    # def setUIState(self, connectedFlag):
+    #     if connectedFlag:
+    #         self.connectDisconnectButton.setText('Disconnect')
+    #         self.connectDisconnectButton.setIcon(
+    #             GUIToolKit.getIconByName('disconnect'))
+    #     else:
+    #         self.connectDisconnectButton.setText('Connect')
+    #         self.connectDisconnectButton.setIcon(
+    #             GUIToolKit.getIconByName('connect'))
+    #
+    #     self.portNameLabel.setEnabled(not connectedFlag)
+    #     self.portNameComboBox.setEnabled(not connectedFlag)
+    #     self.bitRateLabel.setEnabled(not connectedFlag)
+    #     self.bitRatelineEdit.setEnabled(not connectedFlag)
+    #     self.parityLabel.setEnabled(not connectedFlag)
+    #     self.parityComboBox.setEnabled(not connectedFlag)
+    #     self.byteSizeLabel.setEnabled(not connectedFlag)
+    #     self.byteSizeComboBox.setEnabled(not connectedFlag)
+    #     self.stopBitsLabel.setEnabled(not connectedFlag)
+    #     self.stopBitsComboBox.setEnabled(not connectedFlag)
 
     def connectDisconnectDeviceAction(self):
         if self.device.isConnected:

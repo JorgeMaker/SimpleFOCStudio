@@ -3,7 +3,7 @@
 from PyQt5 import QtGui, QtWidgets
 from src.gui.sharedcomnponets.sharedcomponets import GUIToolKit
 
-class CommandLineGroupBox(QtWidgets.QGroupBox):
+class CommandLineWidget(QtWidgets.QGroupBox):
 
     def __init__(self, parent=None, simpleFocConn=None):
         super().__init__(parent)
@@ -50,7 +50,7 @@ class CommandLineGroupBox(QtWidgets.QGroupBox):
         self.clearButton.setText('Clear')
 
         self.cmlVerticalLayout.addWidget(self.cmlWidget)
-
+        self.device.addConnectionStateListener(self)
         self.setEnabled(False)
 
     def connectionStateChanged(self, deviceConnected):
@@ -72,11 +72,8 @@ class CommandLineGroupBox(QtWidgets.QGroupBox):
 
     def disableUI(self):
         self.commandLineDisplay.setEnabled(False)
-        #self.cmlWidget.setEnabled(False)
         self.commandLineEdit.setEnabled(False)
         self.sendButton.setEnabled(False)
-
-        #self.setEnabled(False)
 
     def publishCommandResponseData(self, data):
         self.commandLineDisplay.append(data)

@@ -6,7 +6,7 @@ from src.gui.configtool.controlLoopConfig import ControlLoopGroupBox
 from src.gui.configtool.generalSettingsWidget import GeneralSettingsGroupBox
 from src.gui.configtool.connectionControl import ConnectionControlGroupBox
 from src.gui.configtool.droDisplayWidget import DROGroupBox
-from src.gui.sharedcomnponets.commandLineInterface import CommandLineGroupBox
+from src.gui.sharedcomnponets.commandLineInterface import CommandLineWidget
 from src.gui.configtool.pidConfiguration import PidGroupBox
 from src.gui.configtool.graphicWidget import SimpleFOCGraphicWidget
 from src.gui.sharedcomnponets.sharedcomponets import (WorkAreaTabWidget, GUIToolKit)
@@ -52,11 +52,10 @@ class DeviceConfigurationTool(WorkAreaTabWidget):
         self.generalDeviceSettings = GeneralSettingsGroupBox(self.bottomWidget, simpleFocConn=self.device)
         self.bottomHorizontalLayout.addWidget(self.generalDeviceSettings)
 
-        self.commandLine = CommandLineGroupBox(self, simpleFocConn=self.device)
+        self.commandLine = CommandLineWidget(self, simpleFocConn=self.device)
         self.bottomHorizontalLayout.addWidget(self.commandLine)
         self.verticalLayout.addWidget(self.bottomWidget)
 
-        self.device.addConnectionStateListener(self.commandLine)
         self.device.commProvider.commandDataReceived.connect(self.commandLine.publishCommandResponseData)
 
     def getTabIcon(self):

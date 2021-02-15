@@ -12,6 +12,10 @@ class SimpleFOCDevice():
     VELOCITY_CONTROL = 1
     ANGLE_CONTROL = 2
 
+    PULL_CONFIG_ON_CONNECT = 'Pull config'
+    PUSH_CONFG_ON_CONNECT = 'Push config'
+    ONLY_CONNECT = 'Only connect'
+
     def __init__(self, pid_p=0, pid_i=0, pid_d=0, v_ramp=0, lpf=0,
                  a_gain=0, vel_lim=0, v_limit=0, ctr_type=ANGLE_CONTROL,
                  initial_target=0,conn_id='',port='',byte_size=serial.EIGHTBITS,
@@ -126,7 +130,7 @@ class SimpleFOCDevice():
     def __closeCommunication(self):
         self.serialPort.close()
 
-    def connect(self):
+    def connect(self, connectionMode):
         try:
             self.__initCommunications()
         except SerialException as serEx:
@@ -148,7 +152,11 @@ class SimpleFOCDevice():
             self.isConnected = True
             for listener in self.connectionStateListenerList:
                 listener.deviceConnected(True)
-            self.sendFullConfiguration()
+            if connectionMode == SimpleFOCDevice.PULL_CONFIG_ON_CONNECT:
+                self.pullConfiguration()
+            elif connectionMode == SimpleFOCDevice.PUSH_CONFG_ON_CONNECT:
+                self.pushConfiguration()
+                pass
             return True
 
     def disConnect(self):
@@ -221,15 +229,16 @@ class SimpleFOCDevice():
 
     def sendZeroEncoder(self):
         if self.isConnected:
+            # TODO TODO TODO
             raise NotImplemented
-            #  TODO
 
     def sendHaltDevice(self):
         if self.isConnected:
+            # TODO TODO TODO
             raise NotImplemented
-            #  TODO
 
-    def sendFullConfiguration(self):
+
+    def pushConfiguration(self):
         self.sendControlType(self.controlType)
         self.sendProportionalGain(self.proportionalGainPID)
         self.sendIntegralGain(self.integralGainPID)
@@ -240,6 +249,11 @@ class SimpleFOCDevice():
         self.sendVelocityLimit(self.velocityLimit)
         self.sendVoltageLimit(self.voltageLimit)
         self.sendTargetValue(self.initialTarget)
+
+
+    def pullConfiguration(self):
+        # TODO TODO TODO
+        raise NotImplemented
 
 class SerialPortReceiveHandler(QtCore.QThread):
 

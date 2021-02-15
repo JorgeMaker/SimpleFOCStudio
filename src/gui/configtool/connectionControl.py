@@ -1,6 +1,7 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
 from PyQt5 import QtWidgets
+from src.simpleFOCConnector import SimpleFOCDevice
 from src.gui.sharedcomnponets.sharedcomponets import GUIToolKit
 from src.gui.configtool.configureConnectionDialog import ConfigureSerailConnectionDialog
 
@@ -16,6 +17,12 @@ class ConnectionControlGroupBox(QtWidgets.QGroupBox):
 
         self.horizontalLayout = QtWidgets.QHBoxLayout(self)
         self.horizontalLayout.setObjectName('generalControlHL')
+
+        self.connectionModeComboBox = QtWidgets.QComboBox()
+        self.connectionModeComboBox.setObjectName('connectDeviceButton')
+        self.connectionModeComboBox.addItems([SimpleFOCDevice.PULL_CONFIG_ON_CONNECT,SimpleFOCDevice.PUSH_CONFG_ON_CONNECT])
+
+        self.horizontalLayout.addWidget(self.connectionModeComboBox)
 
         self.connectDisconnectButton = QtWidgets.QPushButton(self)
         self.connectDisconnectButton.setIcon(GUIToolKit.getIconByName('connect'))
@@ -41,7 +48,8 @@ class ConnectionControlGroupBox(QtWidgets.QGroupBox):
             self.connectDisconnectButton.setText('Connect')
 
         else:
-            hasBeenConnected  = self.device.connect()
+            connectionMode  = self.connectionModeComboBox.currentText()
+            hasBeenConnected  = self.device.connect(connectionMode)
             if hasBeenConnected:
                 self.connectDisconnectButton.setIcon(
                     GUIToolKit.getIconByName('disconnect'))

@@ -101,11 +101,12 @@ class GeneralSettingsGroupBox(QtWidgets.QGroupBox):
 
         self.disableUI()
 
-        self.device.commProvider.commandDataReceived.connect(
-            self.comandResposeReceivedAction)
+        # self.device.commProvider.commandDataReceived.connect(
+        #     self.comandResposeReceivedAction)
 
 
         self.device.addConnectionStateListener(self)
+        self.device.addCommandResponseListener(self)
 
     def connectionStateChanged(self, deviceConnected):
         if deviceConnected is True:
@@ -155,7 +156,7 @@ class GeneralSettingsGroupBox(QtWidgets.QGroupBox):
         self.volLLineEdit.setText(value)
         self.device.sendVoltageLimit(self.volLLineEdit.text())
 
-    def comandResposeReceivedAction(self, comandResponse):
+    def commandResponseReceived(self, comandResponse):
         if 'P angle|  P:' in comandResponse:
             self.pgainLineEdit.setText(
                 comandResponse.replace('P angle|  P:', ''))

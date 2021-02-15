@@ -24,7 +24,7 @@ class SimpleFOCGraphicWidget(QtWidgets.QGroupBox):
         self.horizontalLayout = QtWidgets.QVBoxLayout(self)
         self.device = simpleFocConn
 
-        self.device.addConnectionStateListener(self)
+
 
         self.numberOfSamples = 300
 
@@ -55,7 +55,7 @@ class SimpleFOCGraphicWidget(QtWidgets.QGroupBox):
 
         self.horizontalLayout.addWidget(self.plotWidget)
 
-        self.controlPlotWidget = ControlPlotPanel(self, self.plotWidget)
+        self.controlPlotWidget = ControlPlotPanel(self, self.device)
         self.horizontalLayout.addWidget(self.controlPlotWidget)
 
         self.signal0PlotFlag = True
@@ -75,12 +75,12 @@ class SimpleFOCGraphicWidget(QtWidgets.QGroupBox):
         self.currentStatus = self.disconnectedState
         self.controlPlotWidget.pauseContinueButton.setDisabled(True)
 
-        self.device.addControlLoopModeListener(self.controlPlotWidget)
-        self.controlPlotWidget.controlLoopModeChanged(self.device.controlType)
 
+        self.controlPlotWidget.controlTypeChonged(self.device.controlType)
 
         self.disableUI()
         self.device.addConnectionStateListener(self)
+        #self.device.addControlLoopModeListener(self.controlPlotWidget)
 
     def connectionStateChanged(self, deviceConnected):
         if deviceConnected is True:
@@ -179,12 +179,11 @@ class SimpleFOCGraphicWidget(QtWidgets.QGroupBox):
 
 class ControlPlotPanel(QtWidgets.QWidget):
 
-    def __init__(self, controllePlotWidget=None, parent=None):
+    def __init__(self , parent=None, simpleFocConn=None):
         '''Constructor for ToolsWidget'''
         super().__init__(parent)
 
-        self.controlledPlot = controllePlotWidget
-
+        self.device = simpleFocConn
         self.horizontalLayout = QtWidgets.QHBoxLayout(self)
         self.horizontalLayout.setObjectName('horizontalLayout')
 
@@ -236,6 +235,8 @@ class ControlPlotPanel(QtWidgets.QWidget):
         self.horizontalLayout.addItem(spacerItem)
         self.horizontalLayout.addItem(spacerItem)
 
+        self.device.addCommandResponseListener(self)
+
     def startStoPlotAction(self):
         if self.controlledPlot.currentStatus is self.controlledPlot.initialConnectedState:
             # Start pressed
@@ -284,7 +285,11 @@ class ControlPlotPanel(QtWidgets.QWidget):
         self.signal1CheckBox.setText(label1)
         self.signal2CheckBox.setText(label2)
 
-    def controlLoopModeChanged(self, controlMode):
-
+    def controlTypeChonged(self, controlMode):
         label0, label2, label1 = SimpleFOCDevice.getSignalLabels(controlMode)
         self.updateLabels(label0, label1, label2)
+
+    def commandResponseReceived(self, cmdRespose):
+        if 'Control: ' in cmdRespose:
+            print("DRO  --->"+cmdRespose.replace('Control: ', ''))
+            self.controlTypeChonged(SimpleFOCDevice.getControlModeCode(cmdRespose.replace('Control: ', '')))

@@ -50,12 +50,15 @@ class DROGroupBox(QtWidgets.QGroupBox):
 
         self.device.commProvider.telemetryDataReceived.connect(self.updateDRO)
 
-        self.device.addControlLoopModeListener(self)
-        self.controlLoopModeChanged(self.device.controlType)
+
+        self.controlTypeChonged(self.device.controlType)
 
         self.initDiplay()
         self.disableUI()
+
+        # self.device.addControlLoopModeListener(self)
         self.device.addConnectionStateListener(self)
+        self.device.addCommandResponseListener(self)
 
     def updateLabels(self, label0, label1, label2):
         self.signal0Label.setText(label0)
@@ -114,6 +117,11 @@ class DROGroupBox(QtWidgets.QGroupBox):
         except IndexError as error:
             logging.error(error, exc_info=True)
 
-    def controlLoopModeChanged(self, controlMode):
+    def controlTypeChonged(self, controlMode):
         label0, label1, label2 = SimpleFOCDevice.getSignalLabels(controlMode)
         self.updateLabels(label0, label1, label2)
+
+    def commandResponseReceived(self, cmdRespose):
+        if 'Control: ' in cmdRespose:
+            print("DRO  --->"+cmdRespose.replace('Control: ', ''))
+            self.controlTypeChonged(SimpleFOCDevice.getControlModeCode(cmdRespose.replace('Control: ', '')))

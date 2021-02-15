@@ -37,6 +37,7 @@ class ControlLoopGroupBox(QtWidgets.QGroupBox):
 
         self.disableUI()
         self.device.addConnectionStateListener(self)
+        self.device.addCommandResponseListener(self)
 
     def connectionStateChanged(self, deviceConnected):
         if deviceConnected is True:
@@ -66,3 +67,6 @@ class ControlLoopGroupBox(QtWidgets.QGroupBox):
 
     def sendControlLopModeVoltage(self):
         self.device.sendControlType(SimpleFOCDevice.VOLTAGE_CONTROL)
+
+    def commandResponseReceived(self, cmdRespose):
+        print("Control loop Widget --->"+cmdRespose)

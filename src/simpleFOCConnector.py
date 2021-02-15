@@ -27,7 +27,7 @@ class SimpleFOCDevice():
         self.openedFile = None
 
         self.connectionStateListenerList = []
-        self.controlLoopModeListenerList = []
+        self.commandResponseListenersList =[]
 
         self.proportionalGainPID = pid_p
         self.integralGainPID = pid_i
@@ -48,7 +48,7 @@ class SimpleFOCDevice():
 
         self.target = initial_target
 
-        self.commProvider = SerialPortReceiveHandler()
+        self.commProvider = SerialPortReceiveHandler(self.commandResponseListenersList)
 
     @staticmethod
     def fromJSON(jsonValue):
@@ -116,6 +116,14 @@ class SimpleFOCDevice():
         if controlMode is SimpleFOCDevice.ANGLE_CONTROL:
         #   return 'Voltage Q','Angle SP','Angle' ¿Correct?
             return 'Angle','Voltage Q','Angle SP'
+    @staticmethod
+    def getControlModeCode(mode):
+        if mode == 'angle':
+            return SimpleFOCDevice.ANGLE_CONTROL
+        elif mode == 'voltage':
+            return SimpleFOCDevice.VOLTAGE_CONTROL
+        elif mode == 'velocity':
+            return SimpleFOCDevice.VELOCITY_CONTROL
 
     def __initCommunications(self):
         self.serialPort = serial.Serial(self.serialPortName,
@@ -160,7 +168,6 @@ class SimpleFOCDevice():
             return True
 
     def disConnect(self):
-        #self.commProvider.stop()
         self.isConnected = False
         self.__closeCommunication()
         for listener in self.connectionStateListenerList:
@@ -169,8 +176,8 @@ class SimpleFOCDevice():
     def addConnectionStateListener(self, listener):
         self.connectionStateListenerList.append(listener)
 
-    def addControlLoopModeListener(self, listener):
-        self.controlLoopModeListenerList.append(listener)
+    def addCommandResponseListener(self, listener):
+        self.commandResponseListenersList.append(listener)
 
     def sendCommand(self, command):
         if self.isConnected:
@@ -179,8 +186,6 @@ class SimpleFOCDevice():
     def sendControlType(self, loop_control_type):
         if self.isConnected:
             self.sendCommand('C' + str(loop_control_type))
-            for listener in self.controlLoopModeListenerList:
-                listener.controlLoopModeChanged(loop_control_type)
 
     def sendProportionalGain(self, value):
         if self.isConnected:
@@ -261,10 +266,10 @@ class SerialPortReceiveHandler(QtCore.QThread):
     commandDataReceived = QtCore.pyqtSignal(str)
     rawDataReceived = QtCore.pyqtSignal(str)
 
-    def __init__(self, serial_port=None, *args, **kwargs):
+    def __init__(self, commandListeners = None, serial_port=None, *args, **kwargs):
         super(SerialPortReceiveHandler, self).__init__(*args, **kwargs)
         self._stop_event = threading.Event()
-
+        self.commandResponseListenersList = commandListeners
         self.serialComm = serial_port
 
     def handle_received_data(self, data):
@@ -280,6 +285,8 @@ class SerialPortReceiveHandler(QtCore.QThread):
                 logging.error('data ='+str(data), exc_info=True)
         else:
             self.commandDataReceived.emit(data.rstrip())
+            for listener in self.commandResponseListenersList:
+                listener.commandResponseReceived(data.rstrip())
         self.rawDataReceived.emit(data.rstrip())
 
     def isDataReceivedTelementry(self, data):

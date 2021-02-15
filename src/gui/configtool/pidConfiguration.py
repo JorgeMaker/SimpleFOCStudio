@@ -98,11 +98,12 @@ class PidGroupBox(QtWidgets.QGroupBox):
         self.setIntegralGainAction(self.device.integralGainPID)
         self.setVoltageRampAction(self.device.voltageRampPID)
 
-        self.device.commProvider.commandDataReceived.connect(
-            self.comandResposeReceivedAction)
+        # self.device.commProvider.commandDataReceived.connect(
+        #     self.comandResposeReceivedAction)
 
         self.disableUI()
         self.device.addConnectionStateListener(self)
+        self.device.addCommandResponseListener(self)
 
     def connectionStateChanged(self, deviceConnected):
         if deviceConnected is True:
@@ -152,7 +153,7 @@ class PidGroupBox(QtWidgets.QGroupBox):
         self.vrLineEdit.setText(value)
         self.device.sendVoltageRamp(self.vrLineEdit.text())
 
-    def comandResposeReceivedAction(self, commandDataReceived):
+    def commandResponseReceived(self, commandDataReceived):
         if 'PID velocity| P' in commandDataReceived:
             self.pgLineEdit.setText(commandDataReceived.replace('PID velocity| P:', ''))
         elif 'PID velocity| I' in commandDataReceived:
@@ -161,6 +162,4 @@ class PidGroupBox(QtWidgets.QGroupBox):
             self.dgLineEdit.setText(commandDataReceived.replace('PID velocity| D:', ''))
         elif 'PID velocity| volt_ramp' in commandDataReceived:
             self.vrLineEdit.setText(commandDataReceived.replace('PID velocity| volt_ramp:', ''))
-
-
 

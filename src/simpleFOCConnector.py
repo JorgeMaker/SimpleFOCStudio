@@ -2,7 +2,7 @@
 # -*- coding: utf-8 -*-
 import logging
 import threading
-
+import time
 import serial
 from PyQt5 import QtCore, QtWidgets
 from serial import SerialException
@@ -261,8 +261,23 @@ class SimpleFOCDevice:
         self.sendTargetValue(self.initialTarget)
 
     def pullConfiguration(self):
-        # TODO TODO TODO
-        raise NotImplemented
+            self.sendControlType('')
+            time.sleep(1 / 1000)
+            self.sendProportionalGain('')
+            time.sleep(1 / 1000)
+            self.sendIntegralGain('')
+            time.sleep(1 / 1000)
+            self.sendDerivativeGain('')
+            time.sleep(1 / 1000)
+            self.sendVoltageRamp('')
+            time.sleep(1 / 1000)
+            self.sendLowPassFilter('')
+            time.sleep(1 / 1000)
+            self.sendPGain('')
+            time.sleep(1 / 1000)
+            self.sendVelocityLimit('')
+            time.sleep(5 / 1000)
+            self.sendVoltageLimit('')
 
 class SerialPortReceiveHandler(QtCore.QThread):
     telemetryDataReceived = QtCore.pyqtSignal(float, float, float)

@@ -1,16 +1,1 @@
-{
-  "proportionalGainPID": "0.3",
-  "integralGainPID": 5,
-  "derivativeGainPID": 0,
-  "voltageRampPID": 12,
-  "lowPassFilter": 0.01,
-  "anglePGain": 20,
-  "velocityLimit": 50,
-  "voltageLimit": 1,
-  "controlType": 2,
-  "initialTarget": 0,
-  "connectionID": "SimpleFOC1",
-  "serialPortName": "/dev/tty.usbmodem6D7F478857481",
-  "serialRate": "115200",
-  "serialByteSize": 8, "serialParity": "N", "stopBits": 1
-}
+{"proportionalGainPID": "", "integralGainPID": "", "derivativeGainPID": "", "voltageRampPID": "", "lowPassFilter": "", "anglePGain": "", "velocityLimit": "", "voltageLimit": "  2.00", "controlType": 2, "initialTarget": 0, "connectionID": "", "serialPortName": "/dev/cu.usbserial-14130", "serialRate": "115200", "serialByteSize": 8, "serialParity": "N", "stopBits": 1}

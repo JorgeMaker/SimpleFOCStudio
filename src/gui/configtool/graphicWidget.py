@@ -3,7 +3,7 @@
 from PyQt5 import QtWidgets
 import pyqtgraph as pg
 import numpy as np
-from src.gui.sharedcomponets import GUIToolKit
+from src.gui.sharedcomnponets.sharedcomponets import GUIToolKit
 import logging
 
 from src.simpleFOCConnector import SimpleFOCDevice
@@ -15,16 +15,16 @@ class SimpleFOCGraphicWidget(QtWidgets.QGroupBox):
     connectedPausedState = 2
     connectedPlottingStartedState = 3
 
-    def __init__(self, parent=None, simpleFocConn=None):
-        """Constructor for ToolsWidget"""
+    def __init__(self, parent=None):
+
         super().__init__(parent)
 
-        self.setObjectName("plotWidget")
-        self.setTitle("Real time motor variables: ")
+        self.setObjectName('plotWidget')
+        self.setTitle('Real time motor variables: ')
         self.horizontalLayout = QtWidgets.QVBoxLayout(self)
-        self.device = simpleFocConn
+        self.device = SimpleFOCDevice.getInstance()
 
-        self.device.addConnectionStateListener(self)
+
 
         self.numberOfSamples = 300
 
@@ -55,7 +55,7 @@ class SimpleFOCGraphicWidget(QtWidgets.QGroupBox):
 
         self.horizontalLayout.addWidget(self.plotWidget)
 
-        self.controlPlotWidget = ControlPlotPanel(self, self.plotWidget)
+        self.controlPlotWidget = ControlPlotPanel(controllePlotWidget=self)
         self.horizontalLayout.addWidget(self.controlPlotWidget)
 
         self.signal0PlotFlag = True
@@ -75,14 +75,14 @@ class SimpleFOCGraphicWidget(QtWidgets.QGroupBox):
         self.currentStatus = self.disconnectedState
         self.controlPlotWidget.pauseContinueButton.setDisabled(True)
 
-        self.device.addControlLoopModeListener(self.controlPlotWidget)
-        self.controlPlotWidget.controlLoopModeChanged(self.device.controlType)
 
+        self.controlPlotWidget.controlTypeChonged(self.device.controlType)
 
-        self.disableUI()
         self.device.addConnectionStateListener(self)
 
-    def deviceConnected(self, deviceConnected):
+        self.connectionStateChanged(self.device.isConnected)
+
+    def connectionStateChanged(self, deviceConnected):
         if deviceConnected is True:
             self.currentStatus = self.initialConnectedState
             self.enabeUI()
@@ -179,55 +179,55 @@ class SimpleFOCGraphicWidget(QtWidgets.QGroupBox):
 
 class ControlPlotPanel(QtWidgets.QWidget):
 
-    def __init__(self, controllePlotWidget=None, parent=None):
-        """Constructor for ToolsWidget"""
+    def __init__(self , parent=None,controllePlotWidget=None):
+        '''Constructor for ToolsWidget'''
         super().__init__(parent)
 
+        self.device = SimpleFOCDevice.getInstance()
         self.controlledPlot = controllePlotWidget
-
         self.horizontalLayout = QtWidgets.QHBoxLayout(self)
-        self.horizontalLayout.setObjectName("horizontalLayout")
+        self.horizontalLayout.setObjectName('horizontalLayout')
 
         self.startStopButton = QtWidgets.QPushButton(self)
-        self.startStopButton.setText("Start plotting")
-        self.startStopButton.setObjectName("pause")
+        self.startStopButton.setText('Start plotting')
+        self.startStopButton.setObjectName('pause')
         self.startStopButton.clicked.connect(self.startStoPlotAction)
-        self.startStopButton.setIcon(GUIToolKit.getIconByName("start"))
+        self.startStopButton.setIcon(GUIToolKit.getIconByName('start'))
         self.horizontalLayout.addWidget(self.startStopButton)
 
         self.pauseContinueButton = QtWidgets.QPushButton(self)
-        self.pauseContinueButton.setObjectName("pauseButton")
-        self.pauseContinueButton.setText("Pause plotting")
-        self.pauseContinueButton.setIcon(GUIToolKit.getIconByName("pause"))
+        self.pauseContinueButton.setObjectName('pauseButton')
+        self.pauseContinueButton.setText('Pause plotting')
+        self.pauseContinueButton.setIcon(GUIToolKit.getIconByName('pause'))
         self.pauseContinueButton.clicked.connect(self.pauseContinuePlotAction)
         self.horizontalLayout.addWidget(self.pauseContinueButton)
 
         self.zoomAllButton = QtWidgets.QPushButton(self)
-        self.zoomAllButton.setObjectName("zoomAllButton")
-        self.zoomAllButton.setText("View all plot")
-        self.zoomAllButton.setIcon(GUIToolKit.getIconByName("zoomall"))
+        self.zoomAllButton.setObjectName('zoomAllButton')
+        self.zoomAllButton.setText('View all plot')
+        self.zoomAllButton.setIcon(GUIToolKit.getIconByName('zoomall'))
         self.zoomAllButton.clicked.connect(self.zoomAllPlot)
         self.horizontalLayout.addWidget(self.zoomAllButton)
 
         self.signal0CheckBox = QtWidgets.QCheckBox(self)
-        self.signal0CheckBox.setObjectName("signal0CheckBox")
-        self.signal0CheckBox.setText("Signal0")
-        self.signal0CheckBox.setIcon(GUIToolKit.getIconByName("reddot"))
+        self.signal0CheckBox.setObjectName('signal0CheckBox')
+        self.signal0CheckBox.setText('Signal0')
+        self.signal0CheckBox.setIcon(GUIToolKit.getIconByName('reddot'))
         self.signal0CheckBox.setChecked(True)
         self.horizontalLayout.addWidget(self.signal0CheckBox)
 
         self.signal2CheckBox = QtWidgets.QCheckBox(self)
-        self.signal2CheckBox.setText("Signal2")
-        self.signal2CheckBox.setIcon(GUIToolKit.getIconByName("greendot"))
+        self.signal2CheckBox.setText('Signal2')
+        self.signal2CheckBox.setIcon(GUIToolKit.getIconByName('greendot'))
         self.signal2CheckBox.setChecked(True)
-        self.signal2CheckBox.setObjectName("signal2CheckBox")
+        self.signal2CheckBox.setObjectName('signal2CheckBox')
         self.horizontalLayout.addWidget(self.signal2CheckBox)
 
         self.signal1CheckBox = QtWidgets.QCheckBox(self)
         self.signal1CheckBox.setChecked(True)
-        self.signal1CheckBox.setText("Signal1")
-        self.signal1CheckBox.setIcon(GUIToolKit.getIconByName("orangedot"))
-        self.signal1CheckBox.setObjectName("signal1CheckBox")
+        self.signal1CheckBox.setText('Signal1')
+        self.signal1CheckBox.setIcon(GUIToolKit.getIconByName('orangedot'))
+        self.signal1CheckBox.setObjectName('signal1CheckBox')
         self.horizontalLayout.addWidget(self.signal1CheckBox)
 
         spacerItem = QtWidgets.QSpacerItem(100, 20,
@@ -236,35 +236,37 @@ class ControlPlotPanel(QtWidgets.QWidget):
         self.horizontalLayout.addItem(spacerItem)
         self.horizontalLayout.addItem(spacerItem)
 
+        self.device.addCommandResponseListener(self)
+
     def startStoPlotAction(self):
         if self.controlledPlot.currentStatus is self.controlledPlot.initialConnectedState:
             # Start pressed
-            self.startStopButton.setText("Stop plotting")
-            self.startStopButton.setIcon(GUIToolKit.getIconByName("stop"))
+            self.startStopButton.setText('Stop plotting')
+            self.startStopButton.setIcon(GUIToolKit.getIconByName('stop'))
             self.controlledPlot.currentStatus = \
                 self.controlledPlot.connectedPlottingStartedState
             self.pauseContinueButton.setEnabled(True)
         else:
             # Stop pressed
-            self.startStopButton.setText("Start plotting")
-            self.startStopButton.setIcon(GUIToolKit.getIconByName("start"))
+            self.startStopButton.setText('Start plotting')
+            self.startStopButton.setIcon(GUIToolKit.getIconByName('start'))
 
-            self.pauseContinueButton.setText("Pause plotting")
-            self.pauseContinueButton.setIcon(GUIToolKit.getIconByName("pause"))
+            self.pauseContinueButton.setText('Pause plotting')
+            self.pauseContinueButton.setIcon(GUIToolKit.getIconByName('pause'))
             self.pauseContinueButton.setEnabled(False)
             self.stopAndResetPlot()
 
     def pauseContinuePlotAction(self):
         if self.controlledPlot.currentStatus is self.controlledPlot.connectedPausedState:
             # Continue pressed
-            self.pauseContinueButton.setText("Pause plotting")
-            self.pauseContinueButton.setIcon(GUIToolKit.getIconByName("pause"))
+            self.pauseContinueButton.setText('Pause plotting')
+            self.pauseContinueButton.setIcon(GUIToolKit.getIconByName('pause'))
             self.controlledPlot.currentStatus = self.controlledPlot.connectedPlottingStartedState
         else:
             # Pause pressed
-            self.pauseContinueButton.setText("Continue plotting")
+            self.pauseContinueButton.setText('Continue plotting')
             self.pauseContinueButton.setIcon(
-                GUIToolKit.getIconByName("continue"))
+                GUIToolKit.getIconByName('continue'))
             self.controlledPlot.currentStatus = self.controlledPlot.connectedPausedState
 
     def stopAndResetPlot(self):
@@ -284,7 +286,10 @@ class ControlPlotPanel(QtWidgets.QWidget):
         self.signal1CheckBox.setText(label1)
         self.signal2CheckBox.setText(label2)
 
-    def controlLoopModeChanged(self, controlMode):
-
+    def controlTypeChonged(self, controlMode):
         label0, label2, label1 = SimpleFOCDevice.getSignalLabels(controlMode)
         self.updateLabels(label0, label1, label2)
+
+    def commandResponseReceived(self, cmdRespose):
+        if 'Control: ' in cmdRespose:
+            self.controlTypeChonged(SimpleFOCDevice.getControlModeCode(cmdRespose.replace('Control: ', '')))

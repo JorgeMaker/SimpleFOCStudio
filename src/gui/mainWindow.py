@@ -2,25 +2,25 @@
 # -*- coding: utf-8 -*-
 from PyQt5 import QtCore, QtWidgets
 from src.gui.toolbar import SimpleFOCConfigToolBar
-from src.gui.configtool.devicesTabbedWidget import DevicesTabbedWidget
+from src.gui.workAreaTabbedWidget import WorkAreaTabbedWidget
 
 class UserInteractionMainWindow(object):
-    """This class creates athe main window for the application  """
+
     def setupUi(self, main_window):
 
-        main_window.setObjectName("MainWindow")
+        main_window.setObjectName('MainWindow')
         main_window.resize(1050, 900)
-        main_window.setWindowTitle("SimpleFOC Configuration Tool ")
+        main_window.setWindowTitle('SimpleFOC Configuration Tool ')
 
         self.centralwidget = QtWidgets.QWidget(main_window)
-        self.centralwidget.setObjectName("centralwidget")
+        self.centralwidget.setObjectName('centralwidget')
 
         # Add layout de to the main window
         self.horizontalLayout = QtWidgets.QVBoxLayout(self.centralwidget)
-        self.horizontalLayout.setObjectName("verticalLayout")
+        self.horizontalLayout.setObjectName('verticalLayout')
 
         # Add tabebd tools widget to the main  window
-        self.tabbedToolsWidget = DevicesTabbedWidget(self.centralwidget)
+        self.tabbedToolsWidget = WorkAreaTabbedWidget(self.centralwidget)
         self.horizontalLayout.addWidget(self.tabbedToolsWidget)
 
         # Add toolbar to the main window
@@ -29,7 +29,7 @@ class UserInteractionMainWindow(object):
 
         # Add status bar to the main window
         self.statusbar = QtWidgets.QStatusBar(main_window)
-        self.statusbar.setObjectName("statusbar")
+        self.statusbar.setObjectName('statusbar')
         main_window.setStatusBar(self.statusbar)
 
         # Add central Widget to the main window

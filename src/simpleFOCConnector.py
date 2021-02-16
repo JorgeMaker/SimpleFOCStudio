@@ -1,77 +1,84 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
-import serial
-from serial import SerialException
-import threading
-from PyQt5 import QtCore, QtWidgets
 import logging
+import threading
+import time
+import serial
+from PyQt5 import QtCore, QtWidgets
+from serial import SerialException
 
-class SimpleFOCDevice():
 
+class SimpleFOCDevice:
+    __instance = None
 
     VOLTAGE_CONTROL = 0
     VELOCITY_CONTROL = 1
     ANGLE_CONTROL = 2
 
-    def __init__(self, pid_p=0, pid_i=0, pid_d=0, v_ramp=0, lpf=0,
-                 a_gain=0, vel_lim=0, v_limit=0, ctr_type=ANGLE_CONTROL,
-                 initial_target=0,conn_id='',port='',byte_size=serial.EIGHTBITS,
-                 parity=serial.PARITY_NONE, stop_bits=serial.STOPBITS_ONE):
-
-        self.serialPort = None
-        self.responseThread = None
-        self.isConnected = False
-        self.openedFile = None
-
-        self.connectionStateListenerList = []
-        self.controlLoopModeListenerList = []
-
-        self.proportionalGainPID = pid_p
-        self.integralGainPID = pid_i
-        self.derivativeGainPID = pid_d
-        self.voltageRampPID = v_ramp
-        self.lowPassFilter = lpf
-        self.anglePGain = a_gain
-        self.velocityLimit = vel_lim
-        self.voltageLimit = v_limit
-        self.controlType = ctr_type
-        self.initialTarget = initial_target
-        self.connectionID = conn_id
-        self.serialPortName = port
-        self.serialRate = 115200
-        self.serialByteSize = byte_size
-        self.serialParity = parity
-        self.stopBits = stop_bits
-
-        self.target = initial_target
-
-        self.commProvider = SerialPortReceiveHandler()
+    PULL_CONFIG_ON_CONNECT = 'Pull config'
+    PUSH_CONFG_ON_CONNECT = 'Push config'
+    ONLY_CONNECT = 'Only connect'
 
     @staticmethod
-    def fromJSON(jsonValue):
+    def getInstance():
+        """ Static access method. """
+        if SimpleFOCDevice.__instance == None:
+            SimpleFOCDevice()
+        return SimpleFOCDevice.__instance
 
-        device = SimpleFOCDevice()
+    def __init__(self):
+        """ Virtually private constructor. """
+        if SimpleFOCDevice.__instance != None:
+            raise Exception("This class is a singleton!")
+        else:
+            self.serialPort = None
+            self.responseThread = None
+            self.isConnected = False
+            self.openedFile = None
 
-        device.proportionalGainPID = jsonValue['proportionalGainPID']
-        device.integralGainPID = jsonValue['integralGainPID']
-        device.derivativeGainPID = jsonValue['derivativeGainPID']
-        device.voltageRampPID = jsonValue['voltageRampPID']
-        device.lowPassFilter = jsonValue['lowPassFilter']
-        device.anglePGain = jsonValue['anglePGain']
-        device.velocityLimit = jsonValue['velocityLimit']
-        device.voltageLimit = jsonValue['voltageLimit']
-        device.controlType = jsonValue['controlType']
-        device.initialTarget = jsonValue['initialTarget']
-        device.connectionID = jsonValue['connectionID']
-        device.serialPortName = jsonValue['serialPortName']
-        device.serialRate = jsonValue['serialRate']
-        device.serialByteSize = jsonValue['serialByteSize']
-        device.serialParity = jsonValue['serialParity']
-        device.stopBits = jsonValue['stopBits']
+            self.connectionStateListenerList = []
+            self.commandResponseListenersList = []
 
-        return device
+            self.proportionalGainPID = 0
+            self.integralGainPID = 0
+            self.derivativeGainPID = 0
+            self.voltageRampPID = 0
+            self.lowPassFilter = 0
+            self.anglePGain = 0
+            self.velocityLimit = 0
+            self.voltageLimit = 0
+            self.controlType =  SimpleFOCDevice.ANGLE_CONTROL
+            self.initialTarget = 0
+            self.connectionID = ""
+            self.serialPortName = ""
+            self.serialRate = 115200
+            self.serialByteSize = serial.EIGHTBITS
+            self.serialParity = serial.PARITY_NONE
+            self.stopBits = serial.STOPBITS_ONE
+            self.target = 0
+            self.commProvider = SerialPortReceiveHandler(
+                self.commandResponseListenersList)
+            SimpleFOCDevice.__instance = self
 
-    def configureDevice(self, configDict):
+    def configueDevice(self, jsonValue):
+        self.proportionalGainPID = jsonValue['proportionalGainPID']
+        self.integralGainPID = jsonValue['integralGainPID']
+        self.derivativeGainPID = jsonValue['derivativeGainPID']
+        self.voltageRampPID = jsonValue['voltageRampPID']
+        self.lowPassFilter = jsonValue['lowPassFilter']
+        self.anglePGain = jsonValue['anglePGain']
+        self.velocityLimit = jsonValue['velocityLimit']
+        self.voltageLimit = jsonValue['voltageLimit']
+        self.controlType = jsonValue['controlType']
+        self.initialTarget = jsonValue['initialTarget']
+        self.connectionID = jsonValue['connectionID']
+        self.serialPortName = jsonValue['serialPortName']
+        self.serialRate = jsonValue['serialRate']
+        self.serialByteSize = jsonValue['serialByteSize']
+        self.serialParity = jsonValue['serialParity']
+        self.stopBits = jsonValue['stopBits']
+
+    def configureConnection(self, configDict):
 
         self.connectionID = configDict['connectionID']
         self.serialPortName = configDict['serialPortName']
@@ -103,16 +110,26 @@ class SimpleFOCDevice():
         return valuesToSave
 
     @staticmethod
+
     def getSignalLabels(controlMode):
         if controlMode is SimpleFOCDevice.VOLTAGE_CONTROL:
             return 'Velocity', 'Voltage Q', 'Angle'
         # return 'Voltage Q','Angle','Velocity'  ¿Correct?
         if controlMode is SimpleFOCDevice.VELOCITY_CONTROL:
-        # return 'Voltage Q','Velocity SP','Velocity' ¿Correct?
+            # return 'Voltage Q','Velocity SP','Velocity' ¿Correct?
             return 'Velocity', 'Voltage Q', 'Velocity SP'
         if controlMode is SimpleFOCDevice.ANGLE_CONTROL:
-        #   return 'Voltage Q','Angle SP','Angle' ¿Correct?
-            return 'Angle','Voltage Q','Angle SP'
+            #   return 'Voltage Q','Angle SP','Angle' ¿Correct?
+            return 'Angle', 'Voltage Q', 'Angle SP'
+
+    @staticmethod
+    def getControlModeCode(mode):
+        if mode == 'angle':
+            return SimpleFOCDevice.ANGLE_CONTROL
+        elif mode == 'voltage':
+            return SimpleFOCDevice.VOLTAGE_CONTROL
+        elif mode == 'velocity':
+            return SimpleFOCDevice.VELOCITY_CONTROL
 
     def __initCommunications(self):
         self.serialPort = serial.Serial(self.serialPortName,
@@ -125,55 +142,56 @@ class SimpleFOCDevice():
         self.commProvider.start()
 
     def __closeCommunication(self):
-        # self.responseThread.stop()
         self.serialPort.close()
 
-    def connect(self):
+    def connect(self, connectionMode):
         try:
             self.__initCommunications()
         except SerialException as serEx:
             logging.warning('Is not possible to open serial port')
-            logging.warning('Port ='+self.serialPortName)
-            logging.warning('Rate ='+str(self.serialRate))
-            logging.warning('parity ='+str(self.serialParity))
-            logging.warning('Byte size ='+str(self.serialByteSize))
-            logging.warning('Stop bits='+str(self.stopBits))
+            logging.warning('Port =' + self.serialPortName)
+            logging.warning('Rate =' + str(self.serialRate))
+            logging.warning('parity =' + str(self.serialParity))
+            logging.warning('Byte size =' + str(self.serialByteSize))
+            logging.warning('Stop bits=' + str(self.stopBits))
 
             msgBox = QtWidgets.QMessageBox()
             msgBox.setIcon(QtWidgets.QMessageBox.Warning)
-            msgBox.setText("Error while trying to open serial port")
-            msgBox.setWindowTitle("SimpleFOC ConfigTool")
+            msgBox.setText('Error while trying to open serial port')
+            msgBox.setWindowTitle('SimpleFOC ConfigTool')
             msgBox.setStandardButtons(QtWidgets.QMessageBox.Ok)
             msgBox.exec()
             return False
         else:
             self.isConnected = True
             for listener in self.connectionStateListenerList:
-                listener.deviceConnected(True)
-            self.sendFullConfiguration()
+                listener.connectionStateChanged(True)
+            if connectionMode == SimpleFOCDevice.PULL_CONFIG_ON_CONNECT:
+                self.pullConfiguration()
+            elif connectionMode == SimpleFOCDevice.PUSH_CONFG_ON_CONNECT:
+                self.pushConfiguration()
+                pass
             return True
 
     def disConnect(self):
-        self.__closeCommunication()
         self.isConnected = False
+        self.__closeCommunication()
         for listener in self.connectionStateListenerList:
-            listener.deviceConnected(False)
+            listener.connectionStateChanged(False)
 
     def addConnectionStateListener(self, listener):
         self.connectionStateListenerList.append(listener)
 
-    def addControlLoopModeListener(self, listener):
-        self.controlLoopModeListenerList.append(listener)
+    def addCommandResponseListener(self, listener):
+        self.commandResponseListenersList.append(listener)
 
     def sendCommand(self, command):
         if self.isConnected:
-            self.serialPort.write((str(command) +'\n').encode('utf-8'))
+            self.serialPort.write((str(command) + '\n').encode('utf-8'))
 
     def sendControlType(self, loop_control_type):
         if self.isConnected:
             self.sendCommand('C' + str(loop_control_type))
-            for listener in self.controlLoopModeListenerList:
-                listener.controlLoopModeChanged(loop_control_type)
 
     def sendProportionalGain(self, value):
         if self.isConnected:
@@ -222,15 +240,15 @@ class SimpleFOCDevice():
 
     def sendZeroEncoder(self):
         if self.isConnected:
+            # TODO TODO TODO
             raise NotImplemented
-            #  TODO
 
     def sendHaltDevice(self):
         if self.isConnected:
+            # TODO TODO TODO
             raise NotImplemented
-            #  TODO
 
-    def sendFullConfiguration(self):
+    def pushConfiguration(self):
         self.sendControlType(self.controlType)
         self.sendProportionalGain(self.proportionalGainPID)
         self.sendIntegralGain(self.integralGainPID)
@@ -242,36 +260,60 @@ class SimpleFOCDevice():
         self.sendVoltageLimit(self.voltageLimit)
         self.sendTargetValue(self.initialTarget)
 
-class SerialPortReceiveHandler(QtCore.QThread):
+    def pullConfiguration(self):
+            self.sendControlType('')
+            time.sleep(1 / 1000)
+            self.sendProportionalGain('')
+            time.sleep(1 / 1000)
+            self.sendIntegralGain('')
+            time.sleep(1 / 1000)
+            self.sendDerivativeGain('')
+            time.sleep(1 / 1000)
+            self.sendVoltageRamp('')
+            time.sleep(1 / 1000)
+            self.sendLowPassFilter('')
+            time.sleep(1 / 1000)
+            self.sendPGain('')
+            time.sleep(1 / 1000)
+            self.sendVelocityLimit('')
+            time.sleep(5 / 1000)
+            self.sendVoltageLimit('')
 
+class SerialPortReceiveHandler(QtCore.QThread):
     telemetryDataReceived = QtCore.pyqtSignal(float, float, float)
     commandDataReceived = QtCore.pyqtSignal(str)
+    rawDataReceived = QtCore.pyqtSignal(str)
 
-    def __init__(self, serial_port=None, *args, **kwargs):
+    def __init__(self, commandListeners=None, serial_port=None, *args,
+                 **kwargs):
         super(SerialPortReceiveHandler, self).__init__(*args, **kwargs)
         self._stop_event = threading.Event()
-
+        self.commandResponseListenersList = commandListeners
         self.serialComm = serial_port
 
     def handle_received_data(self, data):
-        if self.isCommandResposedata(data):
-            self.commandDataReceived.emit(data.rstrip())
-        else:
+        if self.isDataReceivedTelementry(data):
             try:
                 v = data.rstrip().split('\t', 3)
-                self.telemetryDataReceived.emit(float(v[2]), float(v[1]), float(v[0]))
+                self.telemetryDataReceived.emit(float(v[2]), float(v[1]),
+                                                float(v[0]))
             except ValueError as error:
                 logging.error(error, exc_info=True)
-                logging.error("data ="+str(data), exc_info=True)
+                logging.error('data =' + str(data), exc_info=True)
             except IndexError as error:
                 logging.error(error, exc_info=True)
-                logging.error("data ="+str(data), exc_info=True)
-
-    def isCommandResposedata(self, data):
-        if data[0].isdigit() or data[0] == '-':
-            return False
+                logging.error('data =' + str(data), exc_info=True)
         else:
+            self.commandDataReceived.emit(data.rstrip())
+            for listener in self.commandResponseListenersList:
+                listener.commandResponseReceived(data.rstrip())
+        self.rawDataReceived.emit(data.rstrip())
+
+    def isDataReceivedTelementry(self, data):
+        if data[0].isdigit() or data[0] == '-':
             return True
+        else:
+            return False
 
     def run(self):
         try:

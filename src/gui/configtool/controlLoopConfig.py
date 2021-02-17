@@ -75,4 +75,3 @@ class ControlLoopGroupBox(QtWidgets.QGroupBox):
     def commandResponseReceived(self, cmdRespose):
         if 'Control: ' in cmdRespose:
             self.setControlLopMode((SimpleFOCDevice.getControlModeCode(cmdRespose.replace('Control: ', ''))))
-            print("Received: " +cmdRespose.replace('Control: ', ''))

@@ -1,15 +1,16 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
-from PyQt5 import QtWidgets
-import pyqtgraph as pg
-import numpy as np
-from src.gui.sharedcomnponets.sharedcomponets import GUIToolKit
 import logging
 
+import numpy as np
+import pyqtgraph as pg
+from PyQt5 import QtWidgets
+
+from src.gui.sharedcomnponets.sharedcomponets import GUIToolKit
 from src.simpleFOCConnector import SimpleFOCDevice
 
-class SimpleFOCGraphicWidget(QtWidgets.QGroupBox):
 
+class SimpleFOCGraphicWidget(QtWidgets.QGroupBox):
     disconnectedState = 0
     initialConnectedState = 1
     connectedPausedState = 2
@@ -24,8 +25,6 @@ class SimpleFOCGraphicWidget(QtWidgets.QGroupBox):
         self.horizontalLayout = QtWidgets.QVBoxLayout(self)
         self.device = SimpleFOCDevice.getInstance()
 
-
-
         self.numberOfSamples = 300
 
         pg.setConfigOptions(antialias=True)
@@ -39,17 +38,20 @@ class SimpleFOCGraphicWidget(QtWidgets.QGroupBox):
         self.signal2DataArray = np.zeros(self.numberOfSamples)
 
         signal0Pen = pg.mkPen(color=GUIToolKit.RED_COLOR, width=2)
-        self.signal0Plot = pg.PlotDataItem(self.timeArray, self.signal0DataArray,
+        self.signal0Plot = pg.PlotDataItem(self.timeArray,
+                                           self.signal0DataArray,
                                            pen=signal0Pen)
         self.plotWidget.addItem(self.signal0Plot)
 
         signal1Pen = pg.mkPen(color=GUIToolKit.ORANGE_COLOR, width=2)
-        self.signal1Plot = pg.PlotDataItem(self.timeArray, self.signal1DataArray,
+        self.signal1Plot = pg.PlotDataItem(self.timeArray,
+                                           self.signal1DataArray,
                                            pen=signal1Pen)
         self.plotWidget.addItem(self.signal1Plot)
 
         signal2Pen = pg.mkPen(color=GUIToolKit.GREEN_COLOR, width=2)
-        self.signal2Plot = pg.PlotDataItem(self.timeArray, self.signal2DataArray,
+        self.signal2Plot = pg.PlotDataItem(self.timeArray,
+                                           self.signal2DataArray,
                                            pen=signal2Pen)
         self.plotWidget.addItem(self.signal2Plot)
 
@@ -74,7 +76,6 @@ class SimpleFOCGraphicWidget(QtWidgets.QGroupBox):
 
         self.currentStatus = self.disconnectedState
         self.controlPlotWidget.pauseContinueButton.setDisabled(True)
-
 
         self.controlPlotWidget.controlTypeChonged(self.device.controlType)
 
@@ -140,7 +141,8 @@ class SimpleFOCGraphicWidget(QtWidgets.QGroupBox):
                     self.updatePlot()
             else:
                 logging.warning(
-                    'Arrived corrupted data: {} {} {}'.format(signal0, signal1, signal2))
+                    'Arrived corrupted data: {} {} {}'.format(signal0, signal1,
+                                                              signal2))
 
     def storeAndShiftData(self, signal0, signal1, signal2):
 
@@ -177,9 +179,10 @@ class SimpleFOCGraphicWidget(QtWidgets.QGroupBox):
             self.signal2Plot.updateItems()
             self.signal2Plot.sigPlotChanged.emit(self.signal2Plot)
 
+
 class ControlPlotPanel(QtWidgets.QWidget):
 
-    def __init__(self , parent=None,controllePlotWidget=None):
+    def __init__(self, parent=None, controllePlotWidget=None):
         '''Constructor for ToolsWidget'''
         super().__init__(parent)
 
@@ -236,7 +239,8 @@ class ControlPlotPanel(QtWidgets.QWidget):
         self.horizontalLayout.addItem(spacerItem)
         self.horizontalLayout.addItem(spacerItem)
 
-        self.device.addCommandResponseListener(self)
+        self.device.commProvider.commandDataReceived.connect(
+            self.commandResponseReceived)
 
     def startStoPlotAction(self):
         if self.controlledPlot.currentStatus is self.controlledPlot.initialConnectedState:
@@ -292,4 +296,5 @@ class ControlPlotPanel(QtWidgets.QWidget):
 
     def commandResponseReceived(self, cmdRespose):
         if 'Control: ' in cmdRespose:
-            self.controlTypeChonged(SimpleFOCDevice.getControlModeCode(cmdRespose.replace('Control: ', '')))
+            self.controlTypeChonged(SimpleFOCDevice.getControlModeCode(
+                cmdRespose.replace('Control: ', '')))

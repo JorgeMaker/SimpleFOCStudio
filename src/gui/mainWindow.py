@@ -9,7 +9,7 @@ class UserInteractionMainWindow(object):
     def setupUi(self, main_window):
 
         main_window.setObjectName('MainWindow')
-        main_window.resize(1050, 900)
+        main_window.resize(1300, 900)
         main_window.setWindowTitle('SimpleFOC Configuration Tool ')
 
         self.centralwidget = QtWidgets.QWidget(main_window)

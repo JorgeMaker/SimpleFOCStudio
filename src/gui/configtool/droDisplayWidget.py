@@ -1,9 +1,12 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
-from PyQt5 import QtGui, QtWidgets
-from src.gui.sharedcomnponets.sharedcomponets import GUIToolKit
 import logging
+
+from PyQt5 import QtGui, QtWidgets
+
+from src.gui.sharedcomnponets.sharedcomponets import GUIToolKit
 from src.simpleFOCConnector import SimpleFOCDevice
+
 
 class DROGroupBox(QtWidgets.QGroupBox):
 
@@ -50,14 +53,14 @@ class DROGroupBox(QtWidgets.QGroupBox):
 
         self.device.commProvider.telemetryDataReceived.connect(self.updateDRO)
 
-
         self.controlTypeChonged(self.device.controlType)
 
         self.initDiplay()
         self.disableUI()
 
         self.device.addConnectionStateListener(self)
-        self.device.addCommandResponseListener(self)
+        self.device.commProvider.commandDataReceived.connect(
+            self.commandResponseReceived)
 
         self.connectionStateChanged(self.device.isConnected)
 
@@ -87,7 +90,7 @@ class DROGroupBox(QtWidgets.QGroupBox):
 
     def putStyleToLCDNumber(self, lcdNumber):
         lcdNumber.setStyleSheet('''QLCDNumber {background-color: white;}''')
-        palette = self.setColor(lcdNumber.palette(),GUIToolKit.RED_COLOR)
+        palette = self.setColor(lcdNumber.palette(), GUIToolKit.RED_COLOR)
         lcdNumber.setPalette(palette)
 
     def setColor(self, palette, colorTouple):
@@ -95,13 +98,13 @@ class DROGroupBox(QtWidgets.QGroupBox):
         G = colorTouple[1]
         B = colorTouple[2]
         # foreground color
-        palette.setColor(palette.WindowText, QtGui.QColor(R,G,B))
+        palette.setColor(palette.WindowText, QtGui.QColor(R, G, B))
         # background color
-        palette.setColor(palette.Background, QtGui.QColor(R,G,B))
+        palette.setColor(palette.Background, QtGui.QColor(R, G, B))
         # 'light' border
-        palette.setColor(palette.Light, QtGui.QColor(R,G,B))
+        palette.setColor(palette.Light, QtGui.QColor(R, G, B))
         # 'dark' border
-        palette.setColor(palette.Dark, QtGui.QColor(R,G,B))
+        palette.setColor(palette.Dark, QtGui.QColor(R, G, B))
         return palette
 
     def setValues(self, values):
@@ -111,7 +114,8 @@ class DROGroupBox(QtWidgets.QGroupBox):
 
     def updateDRO(self, signal0, signal1, signal2):
         try:
-            if type(signal0) is float and type(signal1) is float and type(signal2) is float:
+            if type(signal0) is float and type(signal1) is float and type(
+                    signal2) is float:
                 self.signal0LCDNumber.display(signal0)
                 self.signal2LCDNumber.display(signal1)
                 self.signal1LCDNumber.display(signal2)
@@ -124,4 +128,5 @@ class DROGroupBox(QtWidgets.QGroupBox):
 
     def commandResponseReceived(self, cmdRespose):
         if 'Control: ' in cmdRespose:
-            self.controlTypeChonged(SimpleFOCDevice.getControlModeCode(cmdRespose.replace('Control: ', '')))
+            self.controlTypeChonged(SimpleFOCDevice.getControlModeCode(
+                cmdRespose.replace('Control: ', '')))

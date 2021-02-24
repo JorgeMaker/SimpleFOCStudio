@@ -102,7 +102,7 @@ class GeneralSettingsGroupBox(QtWidgets.QGroupBox):
         self.setVoltageLimit(self.device.voltageLimit)
 
         self.device.addConnectionStateListener(self)
-        self.device.addCommandResponseListener(self)
+        self.device.commProvider.commandDataReceived.connect(self.commandResponseReceived)
 
         self.connectionStateChanged(self.device.isConnected)
 

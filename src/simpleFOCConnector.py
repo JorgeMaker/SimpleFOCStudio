@@ -37,7 +37,6 @@ class SimpleFOCDevice:
             self.openedFile = None
 
             self.connectionStateListenerList = []
-            self.commandResponseListenersList = []
 
             self.proportionalGainPID = 0
             self.integralGainPID = 0
@@ -56,8 +55,7 @@ class SimpleFOCDevice:
             self.serialParity = serial.PARITY_NONE
             self.stopBits = serial.STOPBITS_ONE
             self.target = 0
-            self.commProvider = SerialPortReceiveHandler(
-                self.commandResponseListenersList)
+            self.commProvider = SerialPortReceiveHandler()
             SimpleFOCDevice.__instance = self
 
     def configueDevice(self, jsonValue):
@@ -182,9 +180,6 @@ class SimpleFOCDevice:
     def addConnectionStateListener(self, listener):
         self.connectionStateListenerList.append(listener)
 
-    def addCommandResponseListener(self, listener):
-        self.commandResponseListenersList.append(listener)
-
     def sendCommand(self, command):
         if self.isConnected:
             self.serialPort.write((str(command) + '\n').encode('utf-8'))
@@ -284,11 +279,9 @@ class SerialPortReceiveHandler(QtCore.QThread):
     commandDataReceived = QtCore.pyqtSignal(str)
     rawDataReceived = QtCore.pyqtSignal(str)
 
-    def __init__(self, commandListeners=None, serial_port=None, *args,
-                 **kwargs):
+    def __init__(self, serial_port=None, *args,**kwargs):
         super(SerialPortReceiveHandler, self).__init__(*args, **kwargs)
         self._stop_event = threading.Event()
-        self.commandResponseListenersList = commandListeners
         self.serialComm = serial_port
 
     def handle_received_data(self, data):
@@ -305,8 +298,6 @@ class SerialPortReceiveHandler(QtCore.QThread):
                 logging.error('data =' + str(data), exc_info=True)
         else:
             self.commandDataReceived.emit(data.rstrip())
-            for listener in self.commandResponseListenersList:
-                listener.commandResponseReceived(data.rstrip())
         self.rawDataReceived.emit(data.rstrip())
 
     def isDataReceivedTelementry(self, data):

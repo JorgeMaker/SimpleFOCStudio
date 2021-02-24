@@ -99,12 +99,9 @@ class PidGroupBox(QtWidgets.QGroupBox):
         self.setIntegralGainAction(self.device.integralGainPID)
         self.setVoltageRampAction(self.device.voltageRampPID)
 
-        # self.device.commProvider.commandDataReceived.connect(
-        #     self.comandResposeReceivedAction)
-
         self.connectionStateChanged(self.device.isConnected)
         self.device.addConnectionStateListener(self)
-        self.device.addCommandResponseListener(self)
+        self.device.commProvider.commandDataReceived.connect(self.commandResponseReceived)
 
     def connectionStateChanged(self, deviceConnected):
         if deviceConnected is True:

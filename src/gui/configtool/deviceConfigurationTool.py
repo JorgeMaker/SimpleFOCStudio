@@ -14,7 +14,7 @@ from src.simpleFOCConnector import SimpleFOCDevice
 
 class DeviceConfigurationTool(WorkAreaTabWidget):
 
-    def __init__(self, parent=None,simpleFocConn=None):
+    def __init__(self, parent=None):
         super().__init__(parent)
 
         self.device = SimpleFOCDevice.getInstance()

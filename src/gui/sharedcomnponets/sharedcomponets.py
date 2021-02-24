@@ -28,7 +28,10 @@ class GUIToolKit(object):
             'connect': 'connect.png',
             'continue': 'continue.png',
             'alert': 'alert.png',
+            'gear': 'gear.png',
+            'generalsettings': 'generalsettings.png',
             'open': 'open.png',
+            'loop': 'loop.png',
             'save': 'save.png',
             'stop': 'stop.png',
             'restart': 'continue.png',
@@ -37,6 +40,7 @@ class GUIToolKit(object):
             'pause': 'pause.png',
             'disconnect': 'disconnect.png',
             'configure': 'configure.png',
+            'pidconfig': 'pidconfig.png',
             'consoletool': 'consoletool.png'
         }
         currentDir = os.path.dirname(__file__)

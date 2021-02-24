@@ -37,7 +37,8 @@ class ControlLoopGroupBox(QtWidgets.QGroupBox):
 
         self.disableUI()
         self.device.addConnectionStateListener(self)
-        self.device.addCommandResponseListener(self)
+        self.device.commProvider.commandDataReceived.connect(
+            self.commandResponseReceived)
 
         self.connectionStateChanged(self.device.isConnected)
 
@@ -75,4 +76,3 @@ class ControlLoopGroupBox(QtWidgets.QGroupBox):
     def commandResponseReceived(self, cmdRespose):
         if 'Control: ' in cmdRespose:
             self.setControlLopMode((SimpleFOCDevice.getControlModeCode(cmdRespose.replace('Control: ', ''))))
-            print("Received: " +cmdRespose.replace('Control: ', ''))

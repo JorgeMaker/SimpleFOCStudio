@@ -30,7 +30,7 @@ class DeviceConfigurationTool(WorkAreaTabWidget):
         self.horizontalLayout.setObjectName('horizontalLayout')
         self.digitalReadOut = DROGroupBox(self.counterWidget)
         self.horizontalLayout.addWidget(self.digitalReadOut)
-
+        
         self.controlLoop = ControlLoopGroupBox(self.counterWidget)
         self.horizontalLayout.addWidget(self.controlLoop)
 

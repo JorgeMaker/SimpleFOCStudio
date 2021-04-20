@@ -7,13 +7,26 @@ class SimpleFOCConfigToolBar(QtWidgets.QToolBar):
 
     def __init__(self,main_window, devicesTabedWidget,  parent=None):
         super().__init__(parent)
-
-        self.addDeviceAction = QtWidgets.QAction(main_window)
-        self.addDeviceAction.setIcon(GUIToolKit.getIconByName('add'))
+        
+        self.addDeviceAction = QtWidgets.QToolButton(main_window)
+        self.addDeviceAction.setIcon(GUIToolKit.getIconByName('add_motor'))
         self.addDeviceAction.setObjectName('addDeviceAction')
-        self.addDeviceAction.triggered.connect(devicesTabedWidget.addDevice)
+        self.addDeviceAction.setPopupMode(QtWidgets.QToolButton.InstantPopup)
 
-        self.addAction(self.addDeviceAction)
+        self.addDeviceMenu = QtWidgets.QMenu(self.addDeviceAction)
+        self.addDeviceTreeView  = QtWidgets.QAction("Tree View",self.addDeviceMenu)
+        self.addDeviceTreeView.setIcon(GUIToolKit.getIconByName('tree'))
+        self.addDeviceTreeView.triggered.connect(devicesTabedWidget.addDeviceTree)
+        self.addDeviceFormView  = QtWidgets.QAction("Form View",self.addDeviceMenu)
+        self.addDeviceFormView.setIcon(GUIToolKit.getIconByName('form'))
+        self.addDeviceFormView.triggered.connect(devicesTabedWidget.addDeviceForm)
+        
+        self.addDeviceMenu.addAction(self.addDeviceTreeView)
+        self.addDeviceMenu.addAction(self.addDeviceFormView)
+        self.addDeviceAction.setMenu(self.addDeviceMenu)
+        self.addWidget(self.addDeviceAction)
+
+
 
         self.openDeviceAction = QtWidgets.QAction(main_window)
         self.openDeviceAction.setIcon(GUIToolKit.getIconByName('open'))
@@ -30,6 +43,16 @@ class SimpleFOCConfigToolBar(QtWidgets.QToolBar):
         self.addAction(self.saveDeviceAction)
 
         self.addSeparator()
+
+        self.genericConfigAction = QtWidgets.QAction(main_window)
+        self.genericConfigAction.setIcon(GUIToolKit.getIconByName('consoletool'))
+        # self.genericConfigAction.setToolTip('Generic config window')
+        self.genericConfigAction.setObjectName('genericconfig')
+        self.genericConfigAction.triggered.connect(devicesTabedWidget.addGenericConfig)
+
+        self.addAction(self.genericConfigAction)
+
+
 
         self.openConsoleToolAction = QtWidgets.QAction(main_window)
         self.openConsoleToolAction.setIcon(GUIToolKit.getIconByName('consoletool'))

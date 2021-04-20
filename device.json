@@ -1,18 +1,1 @@
-{
-    "anglePGain": "  20.00",
-    "connectionID": "",
-    "controlType": 2,
-    "derivativeGainPID": "  0.00",
-    "initialTarget": 0,
-    "integralGainPID": "  20.00",
-    "lowPassFilter": "  0.20",
-    "proportionalGainPID": "  0.30",
-    "serialByteSize": 8,
-    "serialParity": "N",
-    "serialPortName": "/dev/cu.usbserial-14140",
-    "serialRate": "115200",
-    "stopBits": 1,
-    "velocityLimit": "  20.00",
-    "voltageLimit": "4",
-    "voltageRampPID": "  1000.00"
-}
+{"PIDVelocity": {"P": 0, "I": 0, "D": 0, "outputRamp": 0, "outputLimit": 0}, "PIDAngle": {"P": 0, "I": 0, "D": 0, "outputRamp": 0, "outputLimit": 0}, "PIDCurrentD": {"P": 0, "I": 0, "D": 0, "outputRamp": 0, "outputLimit": 0}, "PIDCurrentQ": {"P": 0, "I": 0, "D": 0, "outputRamp": 0, "outputLimit": 0}, "LPFVelocity": 0, "LPFAngle": 0, "LPFCurrentD": 0, "LPFCurrentQ": 0, "velocityLimit": 0, "voltageLimit": 0, "currentLimit": 0, "controlType": 2, "torqueType": 0, "phaseResistance": 0, "sensorZeroOffset": 0, "sensorElectricalZero": 0, "initialTarget": 0, "connectionID": "", "serialPortName": "", "serialRate": 115200, "serialByteSize": 8, "serialParity": "N", "stopBits": 1}

@@ -18,6 +18,13 @@ class ConnectionControlGroupBox(QtWidgets.QGroupBox):
         self.horizontalLayout = QtWidgets.QHBoxLayout(self)
         self.horizontalLayout.setObjectName('generalControlHL')
 
+        self.devCommandIDLetter = QtWidgets.QLabel("Device cmd ID:")
+        self.horizontalLayout.addWidget(self.devCommandIDLetter)
+        self.devCommandIDLetter = QtWidgets.QLineEdit()
+        self.devCommandIDLetter.setObjectName('devCommandIDLetter')
+        self.devCommandIDLetter.editingFinished.connect(self.changeDevicedevCommandID)
+        self.horizontalLayout.addWidget(self.devCommandIDLetter)
+
         self.connectionModeComboBox = QtWidgets.QComboBox()
         self.connectionModeComboBox.setObjectName('connectDeviceButton')
         self.connectionModeComboBox.addItems([SimpleFOCDevice.PULL_CONFIG_ON_CONNECT, SimpleFOCDevice.PUSH_CONFG_ON_CONNECT])
@@ -41,6 +48,16 @@ class ConnectionControlGroupBox(QtWidgets.QGroupBox):
 
         self.device.addConnectionStateListener(self)
         self.connectionStateChanged(self.device.isConnected)
+    
+    def connectDisconnectDeviceAction(self):
+        if self.device.isConnected:
+            self.device.disConnect()
+        else:
+            connectionMode  = self.connectionModeComboBox.currentText()
+            self.device.connect(connectionMode)
+
+    def changeDevicedevCommandID(self):
+        self.device.devCommandID = self.devCommandIDLetter.text()
 
     def connectDisconnectDeviceAction(self):
         if self.device.isConnected:

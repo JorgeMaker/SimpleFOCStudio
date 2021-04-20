@@ -46,58 +46,58 @@ class PidGroupBox(QtWidgets.QGroupBox):
         self.igLineEdit.setObjectName('igLineEdit')
         self.igLineEdit.setValidator(onlyFloatInputValidator)
         self.igLineEdit.setAlignment(QtCore.Qt.AlignCenter)
-        self.igLineEdit.updateValue.connect(self.sendIntegralGainAction)
+        # self.igLineEdit.updateValue.connect(self.sendIntegralGainAction)
         self.gridLayout.addWidget(self.igLineEdit, 1, 2, 1, 1)
 
         self.dgButton = QtWidgets.QPushButton(self)
         self.dgButton.setObjectName('dgButton')
         self.dgButton.setText('Set D')
-        self.dgButton.clicked.connect(self.sendDerivativeGainAction)
+        # self.dgButton.clicked.connect(self.sendDerivativeGainAction)
         self.gridLayout.addWidget(self.dgButton, 2, 5, 1, 1)
 
         self.dgLineEdit = ConfigQLineEdit(self)
         self.dgLineEdit.setObjectName('dgLineEdit')
         self.dgLineEdit.setValidator(onlyFloatInputValidator)
         self.dgLineEdit.setAlignment(QtCore.Qt.AlignCenter)
-        self.dgLineEdit.updateValue.connect(self.sendDerivativeGainAction)
+        # self.dgLineEdit.updateValue.connect(self.sendDerivativeGainAction)
         self.gridLayout.addWidget(self.dgLineEdit, 2, 2, 1, 1)
 
         self.pgButton = QtWidgets.QPushButton(self)
         self.pgButton.setObjectName('pgButton')
         self.pgButton.setText('Set P')
-        self.pgButton.clicked.connect(self.sendProportionalGainAction)
+        # self.pgButton.clicked.connect(self.sendProportionalGainAction)
         self.gridLayout.addWidget(self.pgButton, 0, 5, 1, 1)
 
         self.pgLineEdit = ConfigQLineEdit(self)
         self.pgLineEdit.setObjectName('pgLineEdit')
         self.pgLineEdit.setValidator(onlyFloatInputValidator)
         self.pgLineEdit.setAlignment(QtCore.Qt.AlignCenter)
-        self.pgLineEdit.updateValue.connect(self.sendProportionalGainAction)
+        # self.pgLineEdit.updateValue.connect(self.sendProportionalGainAction)
         self.gridLayout.addWidget(self.pgLineEdit, 0, 2, 1, 1)
 
         self.vrButton = QtWidgets.QPushButton(self)
         self.vrButton.setObjectName('vrButton')
         self.vrButton.setText('Set R')
-        self.vrButton.clicked.connect(self.sendVoltageRampAction)
+        # self.vrButton.clicked.connect(self.sendRampAction)
         self.gridLayout.addWidget(self.vrButton, 4, 5, 1, 1)
 
         self.igButton = QtWidgets.QPushButton(self)
         self.igButton.setObjectName('igButton')
         self.igButton.setText('Set I')
-        self.igButton.clicked.connect(self.sendIntegralGainAction)
+        # self.igButton.clicked.connect(self.sendIntegralGainAction)
         self.gridLayout.addWidget(self.igButton, 1, 5, 1, 1)
 
         self.vrLineEdit = ConfigQLineEdit(self)
         self.vrLineEdit.setObjectName('vrLineEdit')
         self.vrLineEdit.setValidator(onlyFloatInputValidator)
         self.vrLineEdit.setAlignment(QtCore.Qt.AlignCenter)
-        self.vrLineEdit.updateValue.connect(self.sendVoltageRampAction)
+        # self.vrLineEdit.updateValue.connect(self.sendRampAction)
         self.gridLayout.addWidget(self.vrLineEdit, 4, 2, 1, 1)
 
-        self.setDerivativeGainAction(self.device.derivativeGainPID)
-        self.setProportionalGainAction(self.device.proportionalGainPID)
-        self.setIntegralGainAction(self.device.integralGainPID)
-        self.setVoltageRampAction(self.device.voltageRampPID)
+        # self.setDerivativeGainAction(self.device.derivativeGainPID)
+        # self.setProportionalGainAction(self.device.proportionalGainPID)
+        # self.setIntegralGainAction(self.device.integralGainPID)
+        # self.setVoltageRampAction(self.device.voltageRampPID)
 
         self.connectionStateChanged(self.device.isConnected)
         self.device.addConnectionStateListener(self)
@@ -145,11 +145,11 @@ class PidGroupBox(QtWidgets.QGroupBox):
         self.igLineEdit.setText(value)
         self.device.sendIntegralGain(self.igLineEdit.text())
 
-    def sendVoltageRampAction(self):
+    def sendRampAction(self):
         value = self.vrLineEdit.text()
         value = value.replace(',', '.')
         self.vrLineEdit.setText(value)
-        self.device.sendVoltageRamp(self.vrLineEdit.text())
+        self.device.sendRamp(self.vrLineEdit.text())
 
     def commandResponseReceived(self, commandDataReceived):
         if 'PID velocity| P' in commandDataReceived:

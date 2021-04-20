@@ -15,6 +15,13 @@ class ControlLoopGroupBox(QtWidgets.QGroupBox):
         self.controlLoopHorizontalLayout = QtWidgets.QHBoxLayout(self)
         self.controlLoopHorizontalLayout.setObjectName('controlLoopHorizontalLayout')
 
+
+        self.torqueRadioButton = QtWidgets.QRadioButton(self)
+        self.torqueRadioButton.setObjectName('torqueRadioButton')
+        self.torqueRadioButton.setText('Torque')
+        self.torqueRadioButton.clicked.connect(self.sendControlLopModeTorque)
+        self.controlLoopHorizontalLayout.addWidget(self.torqueRadioButton)
+
         self.angleRadioButton = QtWidgets.QRadioButton(self)
         self.angleRadioButton.setObjectName('angleRadioButton')
         self.angleRadioButton.setText('Angle')
@@ -27,11 +34,17 @@ class ControlLoopGroupBox(QtWidgets.QGroupBox):
         self.velocityRadioButton.clicked.connect(self.sendControlLopModeVelocity)
         self.controlLoopHorizontalLayout.addWidget(self.velocityRadioButton)
 
-        self.voltageRadioButton = QtWidgets.QRadioButton(self)
-        self.voltageRadioButton.setObjectName('voltageRadioButton')
-        self.voltageRadioButton.setText('Voltage')
-        self.voltageRadioButton.clicked.connect(self.sendControlLopModeVoltage)
-        self.controlLoopHorizontalLayout.addWidget(self.voltageRadioButton)
+        self.velocityOpenRadioButton = QtWidgets.QRadioButton(self)
+        self.velocityOpenRadioButton.setObjectName('velocityOpenRadioButton')
+        self.velocityOpenRadioButton.setText('Velocity openloop')
+        self.velocityOpenRadioButton.clicked.connect(self.sendControlLopModeVelocityOpen)
+        self.controlLoopHorizontalLayout.addWidget(self.velocityOpenRadioButton)
+
+        self.angleOpenRadioButton = QtWidgets.QRadioButton(self)
+        self.angleOpenRadioButton.setObjectName('angleOpenRadioButton')
+        self.angleOpenRadioButton.setText('Angle openloop')
+        self.angleOpenRadioButton.clicked.connect(self.sendControlLopModeAngleOpen)
+        self.controlLoopHorizontalLayout.addWidget(self.angleOpenRadioButton)
 
         self.setControlLopMode(self.device.controlType)
 
@@ -55,12 +68,16 @@ class ControlLoopGroupBox(QtWidgets.QGroupBox):
         self.setEnabled(False)
 
     def setControlLopMode(self, value):
-        if value == SimpleFOCDevice.ANGLE_CONTROL:
+        if value == SimpleFOCDevice.TORQUE_CONTROL:
+            self.torqueRadioButton.toggle()
+        elif value == SimpleFOCDevice.ANGLE_CONTROL:
             self.angleRadioButton.toggle()
-        elif value == SimpleFOCDevice.VOLTAGE_CONTROL:
-            self.voltageRadioButton.toggle()
         elif value == SimpleFOCDevice.VELOCITY_CONTROL:
             self.velocityRadioButton.toggle()
+        elif value == SimpleFOCDevice.VELOCITY_OPENLOOP_CONTROL:
+            self.velocityOpenRadioButton.toggle()
+        elif value == SimpleFOCDevice.ANGLE_OPENLOOP_CONTROL:
+            self.angleOpenRadioButton.toggle()
 
     def sendControlLopModeVelocity(self):
         if self.device.isConnected:
@@ -68,11 +85,16 @@ class ControlLoopGroupBox(QtWidgets.QGroupBox):
     def sendControlLopModeAngle(self):
         if self.device.isConnected:
             self.device.sendControlType(SimpleFOCDevice.ANGLE_CONTROL)
-
-    def sendControlLopModeVoltage(self):
+    def sendControlLopModeTorque(self):
         if self.device.isConnected:
-            self.device.sendControlType(SimpleFOCDevice.VOLTAGE_CONTROL)
+            self.device.sendControlType(SimpleFOCDevice.TORQUE_CONTROL)
+    def sendControlLopModeVelocityOpen(self):
+        if self.device.isConnected:
+            self.device.sendControlType(SimpleFOCDevice.VELOCITY_OPENLOOP_CONTROL)
+    def sendControlLopModeAngleOpen(self):
+        if self.device.isConnected:
+            self.device.sendControlType(SimpleFOCDevice.ANGLE_OPENLOOP_CONTROL)
+            
 
     def commandResponseReceived(self, cmdRespose):
-        if 'Control: ' in cmdRespose:
-            self.setControlLopMode((SimpleFOCDevice.getControlModeCode(cmdRespose.replace('Control: ', ''))))
+        self.setControlLopMode(self.device.controlType)

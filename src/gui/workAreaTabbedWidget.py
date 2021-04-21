@@ -9,7 +9,6 @@ from PyQt5 import QtWidgets
 from src.gui.commandlinetool.commandlinetool import CommandLineConsoleTool
 from src.gui.configtool.deviceConfigurationTool import DeviceConfigurationTool
 from src.gui.configtool.treeViewConfigTool import TreeViewConfigTool
-from src.gui.configtool.genericConfigTool import GenericConfigTool
 from src.simpleFOCConnector import SimpleFOCDevice
 
 
@@ -25,7 +24,6 @@ class WorkAreaTabbedWidget(QtWidgets.QTabWidget):
 
         self.cmdLineTool = None
         self.configDeviceTool = None
-        self.configGenericTool = None
         self.activeToolsList = []
 
         self.tabCloseRequested.connect(self.removeTabHandler)
@@ -40,9 +38,7 @@ class WorkAreaTabbedWidget(QtWidgets.QTabWidget):
         if type(self.currentWidget()) == DeviceConfigurationTool or type(
                 self.currentWidget()) == TreeViewConfigTool:
             self.configDeviceTool = None
-        if type(self.currentWidget()) == GenericConfigTool:
-            self.configGenericTool = None
-        if self.configDeviceTool == None and self.cmdLineTool == None and self.configGenericTool == None:
+        if self.configDeviceTool == None and self.cmdLineTool == None:
             if self.device.isConnected:
                 self.device.disConnect()
 
@@ -85,13 +81,6 @@ class WorkAreaTabbedWidget(QtWidgets.QTabWidget):
                         configurationInfo = json.load(json_file)
                         sfd = SimpleFOCDevice.getInstance()
                         sfd.configureDevice(configurationInfo)
-                        print("here")
-                        # if self.configDeviceToolMode == 'FormView':
-                        #     self.configDeviceTool = DeviceConfigurationTool()
-                        #     self.configDeviceTool.connectionControl.connectionModeComboBox.setCurrentText(
-                        #         SimpleFOCDevice.PUSH_CONFG_ON_CONNECT)
-
-                        # elif self.configDeviceToolMode == 'TreeView':
                         self.configDeviceTool = TreeViewConfigTool()
                         self.configDeviceTool.treeViewWidget.connectionControl.connectionModeComboBox.setCurrentText(
                             SimpleFOCDevice.PUSH_CONFG_ON_CONNECT)

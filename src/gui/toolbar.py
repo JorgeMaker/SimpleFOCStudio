@@ -44,16 +44,6 @@ class SimpleFOCConfigToolBar(QtWidgets.QToolBar):
 
         self.addSeparator()
 
-        self.genericConfigAction = QtWidgets.QAction(main_window)
-        self.genericConfigAction.setIcon(GUIToolKit.getIconByName('consoletool'))
-        # self.genericConfigAction.setToolTip('Generic config window')
-        self.genericConfigAction.setObjectName('genericconfig')
-        self.genericConfigAction.triggered.connect(devicesTabedWidget.addGenericConfig)
-
-        self.addAction(self.genericConfigAction)
-
-
-
         self.openConsoleToolAction = QtWidgets.QAction(main_window)
         self.openConsoleToolAction.setIcon(GUIToolKit.getIconByName('consoletool'))
         self.openConsoleToolAction.setToolTip('Open Serial Cosole tool')

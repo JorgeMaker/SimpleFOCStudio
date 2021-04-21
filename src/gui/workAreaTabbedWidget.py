@@ -85,23 +85,27 @@ class WorkAreaTabbedWidget(QtWidgets.QTabWidget):
                         configurationInfo = json.load(json_file)
                         sfd = SimpleFOCDevice.getInstance()
                         sfd.configureDevice(configurationInfo)
-                        if self.configDeviceToolMode == 'FormView':
-                            self.configDeviceTool = DeviceConfigurationTool()
-                            self.configDeviceTool.connectionControl.connectionModeComboBox.setCurrentText(
-                                SimpleFOCDevice.PUSH_CONFG_ON_CONNECT)
+                        print("here")
+                        # if self.configDeviceToolMode == 'FormView':
+                        #     self.configDeviceTool = DeviceConfigurationTool()
+                        #     self.configDeviceTool.connectionControl.connectionModeComboBox.setCurrentText(
+                        #         SimpleFOCDevice.PUSH_CONFG_ON_CONNECT)
 
-                        elif self.configDeviceToolMode == 'TreeView':
-                            self.configDeviceTool = TreeViewConfigTool()
-                            self.configDeviceTool.treeViewWidget.connectionControl.connectionModeComboBox.setCurrentText(
-                                SimpleFOCDevice.PUSH_CONFG_ON_CONNECT)
+                        # elif self.configDeviceToolMode == 'TreeView':
+                        self.configDeviceTool = TreeViewConfigTool()
+                        self.configDeviceTool.treeViewWidget.connectionControl.connectionModeComboBox.setCurrentText(
+                            SimpleFOCDevice.PUSH_CONFG_ON_CONNECT)
                         sfd.openedFile = filenames
+                        print("here")
                         self.activeToolsList.append(self.configDeviceTool)
                         tabName = self.configDeviceTool.getTabName()
                         if tabName == '':
                             tabName = 'Device'
+                        print("here")
                         self.addTab(self.configDeviceTool,
                                     self.configDeviceTool.getTabIcon(), tabName)
                         self.setCurrentIndex(self.currentIndex() + 1)
+                        print("here")
 
                 except Exception as exception:
                     msgBox = QtWidgets.QMessageBox()

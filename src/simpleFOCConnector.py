@@ -100,6 +100,7 @@ class SimpleFOCDevice:
             self.stopBits = serial.STOPBITS_ONE
             self.commProvider = SerialPortReceiveHandler()
             self.commProvider.commandDataReceived.connect(self.parseResponses)
+            self.commProvider.stateMonitorReceived.connect(self.parseStateResponses)
             self.connectionID = ""
 
             # command id of the device
@@ -150,10 +151,11 @@ class SimpleFOCDevice:
 
     def configureDevice(self, jsonValue):
         # motion control parameters
-        self.PIDVelocity.load(jsonValues['PIDVelocity'])
-        self.PIDAngle.load(jsonValues['PIDAngle'])
-        self.PIDCurrentD.load(jsonValues['PIDCurrentD'])
-        self.PIDCurrentQ.load(jsonValues['PIDCurrentQ'])
+        self.PIDVelocity.load(jsonValue['PIDVelocity'])
+        self.PIDAngle.load(jsonValue['PIDAngle'])
+        self.PIDCurrentD.load(jsonValue['PIDCurrentD'])
+        self.PIDCurrentQ.load(jsonValue['PIDCurrentQ'])
+        
         # low pass filters
         self.LPFVelocity.Tf =  jsonValue['LPFVelocity']
         self.LPFAngle.Tf =  jsonValue['LPFAngle']
@@ -222,27 +224,6 @@ class SimpleFOCDevice:
             'stopBits': self.stopBits
         }
         return valuesToSave
-
-    @staticmethod
-    def getSignalLabels(controlMode):
-        if controlMode is SimpleFOCDevice.TORQUE_CONTROL :
-            return 'Velocity', 'Voltage Q', 'Angle'
-        # return 'Voltage Q','Angle','Velocity'  ¿Correct?
-        if controlMode is SimpleFOCDevice.VELOCITY_CONTROL:
-            # return 'Voltage Q','Velocity SP','Velocity' ¿Correct?
-            return 'Velocity', 'Voltage Q', 'Velocity SP'
-        if controlMode is SimpleFOCDevice.ANGLE_CONTROL:
-            #   return 'Voltage Q','Angle SP','Angle' ¿Correct?
-            return 'Angle', 'Voltage Q', 'Angle SP'
-
-    @staticmethod
-    def getControlModeCode(mode):
-        if mode == 'angle':
-            return SimpleFOCDevice.ANGLE_CONTROL
-        elif mode == 'voltage':
-            return SimpleFOCDevice.TORQUE_CONTROL 
-        elif mode == 'velocity':
-            return SimpleFOCDevice.VELOCITY_CONTROL
 
     def __initCommunications(self):
         self.serialPort = serial.Serial(self.serialPortName,
@@ -324,7 +305,7 @@ class SimpleFOCDevice:
         if self.isConnected:
             if value  != '':
                 self.motionDownsample = value    
-            self.setCommand('MD', str(value))
+            self.setCommand('CD', str(value))
 
     def sendProportionalGain(self, pid, value ):
         if self.isConnected:
@@ -408,7 +389,7 @@ class SimpleFOCDevice:
         if self.isConnected:
             if targetvalue != '':
                 self.deviceStatus = targetvalue
-            self.setCommand('E', str(value))
+            self.setCommand('E', str(targetvalue))
 
     def sendMonitorDownsample(self, targetvalue):
         if self.isConnected:
@@ -454,7 +435,7 @@ class SimpleFOCDevice:
 
 
     def pushConfiguration(self):
-        print("push config")
+        print("push")
         # self.sendControlType(self.controlType)
         # self.sendProportionalGain(self.PIDVelocity, self.self)
         # self.sendIntegralGain(self.PIDVelocity, self.integralGainPID)
@@ -466,29 +447,50 @@ class SimpleFOCDevice:
         # self.sendVoltageLimit(self.voltageLimit)
         # self.sendTargetValue(self.initialTarget)
 
-    def pullConfiguration(self):
-        print("pull config")
-        # self.sendControlType('')
-        # time.sleep(5 / 1000)
-        # self.sendProportionalGain(self.PIDVelocity,'')
-        # time.sleep(5 / 1000)
-        # self.sendIntegralGain(self.PIDVelocity,'')
-        # time.sleep(5 / 1000)
-        # self.sendDerivativeGain(self.PIDVelocity,'')
-        # time.sleep(5 / 1000)
-        # self.sendOutputRamp(self.PIDVelocity,'')
-        # time.sleep(5 / 1000)
-        # self.sendOutputLimit(self.PIDVelocity,'')
-        # time.sleep(5 / 1000)
-        # self.sendLowPassFilter(self.LPFVelocity,'')
-        # time.sleep(5 / 1000)
-        # # self.sendPGain('')
-        # time.sleep(5 / 1000)
-        # self.sendVelocityLimit('')
-        # time.sleep(5 / 1000)
-        # self.sendVoltageLimit('')
+    def pullPIDConf(self, pid, lpf):
+        self.sendProportionalGain(pid,'')
+        time.sleep(5 / 1000)
+        self.sendIntegralGain(pid,'')
+        time.sleep(5 / 1000)
+        self.sendDerivativeGain(pid,'')
+        time.sleep(5 / 1000)
+        self.sendOutputRamp(pid,'')
+        time.sleep(5 / 1000)
+        self.sendOutputLimit(pid,'')
+        time.sleep(5 / 1000)
+        self.sendLowPassFilter(lpf,'')
 
-    def parsePIDFRepsonse(self, pid, lpf, comandResponse):
+    def pullConfiguration(self):
+        time.sleep(5 / 1000)
+        self.sendControlType('')
+        time.sleep(5 / 1000)
+        self.sendTorqueType('')
+        time.sleep(5 / 1000)
+        self.pullPIDConf( self.PIDVelocity, self.LPFVelocity)
+        time.sleep(5 / 1000)
+        self.pullPIDConf( self.PIDAngle, self.LPFAngle)
+        time.sleep(5 / 1000)
+        self.pullPIDConf( self.PIDCurrentD, self.LPFCurrentD)
+        time.sleep(5 / 1000)
+        self.pullPIDConf( self.PIDCurrentQ, self.LPFCurrentQ)
+        time.sleep(5 / 1000)
+        self.sendVelocityLimit('')
+        time.sleep(5 / 1000)
+        self.sendVoltageLimit('')
+        time.sleep(5 / 1000)
+        self.sendCurrentLimit('')
+        time.sleep(5 / 1000)
+        self.sendSensorZeroElectrical('')
+        time.sleep(5 / 1000)
+        self.sendSensorZeroOffset('')
+        time.sleep(5 / 1000)
+        self.sendMotionDownsample('')
+        time.sleep(5 / 1000)
+        self.sendPhaseResistance('')
+        time.sleep(5 / 1000)
+        self.sendDeviceStatus('')
+
+    def parsePIDFResponse(self, pid, lpf, comandResponse):
         if 'P' in comandResponse:
             pid.P = float(comandResponse.replace('P: ', ''))
         if 'I' in comandResponse:
@@ -496,13 +498,17 @@ class SimpleFOCDevice:
         if 'D' in comandResponse:
             pid.D = float(comandResponse.replace('D: ', ''))
         if 'ramp' in comandResponse:
-            pid.outputRamp = float(comandResponse.replace('ramp:', ''))
+            val = comandResponse.replace('ramp:', '')
+            if 'ovf' in val:
+                pid.outputRamp = 0
+            else:
+                pid.outputRamp = float(comandResponse.replace('ramp:', ''))
         if 'limit' in comandResponse:
             pid.outputLimit = float(comandResponse.replace('limit:', ''))
         if 'Tf' in comandResponse:
             lpf.Tf = float(comandResponse.replace('Tf: ', ''))
 
-    def parseLimitsReposnse(self, comandResponse):
+    def parseLimitsResponse(self, comandResponse):
         if 'vel:' in comandResponse:
             self.velocityLimit = float(comandResponse.replace('vel:', ''))
         elif 'volt:' in comandResponse:
@@ -567,19 +573,19 @@ class SimpleFOCDevice:
     def parseResponses(self, comandResponse):
         if 'PID vel' in comandResponse:
             comandResponse = comandResponse.replace('PID vel|', '')
-            self.parsePIDFRepsonse(self.PIDVelocity, self.LPFVelocity, comandResponse)
+            self.parsePIDFResponse(self.PIDVelocity, self.LPFVelocity, comandResponse)
         elif 'PID angle' in comandResponse:
             comandResponse = comandResponse.replace('PID angle|', '')
-            self.parsePIDFRepsonse(self.PIDAngle, self.LPFAngle, comandResponse)
+            self.parsePIDFResponse(self.PIDAngle, self.LPFAngle, comandResponse)
         elif 'PID curr q' in comandResponse:
             comandResponse = comandResponse.replace('PID curr q|', '')
-            self.parsePIDFRepsonse(self.PIDCurrentQ, self.LPFCurrentQ, comandResponse)
+            self.parsePIDFResponse(self.PIDCurrentQ, self.LPFCurrentQ, comandResponse)
         elif 'PID curr d' in comandResponse:
             comandResponse = comandResponse.replace('PID curr d|', '')
-            self.parsePIDFRepsonse(self.PIDCurrentD, self.LPFCurrentD, comandResponse)
+            self.parsePIDFResponse(self.PIDCurrentD, self.LPFCurrentD, comandResponse)
         elif 'Limits' in comandResponse:
             comandResponse = comandResponse.replace('Limits|', '')
-            self.parseLimitsReposnse(comandResponse)
+            self.parseLimitsResponse(comandResponse)
         elif 'Motion' in comandResponse:
             comandResponse = comandResponse.replace('Motion:', '')
             self.parseMotionResponse(comandResponse)
@@ -597,11 +603,16 @@ class SimpleFOCDevice:
         elif 'R phase' in comandResponse:
             self.phaseResistance = float(comandResponse.replace('R phase:', ''))
 
+    def parseStateResponses(self, comandResponse):
+        if 'Monitor' in comandResponse:
+            comandResponse = comandResponse.replace('Monitor |', '')
+            self.parseMonitorResponse(comandResponse)
 
 
 class SerialPortReceiveHandler(QtCore.QThread):
     monitoringDataReceived = QtCore.pyqtSignal(list)
     commandDataReceived = QtCore.pyqtSignal(str)
+    stateMonitorReceived = QtCore.pyqtSignal(str)
     rawDataReceived = QtCore.pyqtSignal(str)
 
     def __init__(self, serial_port=None, *args,**kwargs):
@@ -610,6 +621,9 @@ class SerialPortReceiveHandler(QtCore.QThread):
         self.serialComm = serial_port
 
     def handle_received_data(self, data):
+        if not data:
+            return
+            
         if self.isDataReceivedMonitoring(data):
             try:
                 v = data.rstrip().split('\t')
@@ -620,12 +634,20 @@ class SerialPortReceiveHandler(QtCore.QThread):
             except IndexError as error:
                 logging.error(error, exc_info=True)
                 logging.error('data =' + str(data), exc_info=True)
+        elif self.isDataReceivedStates(data):
+            self.stateMonitorReceived.emit(data.rstrip())
         else:
             self.commandDataReceived.emit(data.rstrip())
         self.rawDataReceived.emit(data.rstrip())
 
     def isDataReceivedMonitoring(self, data):
         if data[0].isdigit() or data[0] == '-':
+            return True
+        else:
+            return False
+            
+    def isDataReceivedStates(self, data):
+        if 'Monitor' in data:
             return True
         else:
             return False

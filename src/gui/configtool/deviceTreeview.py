@@ -22,7 +22,7 @@ class DeviceTreeView(QTreeWidget):
         self.motionControl.setText(0, 'Motion config')
         self.motionControl.setIcon(0, GUIToolKit.getIconByName('pidconfig'))
         self.sFOCDevice.addChild(self.motionControl)
-
+        
         self.controller = QtWidgets.QTreeWidgetItem(self.motionControl)
         self.controller.setText(0, 'Motion Control Type')
         self.controller.setIcon(0, GUIToolKit.getIconByName('gear'))
@@ -208,6 +208,7 @@ class DeviceTreeView(QTreeWidget):
 
         self.device.addConnectionStateListener(self)
         self.device.commProvider.commandDataReceived.connect(self.commandResponseReceived)
+        self.device.commProvider.stateMonitorReceived.connect(self.stateResponseReceived)
 
         self.itemChanged.connect(self.sendCommand)
 
@@ -341,6 +342,17 @@ class DeviceTreeView(QTreeWidget):
     def commandResponseReceived(self, comandResponse):
         self.refreshDeviceTree()
 
+    def stateResponseReceived(self, comandResponse):
+        self.blockSignals(True)
+        self.stateVelValue.setText(0,str(self.device.velocityNow))
+        self.stateAngleValue.setText(0,str(self.device.angleNow))
+        self.stateVdValue.setText(0,str(self.device.voltageDNow))
+        self.stateVqValue.setText(0,str(self.device.voltageQNow))
+        self.stateCqValue.setText(0,str(self.device.currentQNow))
+        self.stateCdValue.setText(0,str(self.device.currentDNow))
+        self.satateTargetValue.setText(0,str(self.device.targetNow))
+        self.update()
+        self.blockSignals(False)
 
     def refreshDeviceTree(self):
         self.blockSignals(True)
@@ -359,14 +371,6 @@ class DeviceTreeView(QTreeWidget):
         
         self.phaseResValue.setText(0,str(self.device.phaseResistance))
         self.deviceStatusValue.setText(0,str(self.device.deviceStatus))
-
-        self.stateVelValue.setText(0,str(self.device.velocityNow))
-        self.stateAngleValue.setText(0,str(self.device.angleNow))
-        self.stateVdValue.setText(0,str(self.device.voltageDNow))
-        self.stateVqValue.setText(0,str(self.device.voltageQNow))
-        self.stateCqValue.setText(0,str(self.device.currentQNow))
-        self.stateCdValue.setText(0,str(self.device.currentDNow))
-        self.satateTargetValue.setText(0,str(self.device.targetNow))
 
         self.motionDownsampleValue.setText(0,str(self.device.motionDownsample))
         self.torqueValue.setText(0,str(self.device.torqueType))

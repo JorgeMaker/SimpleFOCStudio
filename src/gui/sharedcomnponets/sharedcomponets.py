@@ -50,6 +50,8 @@ class GUIToolKit(object):
             'start': 'start.png',
             'motor': 'motor.png',
             'pause': 'pause.png',
+            'pull': 'pull.png',
+            'push': 'push.png',
             'disconnect': 'disconnect.png',
             'configure': 'configure.png',
             'pidconfig': 'pidconfig.png',

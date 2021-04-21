@@ -3,6 +3,7 @@
 from PyQt5 import QtWidgets
 
 from src.gui.configtool.controlLoopConfig import ControlLoopGroupBox
+from src.gui.configtool.torqueConfig import TorqueGroupBox
 from src.gui.configtool.generalSettingsWidget import GeneralSettingsGroupBox
 from src.gui.configtool.connectionControl import ConnectionControlGroupBox
 from src.gui.configtool.droDisplayWidget import DROGroupBox
@@ -33,6 +34,9 @@ class DeviceConfigurationTool(WorkAreaTabWidget):
         
         self.controlLoop = ControlLoopGroupBox(self.counterWidget)
         self.horizontalLayout.addWidget(self.controlLoop)
+
+        self.torqueConfig = TorqueGroupBox(self.counterWidget)
+        self.horizontalLayout.addWidget(self.torqueConfig)
 
         self.connectionControl = ConnectionControlGroupBox(self.counterWidget)
         self.horizontalLayout.addWidget(self.connectionControl)

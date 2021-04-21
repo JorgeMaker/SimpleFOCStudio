@@ -36,13 +36,13 @@ class ControlLoopGroupBox(QtWidgets.QGroupBox):
 
         self.velocityOpenRadioButton = QtWidgets.QRadioButton(self)
         self.velocityOpenRadioButton.setObjectName('velocityOpenRadioButton')
-        self.velocityOpenRadioButton.setText('Velocity openloop')
+        self.velocityOpenRadioButton.setText('Velocity open')
         self.velocityOpenRadioButton.clicked.connect(self.sendControlLopModeVelocityOpen)
         self.controlLoopHorizontalLayout.addWidget(self.velocityOpenRadioButton)
 
         self.angleOpenRadioButton = QtWidgets.QRadioButton(self)
         self.angleOpenRadioButton.setObjectName('angleOpenRadioButton')
-        self.angleOpenRadioButton.setText('Angle openloop')
+        self.angleOpenRadioButton.setText('Angle open')
         self.angleOpenRadioButton.clicked.connect(self.sendControlLopModeAngleOpen)
         self.controlLoopHorizontalLayout.addWidget(self.angleOpenRadioButton)
 

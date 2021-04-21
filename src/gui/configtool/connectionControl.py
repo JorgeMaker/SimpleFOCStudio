@@ -28,7 +28,7 @@ class ConnectionControlGroupBox(QtWidgets.QGroupBox):
         self.connectionModeComboBox = QtWidgets.QComboBox()
         self.connectionModeComboBox.setObjectName('connectDeviceButton')
         self.connectionModeComboBox.addItems([SimpleFOCDevice.PULL_CONFIG_ON_CONNECT, SimpleFOCDevice.PUSH_CONFG_ON_CONNECT])
-
+        
         self.horizontalLayout.addWidget(self.connectionModeComboBox)
 
         self.connectDisconnectButton = QtWidgets.QPushButton(self)

@@ -67,7 +67,7 @@ class DROGroupBox(QtWidgets.QGroupBox):
         self.disableUI()
 
         self.device.addConnectionStateListener(self)
-        self.device.commProvider.commandDataReceived.connect(self.commandResponseReceived)
+        self.device.commProvider.stateMonitorReceived.connect(self.commandResponseReceived)
 
         self.connectionStateChanged(self.device.isConnected)
 

@@ -47,7 +47,6 @@ class SimpleFOCDevice:
     __instance = None
 
     TORQUE_CONTROL  = 0
-    VOLTAGE_CONTROL  = 0
     VELOCITY_CONTROL = 1
     ANGLE_CONTROL = 2
     VELOCITY_OPENLOOP_CONTROL = 3
@@ -62,17 +61,10 @@ class SimpleFOCDevice:
     CURRENT_Q_PID = 'Q'
     CURRENT_D_PID = 'D'
 
-    PID_P = 'P'
-    PID_I = 'I'
-    PID_D = 'D'
-    PID_RAMP = 'R'
-    PID_LIMIT = 'L'
-
     PULL_CONFIG_ON_CONNECT = 'Pull config'
     PUSH_CONFG_ON_CONNECT = 'Push config'
     ONLY_CONNECT = 'Only connect'
 
-    
     @staticmethod
     def getInstance():
         """ Static access method. """
@@ -237,6 +229,8 @@ class SimpleFOCDevice:
         self.stateUpdater.start()
 
     def __closeCommunication(self):
+        # self.stateUpdater.stop()
+        # self.commProvider.stop()
         self.serialPort.close()
 
     def connect(self, connectionMode):
@@ -371,7 +365,7 @@ class SimpleFOCDevice:
         if self.isConnected:
             if targetvalue  != '':
                 self.target = targetvalue
-            self.setCommand(self.target)
+            self.setCommand('',self.target)
 
     def sendSensorZeroOffset(self, targetvalue):
         if self.isConnected:
@@ -657,10 +651,14 @@ class SerialPortReceiveHandler(QtCore.QThread):
             while not self.stopped():
                 if self.serialComm is not None:
                     if self.serialComm.isOpen():
-                        reading = self.serialComm.readline().decode()
-                        self.handle_received_data(reading)
+                        reading = self.serialComm.readline()
+                        if reading:
+                            self.handle_received_data(reading.decode())
         except SerialException as serialException:
             logging.error(serialException, exc_info=True)
+        except TypeError as typeError:
+            logging.error(typeError, exc_info=True)
+            
 
     def stop(self):
         self._stop_event.set()

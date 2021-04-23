@@ -17,7 +17,8 @@ class SimpleFOCGraphicWidget(QtWidgets.QGroupBox):
     connectedPlottingStartedState = 3
 
     
-    signals = ['Target', 'Voltage Q','Voltage D','Current Q','Current D','Velocity','Angle']
+    signals = ['Target', 'Vq','Vd','Cq','Cd','Vel','Angle']
+    signal_tooltip = ['Target', 'Voltage D [Volts]','Voltage D [Volts]','Current Q [miliAmps]','Current D [miliAmps]','Velocity [rad/sec]','Angle [rad]']
     signalColors = [GUIToolKit.RED_COLOR, GUIToolKit.BLUE_COLOR, GUIToolKit.PURPLE_COLOR,GUIToolKit.YELLOW_COLOR, GUIToolKit.MAROON_COLOR, GUIToolKit.ORANGE_COLOR, GUIToolKit.GREEN_COLOR]
     signalIcons = ['reddot', 'bluedot','purpledot', 'yellowdot', 'maroondot', 'orangedot', 'greendot']
 
@@ -35,6 +36,10 @@ class SimpleFOCGraphicWidget(QtWidgets.QGroupBox):
         pg.setConfigOptions(antialias=True)
         self.plotWidget = pg.PlotWidget()
         self.plotWidget.showGrid(x=True, y=True, alpha=0.5)
+        self.plotWidget.addLegend()
+
+        # self.legend = pg.LegendItem()
+        # self.legend.setParentItem(self.plotWidget)
 
         self.timeArray = np.arange(-self.numberOfSamples, 0, 1)
         
@@ -43,24 +48,25 @@ class SimpleFOCGraphicWidget(QtWidgets.QGroupBox):
         self.signalDataArrays = []
         self.signalPlots = []
         self.signalPlotFlags = []
-        for (sig, sigColor, checkBox) in zip(self.signals, self.signalColors,self.controlPlotWidget.signalCheckBox):
+        for (sig, sigColor, checkBox, tooltip) in zip(self.signals, self.signalColors,self.controlPlotWidget.signalCheckBox, self.signal_tooltip):
             # define signal plot data array
             self.signalDataArrays.append(np.zeros(self.numberOfSamples))
             # configure signal plot parameters
             signalPen = pg.mkPen(color=sigColor, width=1.5)
             self.signalPlots.append(pg.PlotDataItem(self.timeArray,
                                             self.signalDataArrays[-1],
-                                            pen=signalPen))
+                                            pen=signalPen, name=tooltip))
             self.plotWidget.addItem(self.signalPlots[-1])
+
             # is plotted flag
             self.signalPlotFlags.append(True)
             # add callback
             checkBox.stateChanged.connect(self.signalPlotFlagUpdate)
 
-        self.horizontalLayout.addWidget(self.plotWidget)
-        
-        self.horizontalLayout.addWidget(self.controlPlotWidget)
 
+        self.horizontalLayout.addWidget(self.plotWidget)
+        self.horizontalLayout.addWidget(self.controlPlotWidget)
+        
         self.device.commProvider.monitoringDataReceived.connect(
             self.upDateGraphic)
 
@@ -155,7 +161,7 @@ class ControlPlotPanel(QtWidgets.QWidget):
         self.horizontalLayout1.setObjectName('horizontalLayout')
 
         self.startStopButton = QtWidgets.QPushButton(self)
-        self.startStopButton.setText('Start plotting')
+        self.startStopButton.setText('Start')
         self.startStopButton.setObjectName('pause')
         self.startStopButton.clicked.connect(self.startStoPlotAction)
         self.startStopButton.setIcon(GUIToolKit.getIconByName('start'))
@@ -163,38 +169,28 @@ class ControlPlotPanel(QtWidgets.QWidget):
 
         self.pauseContinueButton = QtWidgets.QPushButton(self)
         self.pauseContinueButton.setObjectName('pauseButton')
-        self.pauseContinueButton.setText('Pause plotting')
+        self.pauseContinueButton.setText('Pause')
         self.pauseContinueButton.setIcon(GUIToolKit.getIconByName('pause'))
         self.pauseContinueButton.clicked.connect(self.pauseContinuePlotAction)
         self.horizontalLayout1.addWidget(self.pauseContinueButton)
 
         self.zoomAllButton = QtWidgets.QPushButton(self)
         self.zoomAllButton.setObjectName('zoomAllButton')
-        self.zoomAllButton.setText('View all plot')
+        self.zoomAllButton.setText('View all')
         self.zoomAllButton.setIcon(GUIToolKit.getIconByName('zoomall'))
         self.zoomAllButton.clicked.connect(self.zoomAllPlot)
         self.horizontalLayout1.addWidget(self.zoomAllButton)
-
-        self.horizontalLayout2 = QtWidgets.QHBoxLayout()
-        self.horizontalLayout2.setObjectName('horizontalLayout')
-
-        self.downsampleLabel = QtWidgets.QLabel(self)
-        self.downsampleLabel.setText('Downsample')
-        self.downampleValue = QtWidgets.QLineEdit(self.downsampleLabel)
-        self.downampleValue.setText("100")
-        self.downampleValue.editingFinished.connect(self.changeDownsampling)
-        self.horizontalLayout2.addWidget(self.downsampleLabel)
-        self.horizontalLayout2.addWidget(self.downampleValue)
 
         self.signalCheckBox = []
         for i in range(len(self.controlledPlot.signals)):
             checkBox = QtWidgets.QCheckBox(self)
             checkBox.setObjectName('signalCheckBox'+str(i))
+            checkBox.setToolTip(self.controlledPlot.signal_tooltip[i])
             checkBox.setText(self.controlledPlot.signals[i])
             checkBox.setIcon(GUIToolKit.getIconByName(self.controlledPlot.signalIcons[i]))
             checkBox.setChecked(True)
             self.signalCheckBox.append(checkBox)
-            self.horizontalLayout2.addWidget(checkBox)
+            self.horizontalLayout1.addWidget(checkBox)
 
 
         spacerItem = QtWidgets.QSpacerItem(100, 20,
@@ -203,15 +199,21 @@ class ControlPlotPanel(QtWidgets.QWidget):
 
         self.horizontalLayout1.addItem(spacerItem)
         self.horizontalLayout1.addItem(spacerItem)
-        self.horizontalLayout2.addItem(spacerItem)
-        self.horizontalLayout2.addItem(spacerItem)
+
+        self.downsampleLabel = QtWidgets.QLabel(self)
+        self.downsampleLabel.setText('Downsample')
+        self.downampleValue = QtWidgets.QLineEdit(self.downsampleLabel)
+        self.downampleValue.setText("100")
+        self.downampleValue.editingFinished.connect(self.changeDownsampling)
+        self.horizontalLayout1.addWidget(self.downsampleLabel)
+        self.horizontalLayout1.addWidget(self.downampleValue)
+
         self.verticalLayout.addLayout(self.horizontalLayout1)
-        self.verticalLayout.addLayout(self.horizontalLayout2)
 
     def startStoPlotAction(self):
         if self.controlledPlot.currentStatus is self.controlledPlot.initialConnectedState:
             # Start pressed
-            self.startStopButton.setText('Stop plotting')
+            self.startStopButton.setText('Stop')
             self.startStopButton.setIcon(GUIToolKit.getIconByName('stop'))
             self.controlledPlot.currentStatus = \
                 self.controlledPlot.connectedPlottingStartedState
@@ -220,9 +222,9 @@ class ControlPlotPanel(QtWidgets.QWidget):
             self.updateMonitorVariables()
         else:
             # Stop pressed
-            self.startStopButton.setText('Start plotting')
+            self.startStopButton.setText('Start')
             self.startStopButton.setIcon(GUIToolKit.getIconByName('start'))
-            self.pauseContinueButton.setText('Pause plotting')
+            self.pauseContinueButton.setText('Pause')
             self.pauseContinueButton.setIcon(GUIToolKit.getIconByName('pause'))
             self.pauseContinueButton.setEnabled(False)
             self.stopAndResetPlot()
@@ -232,12 +234,12 @@ class ControlPlotPanel(QtWidgets.QWidget):
     def pauseContinuePlotAction(self):
         if self.controlledPlot.currentStatus is self.controlledPlot.connectedPausedState:
             # Continue pressed
-            self.pauseContinueButton.setText('Pause plotting')
+            self.pauseContinueButton.setText('Pause')
             self.pauseContinueButton.setIcon(GUIToolKit.getIconByName('pause'))
             self.controlledPlot.currentStatus = self.controlledPlot.connectedPlottingStartedState
         else:
             # Pause pressed
-            self.pauseContinueButton.setText('Continue plotting')
+            self.pauseContinueButton.setText('Continue')
             self.pauseContinueButton.setIcon(
                 GUIToolKit.getIconByName('continue'))
             self.controlledPlot.currentStatus = self.controlledPlot.connectedPausedState

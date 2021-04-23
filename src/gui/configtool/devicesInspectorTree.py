@@ -1,9 +1,10 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
-from PyQt5.QtWidgets import (QVBoxLayout, QFrame)
+from PyQt5.QtWidgets import (QVBoxLayout, QHBoxLayout, QFrame)
 
 from src.gui.configtool.connectionControl import ConnectionControlGroupBox
 from src.gui.configtool.controlLoopConfig import ControlLoopGroupBox
+from src.gui.configtool.generalControls import GeneralControls
 from src.gui.configtool.torqueConfig import TorqueGroupBox
 from src.gui.configtool.deviceTreeview import DeviceTreeView
 from src.gui.configtool.droDisplayWidget import DROGroupBox
@@ -21,10 +22,8 @@ class DevicesInspectorTree(QFrame):
         self.droWidget = DROGroupBox(self)
         self.layout.addWidget(self.droWidget)
 
-        self.controlLoopMode = ControlLoopGroupBox(self)
-        self.layout.addWidget(self.controlLoopMode)
-        self.torqueMode = TorqueGroupBox(self)
-        self.layout.addWidget(self.torqueMode)
+        self.generalControls = GeneralControls(self)
+        self.layout.addWidget(self.generalControls)
 
 
         self.treeView = DeviceTreeView(self)
@@ -33,4 +32,4 @@ class DevicesInspectorTree(QFrame):
         self.connectionControl = ConnectionControlGroupBox(self)
         self.layout.addWidget(self.connectionControl)
 
-        self.setMaximumWidth(430)
+        self.setMaximumWidth(370)

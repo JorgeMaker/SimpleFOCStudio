@@ -26,11 +26,16 @@ class PidGroupBox(QtWidgets.QGroupBox):
         self.gridLayout = QtWidgets.QGridLayout(self)
         self.gridLayout.setObjectName('gridLayout')
         
+        self.sPidLabel = QtWidgets.QLabel(self)
+        self.sPidLabel.setObjectName('pgLabel')
+        self.sPidLabel.setText('Select PID')
+        self.gridLayout.addWidget(self.sPidLabel, 0, 1, 1, 1)
+
         self.selectorPIDF = QtWidgets.QComboBox(self)
         self.selectorPIDF.setObjectName('selectPIDF')
         self.selectorPIDF.addItems(['Velocity', 'Angle', 'Current Q', 'Current D'])
         self.selectorPIDF.currentIndexChanged.connect(self.changePIDF)
-        self.gridLayout.addWidget(self.selectorPIDF, 0, 1, 1, 5)
+        self.gridLayout.addWidget(self.selectorPIDF, 0, 2, 1, 1)
 
         self.pgLabel = QtWidgets.QLabel(self)
         self.pgLabel.setObjectName('pgLabel')
@@ -61,68 +66,36 @@ class PidGroupBox(QtWidgets.QGroupBox):
         self.pgLineEdit.setObjectName('pgLineEdit')
         self.pgLineEdit.setValidator(onlyFloatInputValidator)
         self.pgLineEdit.setAlignment(QtCore.Qt.AlignCenter)
-        # self.pgLineEdit.editingFinished.connect(self.sendProportionalGainAction)
+        self.pgLineEdit.editingFinished.connect(self.sendProportionalGainAction)
         self.gridLayout.addWidget(self.pgLineEdit, 1, 2, 1, 1)
 
         self.igLineEdit = ConfigQLineEdit(self)
         self.igLineEdit.setObjectName('igLineEdit')
         self.igLineEdit.setValidator(onlyFloatInputValidator)
         self.igLineEdit.setAlignment(QtCore.Qt.AlignCenter)
-        # self.igLineEdit.editingFinished.connect(self.sendIntegralGainAction)
+        self.igLineEdit.editingFinished.connect(self.sendIntegralGainAction)
         self.gridLayout.addWidget(self.igLineEdit, 2, 2, 1, 1)
 
         self.dgLineEdit = ConfigQLineEdit(self)
         self.dgLineEdit.setObjectName('dgLineEdit')
         self.dgLineEdit.setValidator(onlyFloatInputValidator)
         self.dgLineEdit.setAlignment(QtCore.Qt.AlignCenter)
-        # self.dgLineEdit.editingFinished.connect(self.sendDerivativeGainAction)
+        self.dgLineEdit.editingFinished.connect(self.sendDerivativeGainAction)
         self.gridLayout.addWidget(self.dgLineEdit, 3, 2, 1, 1)
         
         self.vrLineEdit = ConfigQLineEdit(self)
         self.vrLineEdit.setObjectName('vrLineEdit')
         self.vrLineEdit.setValidator(onlyFloatInputValidator)
         self.vrLineEdit.setAlignment(QtCore.Qt.AlignCenter)
-        # self.vrLineEdit.editingFinished.connect(self.sendRampAction)
+        self.vrLineEdit.editingFinished.connect(self.sendRampAction)
         self.gridLayout.addWidget(self.vrLineEdit, 4, 2, 1, 1)
 
         self.lpfLineEdit = ConfigQLineEdit(self)
         self.lpfLineEdit.setObjectName('lpfLineEdit')
         self.lpfLineEdit.setValidator(onlyFloatInputValidator)
         self.lpfLineEdit.setAlignment(QtCore.Qt.AlignCenter)
-        # self.lpfLineEdit.editingFinished.connect(self.sendLPFAction)
+        self.lpfLineEdit.editingFinished.connect(self.sendLPFAction)
         self.gridLayout.addWidget(self.lpfLineEdit, 5, 2, 1, 1)
-
-
-        self.pgButton = QtWidgets.QPushButton(self)
-        self.pgButton.setObjectName('pgButton')
-        self.pgButton.setText('Set P')
-        self.pgButton.clicked.connect(self.sendProportionalGainAction)
-        self.gridLayout.addWidget(self.pgButton, 1, 5, 1, 1)
-
-        self.igButton = QtWidgets.QPushButton(self)
-        self.igButton.setObjectName('igButton')
-        self.igButton.setText('Set I')
-        self.igButton.clicked.connect(self.sendIntegralGainAction)
-        self.gridLayout.addWidget(self.igButton, 2, 5, 1, 1)
-
-        self.dgButton = QtWidgets.QPushButton(self)
-        self.dgButton.setObjectName('dgButton')
-        self.dgButton.setText('Set D')
-        self.dgButton.clicked.connect(self.sendDerivativeGainAction)
-        self.gridLayout.addWidget(self.dgButton, 3, 5, 1, 1)
-
-        self.vrButton = QtWidgets.QPushButton(self)
-        self.vrButton.setObjectName('vrButton')
-        self.vrButton.setText('Set R')
-        self.vrButton.clicked.connect(self.sendRampAction)
-        self.gridLayout.addWidget(self.vrButton, 4, 5, 1, 1)
-
-        self.lpfButton = QtWidgets.QPushButton(self)
-        self.lpfButton.setObjectName('vrButton')
-        self.lpfButton.setText('Set F')
-        self.lpfButton.clicked.connect(self.sendLPFAction)
-        self.gridLayout.addWidget(self.lpfButton, 5, 5, 1, 1)
-
 
         self.reloadPIDValues()
 

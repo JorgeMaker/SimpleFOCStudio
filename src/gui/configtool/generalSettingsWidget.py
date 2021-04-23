@@ -1,7 +1,7 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
 from PyQt5 import QtGui, QtWidgets, QtCore
-from src.gui.sharedcomnponets.sharedcomponets import ConfigQLineEdit
+from src.gui.sharedcomnponets.sharedcomponets import ConfigQLineEdit, GUIToolKit
 from src.simpleFOCConnector import SimpleFOCDevice
 
 class GeneralSettingsGroupBox(QtWidgets.QGroupBox):
@@ -24,21 +24,6 @@ class GeneralSettingsGroupBox(QtWidgets.QGroupBox):
         self.gcGridLayout = QtWidgets.QGridLayout(self)
         self.gcGridLayout.setObjectName('gcGridLayout')
 
-        self.curLimitLabel = QtWidgets.QLabel(self)
-        self.curLimitLabel.setObjectName('curLimitLabel')
-        self.curLimitLabel.setText('Current Limit')
-        self.gcGridLayout.addWidget(self.curLimitLabel, 3, 0, 1, 1)
-
-        self.volLimitLabel = QtWidgets.QLabel(self)
-        self.volLimitLabel.setObjectName('volLimitLabel')
-        self.volLimitLabel.setText('Voltage limit')
-        self.gcGridLayout.addWidget(self.volLimitLabel, 6, 0, 1, 1)
-
-        self.velLimitlabel = QtWidgets.QLabel(self)
-        self.velLimitlabel.setObjectName('velLimitlabel')
-        self.velLimitlabel.setText('Velocity limit')
-        self.gcGridLayout.addWidget(self.velLimitlabel, 4, 0, 1, 1)
-
         self.motionDownsample = QtWidgets.QLabel(self)
         self.motionDownsample.setObjectName('motionDownsample')
         self.motionDownsample.setText('Motion Downsample')
@@ -48,53 +33,44 @@ class GeneralSettingsGroupBox(QtWidgets.QGroupBox):
         self.motionDownsampleEdit.setObjectName('motionDownsampleEdit')
         self.motionDownsampleEdit.setValidator(onlyFloat)
         self.motionDownsampleEdit.setAlignment(QtCore.Qt.AlignCenter)
-        # self.motionDownsampleEdit.updateValue.connect(self.sendMotionDownsampleAction)
+        self.motionDownsampleEdit.updateValue.connect(self.sendMotionDownsampleAction)
         self.gcGridLayout.addWidget(self.motionDownsampleEdit, 2, 1, 1, 1)
+
+        self.curLimitLabel = QtWidgets.QLabel(self)
+        self.curLimitLabel.setObjectName('curLimitLabel')
+        self.curLimitLabel.setText('Current Limit')
+        self.gcGridLayout.addWidget(self.curLimitLabel, 3, 0, 1, 1)
+
+        self.velLimitlabel = QtWidgets.QLabel(self)
+        self.velLimitlabel.setObjectName('velLimitlabel')
+        self.velLimitlabel.setText('Velocity limit')
+        self.gcGridLayout.addWidget(self.velLimitlabel, 4, 0, 1, 1)
+
+        self.volLimitLabel = QtWidgets.QLabel(self)
+        self.volLimitLabel.setObjectName('volLimitLabel')
+        self.volLimitLabel.setText('Voltage limit')
+        self.gcGridLayout.addWidget(self.volLimitLabel, 6, 0, 1, 1)
 
         self.clLineEdit = ConfigQLineEdit(self)
         self.clLineEdit.setObjectName('clLineEdit')
         self.clLineEdit.setValidator(onlyFloat)
         self.clLineEdit.setAlignment(QtCore.Qt.AlignCenter)
-        # self.clLineEdit.updateValue.connect(self.sendCurrentLimitAction)
+        self.clLineEdit.updateValue.connect(self.sendCurrentLimitAction)
         self.gcGridLayout.addWidget(self.clLineEdit, 3, 1, 1, 1)
 
         self.vlLineEdit = ConfigQLineEdit(self)
         self.vlLineEdit.setObjectName('vlLineEdit')
         self.vlLineEdit.setValidator(onlyFloat)
         self.vlLineEdit.setAlignment(QtCore.Qt.AlignCenter)
-        # self.vlLineEdit.updateValue.connect(self.sendVelLimitAction)
+        self.vlLineEdit.updateValue.connect(self.sendVelLimitAction)
         self.gcGridLayout.addWidget(self.vlLineEdit, 4, 1, 1, 1)
 
         self.volLLineEdit = ConfigQLineEdit(self)
         self.volLLineEdit.setObjectName('volLLineEdit')
         self.volLLineEdit.setValidator(onlyFloat)
         self.volLLineEdit.setAlignment(QtCore.Qt.AlignCenter)
-        # self.volLLineEdit.updateValue.connect(self.sendVoltageLimitAction)
+        self.volLLineEdit.updateValue.connect(self.sendVoltageLimitAction)
         self.gcGridLayout.addWidget(self.volLLineEdit, 6, 1, 1, 1)
-
-        self.motionDownsampleButton = QtWidgets.QPushButton(self)
-        self.motionDownsampleButton.setObjectName('lpfButton')
-        self.motionDownsampleButton.setText('Set')
-        self.motionDownsampleButton.clicked.connect(self.sendMotionDownsampleAction)
-        self.gcGridLayout.addWidget(self.motionDownsampleButton, 2, 2, 1, 1)
-
-        self.clButton = QtWidgets.QPushButton(self)
-        self.clButton.setObjectName('clButton')
-        self.clButton.setText('Set')
-        self.clButton.clicked.connect(self.sendCurrentLimitAction)
-        self.gcGridLayout.addWidget(self.clButton, 3, 2, 1, 1)
-
-        self.velLimitButton = QtWidgets.QPushButton(self)
-        self.velLimitButton.setObjectName('velLimitButton')
-        self.velLimitButton.setText('Set')
-        self.velLimitButton.clicked.connect(self.sendVelLimitAction)
-        self.gcGridLayout.addWidget(self.velLimitButton, 4, 2, 1, 1)
-
-        self.voltageLimitButton = QtWidgets.QPushButton( self)
-        self.voltageLimitButton.setObjectName('VoltageLimitButton')
-        self.voltageLimitButton.setText('Set')
-        self.voltageLimitButton.clicked.connect(self.sendVoltageLimitAction)
-        self.gcGridLayout.addWidget(self.voltageLimitButton, 6, 2, 1, 1)
 
         self.reloadValues()
 

@@ -16,23 +16,12 @@ class TorqueGroupBox(QtWidgets.QGroupBox):
         self.torqueTypeHorizontalLayout.setObjectName('torqueHorizontalLayout')
 
 
-        self.voltageRadioButton = QtWidgets.QRadioButton(self)
-        self.voltageRadioButton.setObjectName('voltageRadioButton')
-        self.voltageRadioButton.setText('Voltage')
-        self.voltageRadioButton.clicked.connect(self.sendTorqueModeVoltage)
-        self.torqueTypeHorizontalLayout.addWidget(self.voltageRadioButton)
-
-        self.dcCurrentRadioButton = QtWidgets.QRadioButton(self)
-        self.dcCurrentRadioButton.setObjectName('dcCurrentRadioButton')
-        self.dcCurrentRadioButton.setText('DC Current')
-        self.dcCurrentRadioButton.clicked.connect(self.sendTorqueModeDCCurrent)
-        self.torqueTypeHorizontalLayout.addWidget(self.dcCurrentRadioButton)
-
-        self.focCurrentRadioButton = QtWidgets.QRadioButton(self)
-        self.focCurrentRadioButton.setObjectName('focCurrentRadioButton')
-        self.focCurrentRadioButton.setText('FOC Current')
-        self.focCurrentRadioButton.clicked.connect(self.sendTorqueModeFOCCurrent)
-        self.torqueTypeHorizontalLayout.addWidget(self.focCurrentRadioButton)
+        
+        self.selectorTorque = QtWidgets.QComboBox(self)
+        self.selectorTorque.setObjectName('selectorControlLoop')
+        self.selectorTorque.addItems(['Voltage', 'DC Current', 'FOC Current'])
+        self.selectorTorque.currentIndexChanged.connect(self.changeTorque)
+        self.torqueTypeHorizontalLayout.addWidget(self.selectorTorque)
 
         self.setTorqueMode(self.device.torqueType)
 
@@ -57,20 +46,19 @@ class TorqueGroupBox(QtWidgets.QGroupBox):
 
     def setTorqueMode(self, value):
         if value == SimpleFOCDevice.VOLTAGE_TORQUE:
-            self.voltageRadioButton.toggle()
+            self.selectorTorque.setCurrentIndex(0)
         elif value == SimpleFOCDevice.DC_CURRENT_TORQUE:
-            self.dcCurrentRadioButton.toggle()
+            self.selectorTorque.setCurrentIndex(1)
         elif value == SimpleFOCDevice.FOC_CURRENT_TORQUE:
-            self.focCurrentRadioButton.toggle()
+            self.selectorTorque.setCurrentIndex(2)
 
-    def sendTorqueModeVoltage(self):
-        if self.device.isConnected:
-            self.device.sendTorqueType(SimpleFOCDevice.VOLTAGE_TORQUE)            
-    def sendTorqueModeDCCurrent(self):
-        if self.device.isConnected:
+    def changeTorque(self):
+        index = self.selectorTorque.currentIndex()
+        if index == 0:
+            self.device.sendTorqueType(SimpleFOCDevice.VOLTAGE_TORQUE)
+        elif index == 1:
             self.device.sendTorqueType(SimpleFOCDevice.DC_CURRENT_TORQUE)
-    def sendTorqueModeFOCCurrent(self):
-        if self.device.isConnected:
+        elif index == 2:
             self.device.sendTorqueType(SimpleFOCDevice.FOC_CURRENT_TORQUE)
 
     def commandResponseReceived(self, cmdRespose):

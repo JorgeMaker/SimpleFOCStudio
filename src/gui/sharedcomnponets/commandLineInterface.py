@@ -72,7 +72,7 @@ class CommandLineWidget(QtWidgets.QGroupBox):
         self.setEnabled(True)
 
     def disableUI(self):
-        self.commandLineDisplay.setEnabled(False)
+        # self.commandLineDisplay.setEnabled(False)
         self.commandLineEdit.setEnabled(False)
         self.sendButton.setEnabled(False)
 

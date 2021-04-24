@@ -162,7 +162,7 @@ class ControlPlotPanel(QtWidgets.QWidget):
 
         self.startStopButton = QtWidgets.QPushButton(self)
         self.startStopButton.setText('Start')
-        self.startStopButton.setObjectName('pause')
+        self.startStopButton.setObjectName('Start')
         self.startStopButton.clicked.connect(self.startStoPlotAction)
         self.startStopButton.setIcon(GUIToolKit.getIconByName('start'))
         self.horizontalLayout1.addWidget(self.startStopButton)

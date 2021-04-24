@@ -32,4 +32,4 @@ class DevicesInspectorTree(QFrame):
         self.connectionControl = ConnectionControlGroupBox(self)
         self.layout.addWidget(self.connectionControl)
 
-        self.setMaximumWidth(370)
+        self.setMaximumWidth(460)

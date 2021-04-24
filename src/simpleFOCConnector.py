@@ -33,7 +33,7 @@ class PIDController:
             'outputRamp':self.outputRamp,
             'outputLimit':self.outputLimit
         }
-
+        
 
 class LowPassFilter:
     Tf = 0
@@ -51,6 +51,11 @@ class SimpleFOCDevice:
     ANGLE_CONTROL = 2
     VELOCITY_OPENLOOP_CONTROL = 3
     ANGLE_OPENLOOP_CONTROL = 4
+
+    SINE_PWM  = 0
+    SPACE_VECTOR_PWM = 1
+    TRAPEZOIDAL_120 = 2
+    TRAPEZOIDAL_150 = 3
 
     VOLTAGE_TORQUE = 0
     DC_CURRENT_TORQUE  = 1
@@ -133,6 +138,8 @@ class SimpleFOCDevice:
             # general variables
             self.phaseResistance = 0
             self.deviceStatus = 0
+            self.modulationType = 0
+            self.modulationCentered = 1
 
             # sensor variables
             self.sensorElectricalZero = 0
@@ -217,6 +224,114 @@ class SimpleFOCDevice:
         }
         return valuesToSave
 
+        
+    def toArduinoCode(self, generateParams = []):
+
+        # code = "#include <SimpleFOC.h>\n\n"
+        # code += "void setup(){\n\n"
+        # code += "....\n\n"
+        code = "\n"
+        if generateParams[0] or generateParams==[]:
+            code += "// control loop type and torque mode \n"
+            code += "motor.torque_controller = TorqueControlType::"
+            if self.torqueType == self.VOLTAGE_TORQUE:
+                code += "voltage"
+            elif self.torqueType == self.DC_CURRENT_TORQUE:
+                code += "dc_current"
+            elif self.torqueType == self.FOC_CURRENT_TORQUE:
+                code += "foc_current"
+            code += ";\n"
+            code += "motor.controller = MotionControlType::"
+            if self.controlType == self.TORQUE_CONTROL:
+                code += "torque"
+            elif self.controlType == self.VELOCITY_CONTROL:
+                code += "velocity"
+            elif self.controlType == self.ANGLE_CONTROL:
+                code += "angle"
+            elif self.controlType == self.VELOCITY_CONTROL:
+                code += "velocity_openloop"
+            elif self.controlType == self.ANGLE_CONTROL:
+                code += "angle_openloop"
+            code += ";\n"
+            code += "motor.motion_downsample = " + str(self.motionDownsample) +";\n" 
+            code += "\n"
+
+        if generateParams[1] or generateParams==[]:
+            code += "// velocity loop PID\n"  
+            code += "motor.PID_velocity.P = " + str(self.PIDVelocity.P) +";\n"  
+            code += "motor.PID_velocity.I = " + str(self.PIDVelocity.I) +";\n"  
+            code += "motor.PID_velocity.D = " + str(self.PIDVelocity.D) +";\n"  
+            code += "motor.PID_velocity.output_ramp = " + str(self.PIDVelocity.outputRamp) +";\n"  
+            code += "motor.PID_velocity.limit = " + str(self.PIDVelocity.outputLimit) +";\n"  
+            code += "// Low pass filtering time constant \n"  
+            code += "motor.LPF_velocity.Tf = " + str(self.LPFVelocity.Tf) +";\n"  
+        if generateParams[2] or generateParams==[]:
+            code += "// angle loop PID\n"
+            code += "motor.P_angle.P = " + str(self.PIDAngle.P) +";\n"  
+            code += "motor.P_angle.I = " + str(self.PIDAngle.I) +";\n"   
+            code += "motor.P_angle.D = " + str(self.PIDAngle.D) +";\n"    
+            code += "motor.P_angle.output_ramp = " + str(self.PIDAngle.outputRamp) +";\n"   
+            code += "motor.P_angle.limit = " + str(self.PIDAngle.outputLimit) +";\n"  
+            code += "// Low pass filtering time constant \n" 
+            code += "motor.LPF_angle.Tf = " + str(self.LPFAngle.Tf) +";\n"  
+        if generateParams[3] or generateParams==[]: 
+            code += "// current q loop PID \n"
+            code += "motor.PID_current_q.P = " + str(self.PIDCurrentQ.P) +";\n"  
+            code += "motor.PID_current_q.I = " + str(self.PIDCurrentQ.I) +";\n"   
+            code += "motor.PID_current_q.D = " + str(self.PIDCurrentQ.D) +";\n"   
+            code += "motor.PID_current_q.output_ramp = " + str(self.PIDCurrentQ.outputRamp) +";\n"  
+            code += "motor.PID_current_q.limit = " + str(self.PIDCurrentQ.outputLimit) +";\n"  
+            code += "// Low pass filtering time constant \n" 
+            code += "motor.LPF_current_q.Tf = " + str(self.LPFCurrentQ.Tf) +";\n"  
+        if generateParams[4] or generateParams==[]:
+            code += "// current d loop PID\n"
+            code += "motor.PID_current_d.P = " + str(self.PIDCurrentD.P) +";\n"   
+            code += "motor.PID_current_d.I = " + str(self.PIDCurrentD.I) +";\n"  
+            code += "motor.PID_current_d.D = " + str(self.PIDCurrentD.D) +";\n"  
+            code += "motor.PID_current_d.output_ramp = " + str(self.PIDCurrentD.outputRamp) +";\n"   
+            code += "motor.PID_current_d.limit = " + str(self.PIDCurrentD.outputLimit) +";\n"  
+            code += "// Low pass filtering time constant \n" 
+            code += "motor.LPF_current_d.Tf = " + str(self.LPFCurrentD.Tf) +";\n" 
+ 
+        if generateParams[5] or generateParams==[]:
+            code += "// Limits \n"
+            code += "motor.velocity_limit = " + str(self.velocityLimit) +";\n" 
+            code += "motor.voltage_limit = " + str(self.voltageLimit) +";\n" 
+            code += "motor.current_limit = " + str(self.currentLimit) +";\n" 
+
+        if generateParams[6] or generateParams==[]:
+            code += "// sensor zero offset - home position \n"
+            code += "motor.sensor_offset = " + str(self.sensorZeroOffset) +";\n" 
+
+        if generateParams[7] or generateParams==[]:
+            code += "// sensor zero electrical angle \n"
+            code += "// this parameter enables skipping a part of initFOC \n"
+            code += "motor.sensor_electrical_offset = " + str(self.sensorElectricalZero) +";\n" 
+
+        if generateParams[8] or generateParams==[]:
+            code += "// general settings \n"
+            code += "// motor phase resistance \n"
+            code += "motor.phase_resistance = " + str(self.sensorElectricalZero) +";\n" 
+            
+        if generateParams[9] or generateParams==[]:
+            code += "// pwm modulation settings \n"
+            code += "motor.foc_modulation = FOCModulationType::"
+            if self.modulationType == self.SINE_PWM:
+                code += "SinePWM"
+            elif self.modulationType == self.SPACE_VECTOR_PWM:
+                code += "SpaceVectorPWM"
+            elif self.modulationType == self.TRAPEZOIDAL_120:
+                code += "Trapezoid_120"
+            elif self.modulationType == self.TRAPEZOIDAL_150:
+                code += "Trapezoid_150"
+            code += ";\n"
+            code += "motor.modulation_centered = " + str(self.modulationCentered) +";\n" 
+
+        # code += "\n\nmotor.init();\nmotor.initFOC();\n\n...\n\n }"
+        # code += "\n\nvoid loop() {\n\n....\n\n}"
+        
+        return code
+
     def __initCommunications(self):
         self.serialPort = serial.Serial(self.serialPortName,
                                         self.serialRate,
@@ -226,11 +341,8 @@ class SimpleFOCDevice:
 
         self.commProvider.serialComm = self.serialPort
         self.commProvider.start()
-        self.stateUpdater.start()
 
     def __closeCommunication(self):
-        # self.stateUpdater.stop()
-        # self.commProvider.stop()
         self.serialPort.close()
 
     def connect(self, connectionMode):
@@ -257,14 +369,21 @@ class SimpleFOCDevice:
                 listener.connectionStateChanged(True)
             if connectionMode == SimpleFOCDevice.PULL_CONFIG_ON_CONNECT:
                 self.pullConfiguration()
+                if self.stateUpdater.stopped():
+                    self.stateUpdater = StateUpdateRunner(self)
+                self.stateUpdater.start()
             elif connectionMode == SimpleFOCDevice.PUSH_CONFG_ON_CONNECT:
                 self.pushConfiguration()
+                if self.stateUpdater.stopped():
+                    self.stateUpdater = StateUpdateRunner(self)
+                sself.stateUpdater.start()
                 pass
             return True
 
     def disConnect(self):
         self.isConnected = False
         self.__closeCommunication()
+        self.stateUpdater.stop()
         for listener in self.connectionStateListenerList:
             listener.connectionStateChanged(False)
 
@@ -385,6 +504,25 @@ class SimpleFOCDevice:
                 self.deviceStatus = targetvalue
             self.setCommand('E', str(targetvalue))
 
+            
+    def sendModulationCentered(self, targetvalue):
+        if self.isConnected:
+            if targetvalue != '':
+                self.modulationCentered = targetvalue
+            self.setCommand('WC', str(targetvalue))
+            
+    def sendModulationType(self, targetvalue):
+        if self.isConnected:
+            if targetvalue != '':
+                self.modulationType = targetvalue
+            self.setCommand('WT', str(targetvalue))
+            
+    def sendDeviceStatus(self, targetvalue):
+        if self.isConnected:
+            if targetvalue != '':
+                self.deviceStatus = targetvalue
+            self.setCommand('E', str(targetvalue))
+
     def sendMonitorDownsample(self, targetvalue):
         if self.isConnected:
             if targetvalue != '':
@@ -482,6 +620,10 @@ class SimpleFOCDevice:
         time.sleep(5 / 1000)
         self.sendPhaseResistance('')
         time.sleep(5 / 1000)
+        self.sendModulationCentered('')
+        time.sleep(5 / 1000)
+        self.sendModulationCentered('')
+        time.sleep(5 / 1000)
         self.sendDeviceStatus('')
 
     def parsePIDFResponse(self, pid, lpf, comandResponse):
@@ -523,6 +665,20 @@ class SimpleFOCDevice:
             self.controlType = 3
         elif 'vel' in comandResponse:
             self.controlType = 1
+            
+    def parsePWMModResponse(self, comandResponse):
+        if 'center' in comandResponse:
+            self.modulationCentered = float(comandResponse.replace('center:', ''))
+        elif 'type' in comandResponse:
+            comandResponse = comandResponse.replace('type:', '')
+            if 'Sine' in comandResponse:
+                self.modulationType = self.SINE_PWM
+            elif 'SVPWM' in comandResponse:
+                self.modulationType = self.SPACE_VECTOR_PWM
+            elif 'Trap 120' in comandResponse:
+                self.modulationType = self.TRAPEZOIDAL_120
+            elif 'Trap 150' in comandResponse:
+                self.modulationType = self.TRAPEZOIDAL_150
             
     def parseTorqueResponse(self, comandResponse):
         if 'volt' in comandResponse:
@@ -596,6 +752,9 @@ class SimpleFOCDevice:
             self.deviceStatus = float(comandResponse.replace('Status:', ''))
         elif 'R phase' in comandResponse:
             self.phaseResistance = float(comandResponse.replace('R phase:', ''))
+        elif 'PWM Mod' in comandResponse:
+            comandResponse = comandResponse.replace('PWM Mod | ', '')
+            self.parsePWMModResponse(comandResponse)
 
     def parseStateResponses(self, comandResponse):
         if 'Monitor' in comandResponse:
@@ -658,7 +817,8 @@ class SerialPortReceiveHandler(QtCore.QThread):
             logging.error(serialException, exc_info=True)
         except TypeError as typeError:
             logging.error(typeError, exc_info=True)
-            
+        except AttributeError as ae:
+            logging.error(ae, exc_info=True)            
 
     def stop(self):
         self._stop_event.set()
@@ -688,3 +848,4 @@ class StateUpdateRunner(QtCore.QThread):
 
     def stopped(self):
         return self._stop_event.is_set()
+        

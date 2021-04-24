@@ -49,6 +49,13 @@ class CommandLineWidget(QtWidgets.QGroupBox):
         self.clearButton.setIcon(GUIToolKit.getIconByName('delete'))
         self.clearButton.clicked.connect(self.clearAction)
         self.clearButton.setText('Clear')
+        
+        self.listDevices = QtWidgets.QPushButton(self.cmlWidget)
+        self.listDevices.setObjectName('listDevices')
+        self.cmlHorizontalLayout.addWidget(self.listDevices)
+        self.listDevices.setIcon(GUIToolKit.getIconByName('list'))
+        self.listDevices.clicked.connect(self.sendListDevices)
+        self.listDevices.setText('List Devices')
 
         self.cmlVerticalLayout.addWidget(self.cmlWidget)
         self.device.addConnectionStateListener(self)
@@ -86,3 +93,6 @@ class CommandLineWidget(QtWidgets.QGroupBox):
     def sendAction(self):
         self.device.sendCommand(self.commandLineEdit.text())
         self.commandLineEdit.setText('')
+        
+    def sendListDevices(self):
+        self.device.sendCommand('?')

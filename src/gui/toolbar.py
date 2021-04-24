@@ -42,6 +42,12 @@ class SimpleFOCConfigToolBar(QtWidgets.QToolBar):
 
         self.addAction(self.saveDeviceAction)
 
+        self.generateCodeAction = QtWidgets.QAction(main_window)
+        self.generateCodeAction.setIcon(GUIToolKit.getIconByName('gen'))
+        self.generateCodeAction.setObjectName('genertecode')
+        self.generateCodeAction.triggered.connect(devicesTabedWidget.generateCode)
+
+        self.addAction(self.generateCodeAction)
         self.addSeparator()
 
         self.openConsoleToolAction = QtWidgets.QAction(main_window)

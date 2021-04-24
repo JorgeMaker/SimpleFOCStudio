@@ -9,7 +9,9 @@ from PyQt5 import QtWidgets
 from src.gui.commandlinetool.commandlinetool import CommandLineConsoleTool
 from src.gui.configtool.deviceConfigurationTool import DeviceConfigurationTool
 from src.gui.configtool.treeViewConfigTool import TreeViewConfigTool
+from src.gui.configtool.generatedCodeDisplay import GeneratedCodeDisplay,GenerateCodeDialog
 from src.simpleFOCConnector import SimpleFOCDevice
+from src.gui.sharedcomnponets.sharedcomponets import GUIToolKit
 
 
 class WorkAreaTabbedWidget(QtWidgets.QTabWidget):
@@ -24,6 +26,7 @@ class WorkAreaTabbedWidget(QtWidgets.QTabWidget):
 
         self.cmdLineTool = None
         self.configDeviceTool = None
+        self.generatedCodeTab = None
         self.activeToolsList = []
 
         self.tabCloseRequested.connect(self.removeTabHandler)
@@ -38,20 +41,14 @@ class WorkAreaTabbedWidget(QtWidgets.QTabWidget):
         if type(self.currentWidget()) == DeviceConfigurationTool or type(
                 self.currentWidget()) == TreeViewConfigTool:
             self.configDeviceTool = None
+        if type(self.currentWidget()) == GeneratedCodeDisplay:
+            self.generatedCodeTab = None
         if self.configDeviceTool == None and self.cmdLineTool == None:
             if self.device.isConnected:
                 self.device.disConnect()
 
         self.activeToolsList.pop(index)
         self.removeTab(index)
-
-    def addGenericConfig(self):
-        if self.configGenericTool is None:
-            self.configGenericTool = GenericConfigTool()
-            self.activeToolsList.append(self.configGenericTool)
-            self.addTab(self.configGenericTool,
-                        self.configGenericTool.getTabIcon(), 'Generic Config')
-            self.setCurrentIndex(self.currentIndex() + 1)
 
     def addDeviceForm(self):
         if self.configDeviceTool is None:
@@ -82,19 +79,14 @@ class WorkAreaTabbedWidget(QtWidgets.QTabWidget):
                         sfd = SimpleFOCDevice.getInstance()
                         sfd.configureDevice(configurationInfo)
                         self.configDeviceTool = TreeViewConfigTool()
-                        self.configDeviceTool.treeViewWidget.connectionControl.connectionModeComboBox.setCurrentText(
-                            SimpleFOCDevice.PUSH_CONFG_ON_CONNECT)
                         sfd.openedFile = filenames
-                        print("here")
                         self.activeToolsList.append(self.configDeviceTool)
                         tabName = self.configDeviceTool.getTabName()
                         if tabName == '':
                             tabName = 'Device'
-                        print("here")
                         self.addTab(self.configDeviceTool,
                                     self.configDeviceTool.getTabIcon(), tabName)
                         self.setCurrentIndex(self.currentIndex() + 1)
-                        print("here")
 
                 except Exception as exception:
                     msgBox = QtWidgets.QMessageBox()
@@ -120,6 +112,16 @@ class WorkAreaTabbedWidget(QtWidgets.QTabWidget):
             else:
                 self.saveToFile(currentconfigDeviceTool.device,
                                 currentconfigDeviceTool.device.openedFile)
+                                
+    def generateCode(self):
+        if len(self.activeToolsList) > 0:
+            currentconfigDeviceTool = self.activeToolsList[self.currentIndex()]
+            self.generatedCodeTab = GeneratedCodeDisplay()
+            self.activeToolsList.append(self.generatedCodeTab)
+            self.addTab(self.generatedCodeTab,
+                        self.generatedCodeTab.getTabIcon(), self.generatedCodeTab.getTabName())
+            self.setCurrentIndex(self.currentIndex() + 1)
+
 
     def saveToFile(self, deviceToSave, file):
         if type(file) is list:

@@ -21,16 +21,17 @@ class ConnectionControlGroupBox(QtWidgets.QGroupBox):
         self.devCommandIDLabel = QtWidgets.QLabel("Command:")
         self.horizontalLayout.addWidget(self.devCommandIDLabel)
         self.devCommandIDLetter = QtWidgets.QLineEdit()
-        self.devCommandIDLetter.setMaximumWidth(40)
         self.devCommandIDLetter.setObjectName('devCommandIDLetter')
         self.devCommandIDLetter.editingFinished.connect(self.changeDevicedevCommandID)
         self.horizontalLayout.addWidget(self.devCommandIDLetter)
 
-        self.connectionModeComboBox = QtWidgets.QComboBox()
-        self.connectionModeComboBox.setObjectName('connectDeviceButton')
-        self.connectionModeComboBox.addItems([SimpleFOCDevice.PULL_CONFIG_ON_CONNECT, SimpleFOCDevice.PUSH_CONFG_ON_CONNECT])
+        self.pullConfig = QtWidgets.QPushButton()
+        self.pullConfig.setObjectName('pullConfig')
+        self.pullConfig.setIcon(GUIToolKit.getIconByName('pull'))
+        self.pullConfig.setText(' Pull Params')
+        self.pullConfig.clicked.connect(self.device.pullConfiguration)
         
-        self.horizontalLayout.addWidget(self.connectionModeComboBox)
+        self.horizontalLayout.addWidget(self.pullConfig)
 
         self.connectDisconnectButton = QtWidgets.QPushButton(self)
         self.connectDisconnectButton.setIcon(GUIToolKit.getIconByName('connect'))
@@ -50,13 +51,6 @@ class ConnectionControlGroupBox(QtWidgets.QGroupBox):
         self.device.addConnectionStateListener(self)
         self.connectionStateChanged(self.device.isConnected)
     
-    def connectDisconnectDeviceAction(self):
-        if self.device.isConnected:
-            self.device.disConnect()
-        else:
-            connectionMode  = self.connectionModeComboBox.currentText()
-            self.device.connect(connectionMode)
-
     def changeDevicedevCommandID(self):
         self.device.devCommandID = self.devCommandIDLetter.text()
 
@@ -64,7 +58,7 @@ class ConnectionControlGroupBox(QtWidgets.QGroupBox):
         if self.device.isConnected:
             self.device.disConnect()
         else:
-            connectionMode  = self.connectionModeComboBox.currentText()
+            connectionMode  = SimpleFOCDevice.PULL_CONFIG_ON_CONNECT
             self.device.connect(connectionMode)
 
     def connectionStateChanged(self, isConnected):

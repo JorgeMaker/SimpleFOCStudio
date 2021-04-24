@@ -153,6 +153,23 @@ class DeviceTreeView(QTreeWidget):
         self.selectStatus.addItems(['Disabled', 'Enabled'])
         self.selectStatus.currentIndexChanged.connect(self.changeStatus)
         self.setItemWidget(self.deviceStatus,1,self.selectStatus)
+
+        self.modulationType = QtWidgets.QTreeWidgetItem(self.generalSettings)
+        self.modulationType.setText(0, 'PWM modulation')
+        self.modulationType.setIcon(0, GUIToolKit.getIconByName('gear'))
+        self.selectModulation = QtWidgets.QComboBox(self)
+        self.selectModulation.addItems(['Sine PWM', 'Space Vector PWM', 'Trapezoidal 120', 'Trapezoidal 150'])
+        self.selectModulation.currentIndexChanged.connect(self.changeModType)
+        self.setItemWidget(self.modulationType,1,self.selectModulation)
+
+        self.modulationCenter = QtWidgets.QTreeWidgetItem(self.generalSettings)
+        self.modulationCenter.setText(0, 'Modulation center')
+        self.modulationCenter.setIcon(0, GUIToolKit.getIconByName('gear'))
+        self.selectModCenter = QtWidgets.QComboBox(self)
+        self.selectModCenter.addItems(['Disabled', 'Enabled'])
+        self.selectModCenter.currentIndexChanged.connect(self.changeModCenter)
+        self.setItemWidget(self.modulationCenter,1,self.selectModCenter)
+        
         
         self.header().resizeSection(0, 210) 
 
@@ -280,6 +297,8 @@ class DeviceTreeView(QTreeWidget):
         self.setTorqueMode(self.device.torqueType)
         self.setControlLopMode(self.device.controlType)
         self.setEnabledDisabled(self.device.deviceStatus)
+        self.setModCenter(self.device.modulationCentered)
+        self.setModType(self.device.modulationType)
 
     def stateResponseReceived(self, comandResponse):
         self.blockSignals(True)
@@ -335,7 +354,6 @@ class DeviceTreeView(QTreeWidget):
             self.device.sendTorqueType(SimpleFOCDevice.DC_CURRENT_TORQUE)
         elif index == 2:
             self.device.sendTorqueType(SimpleFOCDevice.FOC_CURRENT_TORQUE)
-        self.blockSignals(False)
 
     def setEnabledDisabled(self, value):
         self.blockSignals(True)
@@ -343,6 +361,7 @@ class DeviceTreeView(QTreeWidget):
             self.selectStatus.setCurrentIndex(0)
         elif value == 1:
             self.selectStatus.setCurrentIndex(1)
+        self.blockSignals(False)
 
     def changeStatus(self):
         index = self.selectStatus.currentIndex()
@@ -350,7 +369,41 @@ class DeviceTreeView(QTreeWidget):
             self.device.sendDeviceStatus(0)
         elif index == 1:
             self.device.sendDeviceStatus(1)
+        
+    def setModCenter(self,value):
+        self.blockSignals(True)
+        self.selectModCenter.setCurrentIndex(value)
         self.blockSignals(False)
+        
+    def changeModCenter(self):
+        index = self.selectModCenter.currentIndex()
+        if index == 0:
+            self.device.sendModulationCentered(0)
+        elif index == 1:
+            self.device.sendModulationCentered(1)
+
+    def setModType(self, value):
+        self.blockSignals(True)
+        if value == SimpleFOCDevice.SINE_PWM:
+            self.selectModulation.setCurrentIndex(0)
+        elif value == SimpleFOCDevice.SPACE_VECTOR_PWM:
+            self.selectModulation.setCurrentIndex(1)
+        elif value == SimpleFOCDevice.TRAPEZOIDAL_120:
+            self.selectModulation.setCurrentIndex(2)
+        elif value == SimpleFOCDevice.TRAPEZOIDAL_150:
+            self.selectModulation.setCurrentIndex(3)
+        self.blockSignals(False)
+
+    def changeModType(self):
+        index = self.selectModulation.currentIndex()
+        if index == 0:
+            self.device.sendModulationType(SimpleFOCDevice.SINE_PWM)
+        elif index == 1:
+            self.device.sendModulationType(SimpleFOCDevice.SPACE_VECTOR_PWM)
+        elif index == 2:
+            self.device.sendModulationType(SimpleFOCDevice.TRAPEZOIDAL_120)
+        elif index == 3:
+            self.device.sendModulationType(SimpleFOCDevice.TRAPEZOIDAL_150)
 
     def setControlLopMode(self, value):
         self.blockSignals(True)

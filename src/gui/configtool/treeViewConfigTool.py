@@ -7,7 +7,7 @@ from src.simpleFOCConnector import SimpleFOCDevice
 from src.gui.configtool.devicesInspectorTree import DevicesInspectorTree
 from src.gui.configtool.deviceInteractionFrame import DeviceInteractionFrame
 
-class TreeViewCofigTool(WorkAreaTabWidget):
+class TreeViewConfigTool(WorkAreaTabWidget):
 
     def __init__(self, parent=None):
         super().__init__(parent)

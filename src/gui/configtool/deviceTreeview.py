@@ -4,7 +4,7 @@ from PyQt5 import QtWidgets, QtCore
 from PyQt5.Qt import QTreeWidget
 
 from src.gui.sharedcomnponets.sharedcomponets import GUIToolKit
-from src.simpleFOCConnector import SimpleFOCDevice
+from src.simpleFOCConnector import SimpleFOCDevice, PIDController, LowPassFilter
 
 
 class DeviceTreeView(QTreeWidget):
@@ -17,160 +17,421 @@ class DeviceTreeView(QTreeWidget):
         self.sFOCDevice.setText(0, 'sFOC Device')
         self.sFOCDevice.setIcon(0, GUIToolKit.getIconByName('motor'))
 
-        self.pidConfiguration = QtWidgets.QTreeWidgetItem(self.sFOCDevice)
-        self.pidConfiguration.setText(0, 'Pid configuration')
-        self.pidConfiguration.setIcon(0, GUIToolKit.getIconByName('pidconfig'))
-        self.sFOCDevice.addChild(self.pidConfiguration)
+        self.setColumnCount(2)
 
-        self.proportionalGain = QtWidgets.QTreeWidgetItem(self.pidConfiguration)
-        self.proportionalGain.setText(0, 'Proportional gain')
-        self.proportionalGain.setIcon(0, GUIToolKit.getIconByName('gear'))
-        self.pidConfiguration.addChild(self.proportionalGain)
-        self.proportionalValue = QtWidgets.QTreeWidgetItem(self.proportionalGain)
-        self.proportionalValue.setText(0, '')
-        self.proportionalValue.setFlags(
-            self.proportionalValue.flags() | QtCore.Qt.ItemIsEditable)
-        self.proportionalGain.addChild(self.proportionalValue)
+        self.motionControl = QtWidgets.QTreeWidgetItem(self.sFOCDevice)
+        self.motionControl.setText(0, 'Motion config')
+        self.motionControl.setIcon(0, GUIToolKit.getIconByName('pidconfig'))
+        self.sFOCDevice.addChild(self.motionControl)
+        
+        self.controller = QtWidgets.QTreeWidgetItem(self.motionControl)
+        self.controller.setText(0, 'Motion Control Type')
+        self.controller.setIcon(0, GUIToolKit.getIconByName('gear'))
+        self.selectorControlLoop = QtWidgets.QComboBox(self)
+        self.selectorControlLoop.addItems(['Torque', 'Velocity', 'Angle', 'Velocity openloop', 'Angle openloop'])
+        self.selectorControlLoop.currentIndexChanged.connect(self.changeControlLoop)
+        self.setItemWidget(self.controller,1,self.selectorControlLoop)
 
-        self.integralGain = QtWidgets.QTreeWidgetItem(self.pidConfiguration)
-        self.integralGain.setText(0, 'Integral gain')
-        self.integralGain.setIcon(0, GUIToolKit.getIconByName('gear'))
-        self.pidConfiguration.addChild(self.integralGain)
-        self.integralGainlValue = QtWidgets.QTreeWidgetItem(self.integralGain)
-        self.integralGainlValue.setText(0, '')
-        self.integralGainlValue.setFlags(
-            self.integralGainlValue.flags() | QtCore.Qt.ItemIsEditable)
-        self.integralGain.addChild(self.integralGainlValue)
+        self.torque = QtWidgets.QTreeWidgetItem(self.motionControl)
+        self.torque.setText(0, 'Torque Control Type')
+        self.torque.setIcon(0, GUIToolKit.getIconByName('gear'))
+        self.selectorTorque = QtWidgets.QComboBox(self)
+        self.selectorTorque.addItems(['Voltage', 'DC Curret', 'FOC Current'])
+        self.selectorTorque.currentIndexChanged.connect(self.changeTorque)
+        self.setItemWidget(self.torque,1,self.selectorTorque)
+        
+        self.motionDownsample = QtWidgets.QTreeWidgetItem(self.motionControl)
+        self.motionDownsample.setText(0, 'Motion Downsample')
+        self.motionDownsample.setIcon(0, GUIToolKit.getIconByName('gear'))
+        self.motionDownsample.setText(1, '')
+        self.motionDownsample.setFlags(
+            self.motionDownsample.flags() | QtCore.Qt.ItemIsEditable)
+        
+        self.PIDVelocityConfig = self.addPIDSubtree(self.motionControl,'Velocity PID')
+        self.PIDAngleConfig = self.addPIDSubtree(self.motionControl,'Angle PID')
+        self.PIDCurrentQConfig = self.addPIDSubtree(self.motionControl,'Current q PID')
+        self.PIDCurrentDConfig = self.addPIDSubtree(self.motionControl,'Current d PID')
 
-        self.derivativeGain = QtWidgets.QTreeWidgetItem(self.pidConfiguration)
-        self.derivativeGain.setText(0, 'Derivative gain')
-        self.derivativeGain.setIcon(0, GUIToolKit.getIconByName('gear'))
-        self.pidConfiguration.addChild(self.derivativeGain)
-        self.derivativeGainValue = QtWidgets.QTreeWidgetItem(self.derivativeGain)
-        self.derivativeGainValue.setText(0, '')
-        self.derivativeGainValue.setFlags(
-            self.derivativeGainValue.flags() | QtCore.Qt.ItemIsEditable)
-        self.derivativeGain.addChild(self.derivativeGainValue)
+        self.limitsConfig = QtWidgets.QTreeWidgetItem(self.sFOCDevice)
+        self.limitsConfig.setText(0, 'Limits')
+        self.limitsConfig.setIcon(0, GUIToolKit.getIconByName('statistics'))
+        self.sFOCDevice.addChild(self.limitsConfig)
 
-        self.voltageRamp = QtWidgets.QTreeWidgetItem(self.pidConfiguration)
-        self.voltageRamp.setText(0, 'Voltage Ramp')
-        self.voltageRamp.setIcon(0, GUIToolKit.getIconByName('gear'))
-        self.pidConfiguration.addChild(self.voltageRamp)
-        self.voltageRampValue = QtWidgets.QTreeWidgetItem(self.voltageRamp)
-        self.voltageRampValue.setText(0, '')
-        self.voltageRampValue.setFlags(
-            self.voltageRampValue.flags() | QtCore.Qt.ItemIsEditable)
-        self.voltageRamp.addChild(self.derivativeGainValue)
+        self.velocityLimit = QtWidgets.QTreeWidgetItem(self.limitsConfig)
+        self.velocityLimit.setText(0, 'Velocity limit')
+        self.velocityLimit.setIcon(0, GUIToolKit.getIconByName('gear'))
+        self.velocityLimit.setText(1, '')
+        self.velocityLimit.setFlags(
+            self.velocityLimit.flags() | QtCore.Qt.ItemIsEditable)
 
-        self.generalStttings = QtWidgets.QTreeWidgetItem(self.sFOCDevice)
-        self.generalStttings.setText(0, 'General settings')
-        self.generalStttings.setIcon(0, GUIToolKit.getIconByName('generalsettings'))
-        self.sFOCDevice.addChild(self.generalStttings)
+        self.voltageLimit = QtWidgets.QTreeWidgetItem(self.limitsConfig)
+        self.voltageLimit.setText(0, 'Voltage limit')
+        self.voltageLimit.setIcon(0, GUIToolKit.getIconByName('gear'))
+        self.voltageLimit.setText(1, '')
+        self.voltageLimit.setFlags(
+            self.voltageLimit.flags() | QtCore.Qt.ItemIsEditable)
 
-        self.lwpFilter = QtWidgets.QTreeWidgetItem(self.generalStttings)
-        self.lwpFilter.setText(0, 'Low pass filterRamp')
-        self.lwpFilter.setIcon(0, GUIToolKit.getIconByName('gear'))
-        self.generalStttings.addChild(self.lwpFilter)
-        self.lwpFilterValue = QtWidgets.QTreeWidgetItem(self.lwpFilter)
-        self.lwpFilterValue.setText(0, '')
-        self.lwpFilterValue.setFlags(
-            self.lwpFilterValue.flags() | QtCore.Qt.ItemIsEditable)
-        self.lwpFilter.addChild(self.lwpFilterValue)
+        self.currentLimit = QtWidgets.QTreeWidgetItem(self.limitsConfig)
+        self.currentLimit.setText(0, 'Current limit')
+        self.currentLimit.setIcon(0, GUIToolKit.getIconByName('gear'))
+        self.currentLimit.setText(1, '')
+        self.currentLimit.setFlags(
+            self.currentLimit.flags() | QtCore.Qt.ItemIsEditable)
 
-        self.pGain = QtWidgets.QTreeWidgetItem(self.generalStttings)
-        self.pGain.setText(0, 'Prop gain')
-        self.pGain.setIcon(0, GUIToolKit.getIconByName('gear'))
-        self.generalStttings.addChild(self.pGain)
-        self.pGainValue = QtWidgets.QTreeWidgetItem(self.pGain)
-        self.pGainValue.setText(0, '')
-        self.pGainValue.setFlags(self.pGainValue.flags() | QtCore.Qt.ItemIsEditable)
-        self.pGain.addChild(self.pGainValue)
 
-        self.veliLimit = QtWidgets.QTreeWidgetItem(self.generalStttings)
-        self.veliLimit.setText(0, 'Velocity limit')
-        self.veliLimit.setIcon(0, GUIToolKit.getIconByName('gear'))
-        self.generalStttings.addChild(self.veliLimit)
-        self.veliLimitValue = QtWidgets.QTreeWidgetItem(self.veliLimit)
-        self.veliLimitValue.setText(0, '')
-        self.veliLimitValue.setFlags(
-            self.veliLimitValue.flags() | QtCore.Qt.ItemIsEditable)
-        self.veliLimit.addChild(self.veliLimitValue)
+        self.statesConfig = QtWidgets.QTreeWidgetItem(self.sFOCDevice)
+        self.statesConfig.setText(0, 'States')
+        self.statesConfig.setIcon(0, GUIToolKit.getIconByName('statistics'))
+        self.sFOCDevice.addChild(self.statesConfig)
 
-        self.voliLimit = QtWidgets.QTreeWidgetItem(self.generalStttings)
-        self.voliLimit.setText(0, 'Voltage limit')
-        self.voliLimit.setIcon(0, GUIToolKit.getIconByName('gear'))
-        self.generalStttings.addChild(self.voliLimit)
-        self.voliLimitValue = QtWidgets.QTreeWidgetItem(self.voliLimit)
-        self.voliLimitValue.setText(0, '')
-        self.voliLimitValue.setFlags(
-            self.voliLimitValue.flags() | QtCore.Qt.ItemIsEditable)
-        self.voliLimit.addChild(self.voliLimitValue)
+
+        self.satateTarget = QtWidgets.QTreeWidgetItem(self.statesConfig)
+        self.satateTarget.setText(0, 'Target')
+        self.satateTarget.setIcon(0, GUIToolKit.getIconByName('gear'))
+        self.satateTarget.setText(1, '')
+
+        self.stateVq = QtWidgets.QTreeWidgetItem(self.statesConfig)
+        self.stateVq.setText(0, 'Voltage q')
+        self.stateVq.setIcon(0, GUIToolKit.getIconByName('gear'))
+        self.stateVd = QtWidgets.QTreeWidgetItem(self.statesConfig)
+        self.stateVd.setText(0, 'Voltage d')
+        self.stateVd.setIcon(0, GUIToolKit.getIconByName('gear'))
+
+        self.stateCq = QtWidgets.QTreeWidgetItem(self.statesConfig)
+        self.stateCq.setText(0, 'Current q')
+        self.stateCq.setIcon(0, GUIToolKit.getIconByName('gear'))
+        self.stateCd = QtWidgets.QTreeWidgetItem(self.statesConfig)
+        self.stateCd.setText(0, 'Current d')
+        self.stateCd.setIcon(0, GUIToolKit.getIconByName('gear'))
+
+        self.stateVel = QtWidgets.QTreeWidgetItem(self.statesConfig)
+        self.stateVel.setText(0, 'Velocity')
+        self.stateVel.setIcon(0, GUIToolKit.getIconByName('gear'))
+        self.stateVel.setText(1, '')
+
+        self.stateAngle = QtWidgets.QTreeWidgetItem(self.statesConfig)
+        self.stateAngle.setText(0, 'Angle')
+        self.stateAngle.setIcon(0, GUIToolKit.getIconByName('gear'))
+        self.stateAngle.setText(1, '')
+
+
+        self.sensorConfig = QtWidgets.QTreeWidgetItem(self.sFOCDevice)
+        self.sensorConfig.setText(0, 'Sensor config')
+        self.sensorConfig.setIcon(0, GUIToolKit.getIconByName('sensor'))
+        self.sFOCDevice.addChild(self.sensorConfig)
+
+        self.sensorZeroOffset = QtWidgets.QTreeWidgetItem(self.sensorConfig)
+        self.sensorZeroOffset.setText(0, 'Zero Angle Offset')
+        self.sensorZeroOffset.setIcon(0, GUIToolKit.getIconByName('gear'))
+        self.sensorZeroOffset.setText(1, '')
+        self.sensorZeroOffset.setFlags(
+            self.sensorZeroOffset.flags() | QtCore.Qt.ItemIsEditable)
+
+        self.sensorZeroElecOffset = QtWidgets.QTreeWidgetItem(self.sensorConfig)
+        self.sensorZeroElecOffset.setText(0, 'Electrical Zero Offset')
+        self.sensorZeroElecOffset.setIcon(0, GUIToolKit.getIconByName('gear'))
+        self.sensorZeroElecOffset.setText(1, '')
+        self.sensorZeroElecOffset.setFlags(
+            self.sensorZeroElecOffset.flags() | QtCore.Qt.ItemIsEditable)
+
+        self.generalSettings = QtWidgets.QTreeWidgetItem(self.sFOCDevice)
+        self.generalSettings.setText(0, 'General settings')
+        self.generalSettings.setIcon(0, GUIToolKit.getIconByName('generalsettings'))
+        self.sFOCDevice.addChild(self.generalSettings)
+
+        self.phaseRes = QtWidgets.QTreeWidgetItem(self.generalSettings)
+        self.phaseRes.setText(0, 'Phase Resistance')
+        self.phaseRes.setIcon(0, GUIToolKit.getIconByName('res'))
+        self.phaseRes.setText(1, '')
+        self.phaseRes.setFlags(
+            self.phaseRes.flags() | QtCore.Qt.ItemIsEditable)
+
+        self.deviceStatus = QtWidgets.QTreeWidgetItem(self.generalSettings)
+        self.deviceStatus.setText(0, 'Motor Status')
+        self.deviceStatus.setIcon(0, GUIToolKit.getIconByName('gear'))
+        self.selectStatus = QtWidgets.QComboBox(self)
+        self.selectStatus.addItems(['Disabled', 'Enabled'])
+        self.selectStatus.currentIndexChanged.connect(self.changeStatus)
+        self.setItemWidget(self.deviceStatus,1,self.selectStatus)
+
+        self.modulationType = QtWidgets.QTreeWidgetItem(self.generalSettings)
+        self.modulationType.setText(0, 'PWM modulation')
+        self.modulationType.setIcon(0, GUIToolKit.getIconByName('gear'))
+        self.selectModulation = QtWidgets.QComboBox(self)
+        self.selectModulation.addItems(['Sine PWM', 'Space Vector PWM', 'Trapezoidal 120', 'Trapezoidal 150'])
+        self.selectModulation.currentIndexChanged.connect(self.changeModType)
+        self.setItemWidget(self.modulationType,1,self.selectModulation)
+
+        self.modulationCenter = QtWidgets.QTreeWidgetItem(self.generalSettings)
+        self.modulationCenter.setText(0, 'Modulation center')
+        self.modulationCenter.setIcon(0, GUIToolKit.getIconByName('gear'))
+        self.selectModCenter = QtWidgets.QComboBox(self)
+        self.selectModCenter.addItems(['Disabled', 'Enabled'])
+        self.selectModCenter.currentIndexChanged.connect(self.changeModCenter)
+        self.setItemWidget(self.modulationCenter,1,self.selectModCenter)
+        
+        
+        self.header().resizeSection(0, 210) 
 
         self.setAlternatingRowColors(True)
         self.header().hide()
-        self.expandAll()
+        self.expandItem(self.sFOCDevice)
+        self.expandItem(self.motionControl)
 
         self.device.addConnectionStateListener(self)
         self.device.commProvider.commandDataReceived.connect(self.commandResponseReceived)
+        self.device.commProvider.stateMonitorReceived.connect(self.stateResponseReceived)
 
         self.itemChanged.connect(self.sendCommand)
 
+        self.setEnabled(self.device.isConnected)
 
-        self.proportionalValue.setText(0,str(self.device.proportionalGainPID))
-        self.integralGainlValue.setText(0,str(self.device.integralGainPID))
-        self.derivativeGainValue.setText(0,str(self.device.derivativeGainPID))
-        self.voltageRampValue.setText(0,str(self.device.voltageRampPID))
+    def addPIDSubtree(self, parent,  label):
+        pidConfiguration = QtWidgets.QTreeWidgetItem()
+        pidConfiguration.setText(0, label)
+        pidConfiguration.setIcon(0, GUIToolKit.getIconByName('pidconfig'))
+        parent.addChild(pidConfiguration)
 
-        self.lwpFilterValue.setText(0,str(self.device.lowPassFilter))
-        self.pGainValue.setText(0,str(self.device.anglePGain))
-        self.veliLimitValue.setText(0,str(self.device.velocityLimit))
-        self.voliLimitValue.setText(0,str(self.device.voltageLimit))
+        proportionalGain = QtWidgets.QTreeWidgetItem(pidConfiguration)
+        proportionalGain.setText(0, 'Proportional gain')
+        proportionalGain.setIcon(0, GUIToolKit.getIconByName('gear'))
+        proportionalGain.setText(1, '')
+        proportionalGain.setFlags(
+            proportionalGain.flags() | QtCore.Qt.ItemIsEditable)
 
-        self.setEnabled(False)
+        integralGain = QtWidgets.QTreeWidgetItem(pidConfiguration)
+        integralGain.setText(0, 'Integral gain')
+        integralGain.setIcon(0, GUIToolKit.getIconByName('gear'))
+        integralGain.setText(1, '')
+        integralGain.setFlags(
+            integralGain.flags() | QtCore.Qt.ItemIsEditable)
+
+        derivativeGain = QtWidgets.QTreeWidgetItem(pidConfiguration)
+        derivativeGain.setText(0, 'Derivative gain')
+        derivativeGain.setIcon(0, GUIToolKit.getIconByName('gear'))
+        derivativeGain.setText(1, '')
+        derivativeGain.setFlags(
+            derivativeGain.flags() | QtCore.Qt.ItemIsEditable)
+
+        voltageRamp = QtWidgets.QTreeWidgetItem(pidConfiguration)
+        voltageRamp.setText(0, 'Output Ramp')
+        voltageRamp.setIcon(0, GUIToolKit.getIconByName('gear'))
+        voltageRamp.setText(1, '')
+        voltageRamp.setFlags(
+            voltageRamp.flags() | QtCore.Qt.ItemIsEditable)
+        
+        limit = QtWidgets.QTreeWidgetItem(pidConfiguration)
+        limit.setText(0, 'Output Limit')
+        limit.setIcon(0, GUIToolKit.getIconByName('gear'))
+        limit.setText(1, '')
+        limit.setFlags(
+            limit.flags() | QtCore.Qt.ItemIsEditable)
+
+        lpfTf = QtWidgets.QTreeWidgetItem(pidConfiguration)
+        lpfTf.setText(0, 'Low pass filter')
+        lpfTf.setIcon(0, GUIToolKit.getIconByName('gear'))
+        lpfTf.setText(1, '')
+        lpfTf.setFlags(
+            lpfTf.flags() | QtCore.Qt.ItemIsEditable)
+
+        return pidConfiguration
+
+
 
     def sendCommand(self, item, column):
-        value = item.text(0)
-        fieldName = item.parent().text(0)
+        value = item.text(1)
+        fieldName = item.text(0)
+        pidLabel = item.parent().text(0)
+        pid = {}
+        lpf = {}
+        if 'Velocity PID' in pidLabel:
+            pid = self.device.PIDVelocity
+            lpf = self.device.LPFVelocity
+        elif 'Angle PID' in pidLabel:
+            pid = self.device.PIDAngle
+            lpf = self.device.LPFAngle
+        elif 'Current q PID' in pidLabel:
+            pid = self.device.PIDCurrentQ
+            lpf = self.device.LPFCurrentQ
+        elif 'Current d PID' in pidLabel:
+            pid = self.device.PIDCurrentD
+            lpf = self.device.LPFCurrentQ
+
         if 'Proportional gain' in fieldName:
-            self.device.sendProportionalGain(value)
+            self.device.sendProportionalGain(pid, value)
         elif 'Integral gain' in fieldName:
-            self.device.sendIntegralGain(value)
+            self.device.sendIntegralGain(pid, value)
         elif 'Derivative gain' in fieldName:
-            self.device.sendDerivativeGain(value)
-        elif 'Voltage Ramp' in fieldName:
-            self.device.sendVoltageRamp(value)
-        elif 'Low pass filterRamp' in fieldName:
-            self.device.sendLowPassFilter(value)
-        elif 'Prop gain' in fieldName:
-            self.device.sendPGain(value)
-        elif 'Velocity limit' in fieldName:
-            self.device.sendVelocityLimit(value)
+            self.device.sendDerivativeGain(pid, value)
+        elif 'Output Ramp' in fieldName:
+            self.device.sendOutputRamp(pid, value)
+        elif 'Low pass filter' in fieldName:
+            self.device.sendLowPassFilter(lpf, value)
+        elif 'Output Limit' in fieldName:
+            self.device.sendOutputLimit(pid,value)
         elif 'Voltage limit' in fieldName:
             self.device.sendVoltageLimit(value)
+        elif 'Velocity limit' in fieldName:
+            self.device.sendVelocityLimit(value)
+        elif 'Current limit' in fieldName:
+            self.device.sendCurrentLimit(value)
+        elif 'Phase Resistance' in fieldName:
+            self.device.sendPhaseResistance(value)
+        elif 'Zero Angle Offset' in fieldName:
+            self.device.sendSensorZeroOffset(value)
+        elif 'Electrical Zero Offset' in fieldName:
+            self.device.sendSensorZeroElectrical(value)
+        elif 'Motion Downsample' in fieldName:
+            self.device.sendMotionDownsample(value)
+
+    def refreshPIDSubtree(self, pidDisp, pidVal, lpfVal):
+        pidDisp.child(0).setText(1,str(pidVal.P))
+        pidDisp.child(1).setText(1,str(pidVal.I))
+        pidDisp.child(2).setText(1,str(pidVal.D))
+        pidDisp.child(3).setText(1,str(pidVal.outputRamp))
+        pidDisp.child(4).setText(1,str(pidVal.outputLimit))
+        pidDisp.child(5).setText(1,str(lpfVal.Tf))
 
     def commandResponseReceived(self, comandResponse):
-        if 'PID velocity| P' in comandResponse:
-            self.proportionalValue.setText(0,comandResponse.replace('PID velocity| P:', ''))
-        elif 'PID velocity| I' in comandResponse:
-            self.integralGainlValue.setText(0,comandResponse.replace('PID velocity| I:', ''))
-        elif 'PID velocity| D' in comandResponse:
-            self.derivativeGainValue.setText(0,comandResponse.replace('PID velocity| D:', ''))
-        elif 'PID velocity| volt_ramp' in comandResponse:
-            self.voltageRampValue.setText(0,comandResponse.replace('PID velocity| volt_ramp:', ''))
-        elif 'LPF velocity| Tf:' in comandResponse:
-            self.lwpFilterValue.setText(0,
-                comandResponse.replace('LPF velocity| Tf:', ''))
-        elif 'P angle|  P:' in comandResponse:
-            self.pGainValue.setText(0,
-                comandResponse.replace('P angle|  P:', ''))
-        elif 'Limits| vel_limit:' in comandResponse:
-            self.veliLimitValue.setText(0,
-                comandResponse.replace('Limits| vel_limit:', ''))
-        elif 'Limits| volt_limit:' in comandResponse:
-            self.voliLimitValue.setText(0,
-                comandResponse.replace('Limits| volt_limit:', ''))
-        self.update()
+        self.refreshDeviceTree()
+        self.setTorqueMode(self.device.torqueType)
+        self.setControlLopMode(self.device.controlType)
+        self.setEnabledDisabled(self.device.deviceStatus)
+        self.setModCenter(self.device.modulationCentered)
+        self.setModType(self.device.modulationType)
 
+    def stateResponseReceived(self, comandResponse):
+        self.blockSignals(True)
+        self.stateVel.setText(1,str(self.device.velocityNow))
+        self.stateAngle.setText(1,str(self.device.angleNow))
+        self.stateVd.setText(1,str(self.device.voltageDNow))
+        self.stateVq.setText(1,str(self.device.voltageQNow))
+        self.stateCq.setText(1,str(self.device.currentQNow))
+        self.stateCd.setText(1,str(self.device.currentDNow))
+        self.satateTarget.setText(1,str(self.device.targetNow))
+        self.update()
+        self.blockSignals(False)
+
+    def refreshDeviceTree(self):
+        self.blockSignals(True)
+
+        self.refreshPIDSubtree( self.PIDVelocityConfig, self.device.PIDVelocity, self.device.LPFVelocity)
+        self.refreshPIDSubtree( self.PIDAngleConfig, self.device.PIDAngle, self.device.LPFAngle)
+        self.refreshPIDSubtree( self.PIDCurrentQConfig, self.device.PIDCurrentQ, self.device.LPFCurrentQ)
+        self.refreshPIDSubtree( self.PIDCurrentDConfig, self.device.PIDCurrentD, self.device.LPFCurrentD)
+
+        self.voltageLimit.setText(1,str(self.device.voltageLimit))
+        self.velocityLimit.setText(1,str(self.device.velocityLimit))
+        self.currentLimit.setText(1,str(self.device.currentLimit))
+
+        self.sensorZeroOffset.setText(1,str(self.device.sensorZeroOffset))
+        self.sensorZeroElecOffset.setText(1,str(self.device.sensorElectricalZero))
+        
+        self.phaseRes.setText(1,str(self.device.phaseResistance))
+        # self.deviceStatus.setText(1,str(self.device.deviceStatus))
+
+        self.motionDownsample.setText(1,str(self.device.motionDownsample))
+        # self.torque.setText(1,str(self.device.torqueType))
+        # self.controller.setText(1,str(self.device.controlType))
+        self.update()
+        self.blockSignals(False)
+
+    def setTorqueMode(self, value):
+        self.blockSignals(True)
+        if value == SimpleFOCDevice.VOLTAGE_TORQUE:
+            self.selectorTorque.setCurrentIndex(0)
+        elif value == SimpleFOCDevice.DC_CURRENT_TORQUE:
+            self.selectorTorque.setCurrentIndex(1)
+        elif value == SimpleFOCDevice.FOC_CURRENT_TORQUE:
+            self.selectorTorque.setCurrentIndex(2)
+        self.blockSignals(False)
+
+    def changeTorque(self):
+        index = self.selectorTorque.currentIndex()
+        if index == 0:
+            self.device.sendTorqueType(SimpleFOCDevice.VOLTAGE_TORQUE)
+        elif index == 1:
+            self.device.sendTorqueType(SimpleFOCDevice.DC_CURRENT_TORQUE)
+        elif index == 2:
+            self.device.sendTorqueType(SimpleFOCDevice.FOC_CURRENT_TORQUE)
+
+    def setEnabledDisabled(self, value):
+        self.blockSignals(True)
+        if value == 0:
+            self.selectStatus.setCurrentIndex(0)
+        elif value == 1:
+            self.selectStatus.setCurrentIndex(1)
+        self.blockSignals(False)
+
+    def changeStatus(self):
+        index = self.selectStatus.currentIndex()
+        if index == 0:
+            self.device.sendDeviceStatus(0)
+        elif index == 1:
+            self.device.sendDeviceStatus(1)
+        
+    def setModCenter(self,value):
+        self.blockSignals(True)
+        self.selectModCenter.setCurrentIndex(value)
+        self.blockSignals(False)
+        
+    def changeModCenter(self):
+        index = self.selectModCenter.currentIndex()
+        if index == 0:
+            self.device.sendModulationCentered(0)
+        elif index == 1:
+            self.device.sendModulationCentered(1)
+
+    def setModType(self, value):
+        self.blockSignals(True)
+        if value == SimpleFOCDevice.SINE_PWM:
+            self.selectModulation.setCurrentIndex(0)
+        elif value == SimpleFOCDevice.SPACE_VECTOR_PWM:
+            self.selectModulation.setCurrentIndex(1)
+        elif value == SimpleFOCDevice.TRAPEZOIDAL_120:
+            self.selectModulation.setCurrentIndex(2)
+        elif value == SimpleFOCDevice.TRAPEZOIDAL_150:
+            self.selectModulation.setCurrentIndex(3)
+        self.blockSignals(False)
+
+    def changeModType(self):
+        index = self.selectModulation.currentIndex()
+        if index == 0:
+            self.device.sendModulationType(SimpleFOCDevice.SINE_PWM)
+        elif index == 1:
+            self.device.sendModulationType(SimpleFOCDevice.SPACE_VECTOR_PWM)
+        elif index == 2:
+            self.device.sendModulationType(SimpleFOCDevice.TRAPEZOIDAL_120)
+        elif index == 3:
+            self.device.sendModulationType(SimpleFOCDevice.TRAPEZOIDAL_150)
+
+    def setControlLopMode(self, value):
+        self.blockSignals(True)
+        if value == SimpleFOCDevice.TORQUE_CONTROL:
+            self.selectorControlLoop.setCurrentIndex(0)
+        elif value == SimpleFOCDevice.VELOCITY_CONTROL:
+            self.selectorControlLoop.setCurrentIndex(1)
+        elif value == SimpleFOCDevice.ANGLE_CONTROL:
+            self.selectorControlLoop.setCurrentIndex(2)
+        elif value == SimpleFOCDevice.VELOCITY_OPENLOOP_CONTROL:
+            self.selectorControlLoop.setCurrentIndex(3)
+        elif value == SimpleFOCDevice.ANGLE_OPENLOOP_CONTROL:
+            self.selectorControlLoop.setCurrentIndex(4)
+        self.blockSignals(False)
+
+    def changeControlLoop(self):
+        index = self.selectorControlLoop.currentIndex()
+        if index == 0:
+            self.device.sendControlType(SimpleFOCDevice.TORQUE_CONTROL)
+        elif index == 1:
+            self.device.sendControlType(SimpleFOCDevice.VELOCITY_CONTROL)
+        elif index == 2:
+            self.device.sendControlType(SimpleFOCDevice.ANGLE_CONTROL)
+        elif index == 3:
+            self.device.sendControlType(SimpleFOCDevice.VELOCITY_OPENLOOP_CONTROL)
+        elif index == 4:
+            self.device.sendControlType(SimpleFOCDevice.ANGLE_OPENLOOP_CONTROL)
+    
     def connectionStateChanged(self, connectionFlag):
         if connectionFlag is True:
             self.setEnabled(True)

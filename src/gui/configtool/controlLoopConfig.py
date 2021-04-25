@@ -15,23 +15,12 @@ class ControlLoopGroupBox(QtWidgets.QGroupBox):
         self.controlLoopHorizontalLayout = QtWidgets.QHBoxLayout(self)
         self.controlLoopHorizontalLayout.setObjectName('controlLoopHorizontalLayout')
 
-        self.angleRadioButton = QtWidgets.QRadioButton(self)
-        self.angleRadioButton.setObjectName('angleRadioButton')
-        self.angleRadioButton.setText('Angle')
-        self.angleRadioButton.clicked.connect(self.sendControlLopModeAngle)
-        self.controlLoopHorizontalLayout.addWidget(self.angleRadioButton)
-
-        self.velocityRadioButton = QtWidgets.QRadioButton(self)
-        self.velocityRadioButton.setObjectName('velocityRadioButton')
-        self.velocityRadioButton.setText('Velocity')
-        self.velocityRadioButton.clicked.connect(self.sendControlLopModeVelocity)
-        self.controlLoopHorizontalLayout.addWidget(self.velocityRadioButton)
-
-        self.voltageRadioButton = QtWidgets.QRadioButton(self)
-        self.voltageRadioButton.setObjectName('voltageRadioButton')
-        self.voltageRadioButton.setText('Voltage')
-        self.voltageRadioButton.clicked.connect(self.sendControlLopModeVoltage)
-        self.controlLoopHorizontalLayout.addWidget(self.voltageRadioButton)
+        
+        self.selectorControlLoop = QtWidgets.QComboBox(self)
+        self.selectorControlLoop.setObjectName('selectorControlLoop')
+        self.selectorControlLoop.addItems(['Torque', 'Velocity', 'Angle', 'Velocity openloop', 'Angle openloop'])
+        self.selectorControlLoop.currentIndexChanged.connect(self.changeControlLoop)
+        self.controlLoopHorizontalLayout.addWidget(self.selectorControlLoop)
 
         self.setControlLopMode(self.device.controlType)
 
@@ -55,24 +44,29 @@ class ControlLoopGroupBox(QtWidgets.QGroupBox):
         self.setEnabled(False)
 
     def setControlLopMode(self, value):
-        if value == SimpleFOCDevice.ANGLE_CONTROL:
-            self.angleRadioButton.toggle()
-        elif value == SimpleFOCDevice.VOLTAGE_CONTROL:
-            self.voltageRadioButton.toggle()
+        if value == SimpleFOCDevice.TORQUE_CONTROL:
+            self.selectorControlLoop.setCurrentIndex(0)
         elif value == SimpleFOCDevice.VELOCITY_CONTROL:
-            self.velocityRadioButton.toggle()
+            self.selectorControlLoop.setCurrentIndex(1)
+        elif value == SimpleFOCDevice.ANGLE_CONTROL:
+            self.selectorControlLoop.setCurrentIndex(2)
+        elif value == SimpleFOCDevice.VELOCITY_OPENLOOP_CONTROL:
+            self.selectorControlLoop.setCurrentIndex(3)
+        elif value == SimpleFOCDevice.ANGLE_OPENLOOP_CONTROL:
+            self.selectorControlLoop.setCurrentIndex(4)
 
-    def sendControlLopModeVelocity(self):
-        if self.device.isConnected:
+    def changeControlLoop(self):
+        index = self.selectorControlLoop.currentIndex()
+        if index == 0:
+            self.device.sendControlType(SimpleFOCDevice.TORQUE_CONTROL)
+        elif index == 1:
             self.device.sendControlType(SimpleFOCDevice.VELOCITY_CONTROL)
-    def sendControlLopModeAngle(self):
-        if self.device.isConnected:
+        elif index == 2:
             self.device.sendControlType(SimpleFOCDevice.ANGLE_CONTROL)
-
-    def sendControlLopModeVoltage(self):
-        if self.device.isConnected:
-            self.device.sendControlType(SimpleFOCDevice.VOLTAGE_CONTROL)
+        elif index == 3:
+            self.device.sendControlType(SimpleFOCDevice.VELOCITY_OPENLOOP_CONTROL)
+        elif index == 4:
+            self.device.sendControlType(SimpleFOCDevice.ANGLE_OPENLOOP_CONTROL)
 
     def commandResponseReceived(self, cmdRespose):
-        if 'Control: ' in cmdRespose:
-            self.setControlLopMode((SimpleFOCDevice.getControlModeCode(cmdRespose.replace('Control: ', ''))))
+        self.setControlLopMode(self.device.controlType)

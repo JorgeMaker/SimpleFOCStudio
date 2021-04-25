@@ -3,7 +3,9 @@
 from PyQt5 import QtWidgets
 
 from src.gui.configtool.controlLoopConfig import ControlLoopGroupBox
+from src.gui.configtool.torqueConfig import TorqueGroupBox
 from src.gui.configtool.generalSettingsWidget import GeneralSettingsGroupBox
+from src.gui.configtool.generalControls import GeneralControls
 from src.gui.configtool.connectionControl import ConnectionControlGroupBox
 from src.gui.configtool.droDisplayWidget import DROGroupBox
 from src.gui.sharedcomnponets.commandLineInterface import CommandLineWidget
@@ -30,9 +32,12 @@ class DeviceConfigurationTool(WorkAreaTabWidget):
         self.horizontalLayout.setObjectName('horizontalLayout')
         self.digitalReadOut = DROGroupBox(self.counterWidget)
         self.horizontalLayout.addWidget(self.digitalReadOut)
-
+        
         self.controlLoop = ControlLoopGroupBox(self.counterWidget)
         self.horizontalLayout.addWidget(self.controlLoop)
+
+        self.torqueConfig = TorqueGroupBox(self.counterWidget)
+        self.horizontalLayout.addWidget(self.torqueConfig)
 
         self.connectionControl = ConnectionControlGroupBox(self.counterWidget)
         self.horizontalLayout.addWidget(self.connectionControl)
@@ -50,8 +55,14 @@ class DeviceConfigurationTool(WorkAreaTabWidget):
         self.pidConfigurator = PidGroupBox(self.bottomWidget)
         self.bottomHorizontalLayout.addWidget(self.pidConfigurator)
 
+        self.generalLayout =  QtWidgets.QVBoxLayout()
         self.generalDeviceSettings = GeneralSettingsGroupBox(self.bottomWidget)
-        self.bottomHorizontalLayout.addWidget(self.generalDeviceSettings)
+        self.generalControls = GeneralControls(self.bottomWidget)
+        self.generalLayout.addWidget(self.generalControls)
+        self.generalLayout.addWidget(self.generalDeviceSettings)
+        self.bottomHorizontalLayout.addLayout(self.generalLayout)
+
+
 
         self.commandLine = CommandLineWidget(self)
         self.bottomHorizontalLayout.addWidget(self.commandLine)

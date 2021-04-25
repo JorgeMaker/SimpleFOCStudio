@@ -3,8 +3,6 @@
 A GIU application developed  with Python/PyQt5 to manage and configure any [SimpleFOC](https://github.com/simplefoc)  BLDC controlled device using serial port communications. It as a UI that plots in real time monitored  variables PyQtGraph. It currently suports [SimpleFOC 2.0](https://github.com/simplefoc/Arduino-FOC/releases/tag/v2.0) devices. 
 
 
-
-devices. 
 <p align="center">
   <img  src="https://github.com/JorgeMaker/SimpleFOCStudio/blob/main/DOC/SimpleFOCStudio.gif?raw=true">
 </p>

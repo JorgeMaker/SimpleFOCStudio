@@ -16,6 +16,12 @@ class SimpleFOCGraphicWidget(QtWidgets.QGroupBox):
     connectedPausedState = 2
     connectedPlottingStartedState = 3
 
+    
+    signals = ['Target', 'Vq','Vd','Cq','Cd','Vel','Angle']
+    signal_tooltip = ['Target', 'Voltage D [Volts]','Voltage D [Volts]','Current Q [miliAmps]','Current D [miliAmps]','Velocity [rad/sec]','Angle [rad]']
+    signalColors = [GUIToolKit.RED_COLOR, GUIToolKit.BLUE_COLOR, GUIToolKit.PURPLE_COLOR,GUIToolKit.YELLOW_COLOR, GUIToolKit.MAROON_COLOR, GUIToolKit.ORANGE_COLOR, GUIToolKit.GREEN_COLOR]
+    signalIcons = ['reddot', 'bluedot','purpledot', 'yellowdot', 'maroondot', 'orangedot', 'greendot']
+
     def __init__(self, parent=None):
 
         super().__init__(parent)
@@ -30,54 +36,42 @@ class SimpleFOCGraphicWidget(QtWidgets.QGroupBox):
         pg.setConfigOptions(antialias=True)
         self.plotWidget = pg.PlotWidget()
         self.plotWidget.showGrid(x=True, y=True, alpha=0.5)
+        self.plotWidget.addLegend()
+
+        # self.legend = pg.LegendItem()
+        # self.legend.setParentItem(self.plotWidget)
 
         self.timeArray = np.arange(-self.numberOfSamples, 0, 1)
+        
+        self.controlPlotWidget = ControlPlotPanel(controllerPlotWidget=self)
 
-        self.signal0DataArray = np.zeros(self.numberOfSamples)
-        self.signal1DataArray = np.zeros(self.numberOfSamples)
-        self.signal2DataArray = np.zeros(self.numberOfSamples)
+        self.signalDataArrays = []
+        self.signalPlots = []
+        self.signalPlotFlags = []
+        for (sig, sigColor, checkBox, tooltip) in zip(self.signals, self.signalColors,self.controlPlotWidget.signalCheckBox, self.signal_tooltip):
+            # define signal plot data array
+            self.signalDataArrays.append(np.zeros(self.numberOfSamples))
+            # configure signal plot parameters
+            signalPen = pg.mkPen(color=sigColor, width=1.5)
+            self.signalPlots.append(pg.PlotDataItem(self.timeArray,
+                                            self.signalDataArrays[-1],
+                                            pen=signalPen, name=tooltip))
+            self.plotWidget.addItem(self.signalPlots[-1])
 
-        signal0Pen = pg.mkPen(color=GUIToolKit.RED_COLOR, width=2)
-        self.signal0Plot = pg.PlotDataItem(self.timeArray,
-                                           self.signal0DataArray,
-                                           pen=signal0Pen)
-        self.plotWidget.addItem(self.signal0Plot)
+            # is plotted flag
+            self.signalPlotFlags.append(True)
+            # add callback
+            checkBox.stateChanged.connect(self.signalPlotFlagUpdate)
 
-        signal1Pen = pg.mkPen(color=GUIToolKit.ORANGE_COLOR, width=2)
-        self.signal1Plot = pg.PlotDataItem(self.timeArray,
-                                           self.signal1DataArray,
-                                           pen=signal1Pen)
-        self.plotWidget.addItem(self.signal1Plot)
-
-        signal2Pen = pg.mkPen(color=GUIToolKit.GREEN_COLOR, width=2)
-        self.signal2Plot = pg.PlotDataItem(self.timeArray,
-                                           self.signal2DataArray,
-                                           pen=signal2Pen)
-        self.plotWidget.addItem(self.signal2Plot)
 
         self.horizontalLayout.addWidget(self.plotWidget)
-
-        self.controlPlotWidget = ControlPlotPanel(controllePlotWidget=self)
         self.horizontalLayout.addWidget(self.controlPlotWidget)
-
-        self.signal0PlotFlag = True
-        self.signal1PlotFlag = True
-        self.signal2PlotFlag = True
-
-        self.controlPlotWidget.signal0CheckBox.stateChanged.connect(
-            self.signal0PlotFlagUpdate)
-        self.controlPlotWidget.signal1CheckBox.stateChanged.connect(
-            self.signal1PlotFlagUpdate)
-        self.controlPlotWidget.signal2CheckBox.stateChanged.connect(
-            self.signal2PlotFlagUpdate)
-
-        self.device.commProvider.telemetryDataReceived.connect(
+        
+        self.device.commProvider.monitoringDataReceived.connect(
             self.upDateGraphic)
 
         self.currentStatus = self.disconnectedState
         self.controlPlotWidget.pauseContinueButton.setDisabled(True)
-
-        self.controlPlotWidget.controlTypeChonged(self.device.controlType)
 
         self.device.addConnectionStateListener(self)
 
@@ -99,61 +93,42 @@ class SimpleFOCGraphicWidget(QtWidgets.QGroupBox):
     def disableUI(self):
         self.setEnabled(False)
 
-    def signal0PlotFlagUpdate(self):
-        if self.controlPlotWidget.signal0CheckBox.isChecked():
-            self.signal0PlotFlag = True
-            self.plotWidget.addItem(self.signal0Plot)
-        else:
-            self.signal0PlotFlag = False
-            self.plotWidget.removeItem(self.signal0Plot)
+    def signalPlotFlagUpdate(self):
+        self.controlPlotWidget.updateMonitorVariables()
+        for i, (checkBox, plotFlag) in enumerate(zip(self.controlPlotWidget.signalCheckBox, self.signalPlotFlags)):
+            if checkBox.isChecked() and (not plotFlag):
+                self.signalPlotFlags[i] = True
+                self.plotWidget.addItem( self.signalPlots[i] )
+            elif (not checkBox.isChecked()) and plotFlag:
+                self.signalPlotFlags[i]  = False
+                self.plotWidget.removeItem( self.signalPlots[i] )
 
-    def signal1PlotFlagUpdate(self):
-        if self.controlPlotWidget.signal1CheckBox.isChecked():
-            self.signal1PlotFlag = True
-            self.plotWidget.addItem(self.signal1Plot)
-
-        else:
-            self.signal1PlotFlag = False
-            self.plotWidget.removeItem(self.signal1Plot)
-
-    def signal2PlotFlagUpdate(self):
-        if self.controlPlotWidget.signal2CheckBox.isChecked():
-            self.signal2PlotFlag = True
-            self.plotWidget.addItem(self.signal2Plot)
-        else:
-            self.signal2PlotFlag = False
-            self.plotWidget.removeItem(self.signal2Plot)
-
-    def connectioStatusUpdate(self, connectedFlaf):
-        if connectedFlaf:
+    def connectioStatusUpdate(self, connectedFlag):
+        if connectedFlag:
             self.currentStatus = self.initialConnectedState
         else:
             self.currentStatus = self.disconnectedState
 
-    def upDateGraphic(self, signal0, signal1, signal2):
+    def upDateGraphic(self, signalList):
         if self.currentStatus is self.connectedPlottingStartedState or \
                 self.currentStatus is self.connectedPausedState:
 
-            if type(signal0) is float and type(signal1) is float and type(
-                    signal2) is float:
-                self.storeAndShiftData(signal0, signal1, signal2)
-                if self.currentStatus is self.connectedPlottingStartedState:
-                    self.updatePlot()
+            signals = np.array(signalList, dtype=float)
+            signalIndex = 0
+
+            enabled = np.where(np.array(self.signalPlotFlags) == True)[0]
+
+            if(len(enabled) != len(signals)):
+                logging.warning('Arrived corrupted data')
+                return
             else:
-                logging.warning(
-                    'Arrived corrupted data: {} {} {}'.format(signal0, signal1,
-                                                              signal2))
+                for i, ind in enumerate(enabled):
+                    self.signalDataArrays[ind] = np.roll(self.signalDataArrays[ind], -1)
+                    self.signalDataArrays[ind][-1] = signals[i]
 
-    def storeAndShiftData(self, signal0, signal1, signal2):
+            if self.currentStatus is self.connectedPlottingStartedState:
+                self.updatePlot()
 
-        self.signal0DataArray = np.roll(self.signal0DataArray, -1)
-        self.signal0DataArray[-1] = signal0
-
-        self.signal1DataArray = np.roll(self.signal1DataArray, -1)
-        self.signal1DataArray[-1] = signal1
-
-        self.signal2DataArray = np.roll(self.signal2DataArray, -1)
-        self.signal2DataArray[-1] = signal2
 
     def computeStatic(self, array):
         mean = np.mean(array)
@@ -163,138 +138,129 @@ class SimpleFOCGraphicWidget(QtWidgets.QGroupBox):
         meadian = np.median(array)
 
     def updatePlot(self):
-
-        if self.signal0PlotFlag:
-            self.signal0Plot.setData(self.timeArray, self.signal0DataArray)
-            self.signal0Plot.updateItems()
-            self.signal0Plot.sigPlotChanged.emit(self.signal0Plot)
-
-        if self.signal1PlotFlag:
-            self.signal1Plot.setData(self.timeArray, self.signal1DataArray)
-            self.signal1Plot.updateItems()
-            self.signal1Plot.sigPlotChanged.emit(self.signal1Plot)
-
-        if self.signal2PlotFlag:
-            self.signal2Plot.setData(self.timeArray, self.signal2DataArray)
-            self.signal2Plot.updateItems()
-            self.signal2Plot.sigPlotChanged.emit(self.signal2Plot)
+        for i, plotFlag in enumerate(self.signalPlotFlags):
+            if plotFlag:
+                self.signalPlots[i].setData(self.timeArray, self.signalDataArrays[i])
+                self.signalPlots[i].updateItems()
+                self.signalPlots[i].sigPlotChanged.emit(self.signalPlots[i])
 
 
 class ControlPlotPanel(QtWidgets.QWidget):
 
-    def __init__(self, parent=None, controllePlotWidget=None):
+    def __init__(self, parent=None, controllerPlotWidget=None):
         '''Constructor for ToolsWidget'''
         super().__init__(parent)
 
         self.device = SimpleFOCDevice.getInstance()
-        self.controlledPlot = controllePlotWidget
-        self.horizontalLayout = QtWidgets.QHBoxLayout(self)
-        self.horizontalLayout.setObjectName('horizontalLayout')
+        self.controlledPlot = controllerPlotWidget
+        
+        self.verticalLayout = QtWidgets.QVBoxLayout(self)
+        self.setLayout(self.verticalLayout)
+
+        self.horizontalLayout1 = QtWidgets.QHBoxLayout()
+        self.horizontalLayout1.setObjectName('horizontalLayout')
 
         self.startStopButton = QtWidgets.QPushButton(self)
-        self.startStopButton.setText('Start plotting')
-        self.startStopButton.setObjectName('pause')
+        self.startStopButton.setText('Start')
+        self.startStopButton.setObjectName('Start')
         self.startStopButton.clicked.connect(self.startStoPlotAction)
         self.startStopButton.setIcon(GUIToolKit.getIconByName('start'))
-        self.horizontalLayout.addWidget(self.startStopButton)
+        self.horizontalLayout1.addWidget(self.startStopButton)
 
         self.pauseContinueButton = QtWidgets.QPushButton(self)
         self.pauseContinueButton.setObjectName('pauseButton')
-        self.pauseContinueButton.setText('Pause plotting')
+        self.pauseContinueButton.setText('Pause')
         self.pauseContinueButton.setIcon(GUIToolKit.getIconByName('pause'))
         self.pauseContinueButton.clicked.connect(self.pauseContinuePlotAction)
-        self.horizontalLayout.addWidget(self.pauseContinueButton)
+        self.horizontalLayout1.addWidget(self.pauseContinueButton)
 
         self.zoomAllButton = QtWidgets.QPushButton(self)
         self.zoomAllButton.setObjectName('zoomAllButton')
-        self.zoomAllButton.setText('View all plot')
+        self.zoomAllButton.setText('View all')
         self.zoomAllButton.setIcon(GUIToolKit.getIconByName('zoomall'))
         self.zoomAllButton.clicked.connect(self.zoomAllPlot)
-        self.horizontalLayout.addWidget(self.zoomAllButton)
+        self.horizontalLayout1.addWidget(self.zoomAllButton)
 
-        self.signal0CheckBox = QtWidgets.QCheckBox(self)
-        self.signal0CheckBox.setObjectName('signal0CheckBox')
-        self.signal0CheckBox.setText('Signal0')
-        self.signal0CheckBox.setIcon(GUIToolKit.getIconByName('reddot'))
-        self.signal0CheckBox.setChecked(True)
-        self.horizontalLayout.addWidget(self.signal0CheckBox)
+        self.signalCheckBox = []
+        for i in range(len(self.controlledPlot.signals)):
+            checkBox = QtWidgets.QCheckBox(self)
+            checkBox.setObjectName('signalCheckBox'+str(i))
+            checkBox.setToolTip(self.controlledPlot.signal_tooltip[i])
+            checkBox.setText(self.controlledPlot.signals[i])
+            checkBox.setIcon(GUIToolKit.getIconByName(self.controlledPlot.signalIcons[i]))
+            checkBox.setChecked(True)
+            self.signalCheckBox.append(checkBox)
+            self.horizontalLayout1.addWidget(checkBox)
 
-        self.signal2CheckBox = QtWidgets.QCheckBox(self)
-        self.signal2CheckBox.setText('Signal2')
-        self.signal2CheckBox.setIcon(GUIToolKit.getIconByName('greendot'))
-        self.signal2CheckBox.setChecked(True)
-        self.signal2CheckBox.setObjectName('signal2CheckBox')
-        self.horizontalLayout.addWidget(self.signal2CheckBox)
-
-        self.signal1CheckBox = QtWidgets.QCheckBox(self)
-        self.signal1CheckBox.setChecked(True)
-        self.signal1CheckBox.setText('Signal1')
-        self.signal1CheckBox.setIcon(GUIToolKit.getIconByName('orangedot'))
-        self.signal1CheckBox.setObjectName('signal1CheckBox')
-        self.horizontalLayout.addWidget(self.signal1CheckBox)
 
         spacerItem = QtWidgets.QSpacerItem(100, 20,
                                            QtWidgets.QSizePolicy.Expanding,
                                            QtWidgets.QSizePolicy.Maximum)
-        self.horizontalLayout.addItem(spacerItem)
-        self.horizontalLayout.addItem(spacerItem)
 
-        self.device.commProvider.commandDataReceived.connect(
-            self.commandResponseReceived)
+        self.horizontalLayout1.addItem(spacerItem)
+        self.horizontalLayout1.addItem(spacerItem)
+
+        self.downsampleLabel = QtWidgets.QLabel(self)
+        self.downsampleLabel.setText('Downsample')
+        self.downampleValue = QtWidgets.QLineEdit(self.downsampleLabel)
+        self.downampleValue.setText("100")
+        self.downampleValue.editingFinished.connect(self.changeDownsampling)
+        self.horizontalLayout1.addWidget(self.downsampleLabel)
+        self.horizontalLayout1.addWidget(self.downampleValue)
+
+        self.verticalLayout.addLayout(self.horizontalLayout1)
 
     def startStoPlotAction(self):
         if self.controlledPlot.currentStatus is self.controlledPlot.initialConnectedState:
             # Start pressed
-            self.startStopButton.setText('Stop plotting')
+            self.startStopButton.setText('Stop')
             self.startStopButton.setIcon(GUIToolKit.getIconByName('stop'))
             self.controlledPlot.currentStatus = \
                 self.controlledPlot.connectedPlottingStartedState
             self.pauseContinueButton.setEnabled(True)
+            self.device.sendMonitorDownsample(int(self.downampleValue.text()))
+            self.updateMonitorVariables()
         else:
             # Stop pressed
-            self.startStopButton.setText('Start plotting')
+            self.startStopButton.setText('Start')
             self.startStopButton.setIcon(GUIToolKit.getIconByName('start'))
-
-            self.pauseContinueButton.setText('Pause plotting')
+            self.pauseContinueButton.setText('Pause')
             self.pauseContinueButton.setIcon(GUIToolKit.getIconByName('pause'))
             self.pauseContinueButton.setEnabled(False)
             self.stopAndResetPlot()
+            self.device.sendMonitorDownsample(0)
+            self.device.sendMonitorClearVariables()
 
     def pauseContinuePlotAction(self):
         if self.controlledPlot.currentStatus is self.controlledPlot.connectedPausedState:
             # Continue pressed
-            self.pauseContinueButton.setText('Pause plotting')
+            self.pauseContinueButton.setText('Pause')
             self.pauseContinueButton.setIcon(GUIToolKit.getIconByName('pause'))
             self.controlledPlot.currentStatus = self.controlledPlot.connectedPlottingStartedState
         else:
             # Pause pressed
-            self.pauseContinueButton.setText('Continue plotting')
+            self.pauseContinueButton.setText('Continue')
             self.pauseContinueButton.setIcon(
                 GUIToolKit.getIconByName('continue'))
             self.controlledPlot.currentStatus = self.controlledPlot.connectedPausedState
 
     def stopAndResetPlot(self):
         self.controlledPlot.currentStatus = self.controlledPlot.initialConnectedState
-        self.controlledPlot.signal0DataArray = np.zeros(
-            self.controlledPlot.numberOfSamples)
-        self.controlledPlot.signal1DataArray = np.zeros(
-            self.controlledPlot.numberOfSamples)
-        self.controlledPlot.signal2DataArray = np.zeros(
-            self.controlledPlot.numberOfSamples)
+        for dataArray in self.controlledPlot.signalDataArrays:
+            dataArray = np.zeros(self.controlledPlot.numberOfSamples)
 
     def zoomAllPlot(self):
         self.controlledPlot.plotWidget.enableAutoRange()
 
-    def updateLabels(self, label0, label1, label2):
-        self.signal0CheckBox.setText(label0)
-        self.signal1CheckBox.setText(label1)
-        self.signal2CheckBox.setText(label2)
+    def changeDownsampling(self):
+        if  self.controlledPlot.currentStatus == self.controlledPlot.connectedPlottingStartedState:
+            self.device.sendMonitorDownsample(int(self.downampleValue.text()))
 
-    def controlTypeChonged(self, controlMode):
-        label0, label2, label1 = SimpleFOCDevice.getSignalLabels(controlMode)
-        self.updateLabels(label0, label1, label2)
-
-    def commandResponseReceived(self, cmdRespose):
-        if 'Control: ' in cmdRespose:
-            self.controlTypeChonged(SimpleFOCDevice.getControlModeCode(
-                cmdRespose.replace('Control: ', '')))
+    def updateMonitorVariables(self):
+        self.device.sendMonitorVariables([self.signalCheckBox[0].isChecked(), 
+                                                self.signalCheckBox[1].isChecked(),
+                                                 self.signalCheckBox[2].isChecked(), 
+                                                 self.signalCheckBox[3].isChecked(), 
+                                                 self.signalCheckBox[4].isChecked(), 
+                                                 self.signalCheckBox[5].isChecked(), 
+                                                 self.signalCheckBox[6].isChecked()])

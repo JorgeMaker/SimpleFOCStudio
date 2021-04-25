@@ -18,11 +18,20 @@ class ConnectionControlGroupBox(QtWidgets.QGroupBox):
         self.horizontalLayout = QtWidgets.QHBoxLayout(self)
         self.horizontalLayout.setObjectName('generalControlHL')
 
-        self.connectionModeComboBox = QtWidgets.QComboBox()
-        self.connectionModeComboBox.setObjectName('connectDeviceButton')
-        self.connectionModeComboBox.addItems([SimpleFOCDevice.PULL_CONFIG_ON_CONNECT, SimpleFOCDevice.PUSH_CONFG_ON_CONNECT])
+        self.devCommandIDLabel = QtWidgets.QLabel("Command:")
+        self.horizontalLayout.addWidget(self.devCommandIDLabel)
+        self.devCommandIDLetter = QtWidgets.QLineEdit()
+        self.devCommandIDLetter.setObjectName('devCommandIDLetter')
+        self.devCommandIDLetter.editingFinished.connect(self.changeDevicedevCommandID)
+        self.horizontalLayout.addWidget(self.devCommandIDLetter)
 
-        self.horizontalLayout.addWidget(self.connectionModeComboBox)
+        self.pullConfig = QtWidgets.QPushButton()
+        self.pullConfig.setObjectName('pullConfig')
+        self.pullConfig.setIcon(GUIToolKit.getIconByName('pull'))
+        self.pullConfig.setText(' Pull Params')
+        self.pullConfig.clicked.connect(self.device.pullConfiguration)
+        
+        self.horizontalLayout.addWidget(self.pullConfig)
 
         self.connectDisconnectButton = QtWidgets.QPushButton(self)
         self.connectDisconnectButton.setIcon(GUIToolKit.getIconByName('connect'))
@@ -41,12 +50,15 @@ class ConnectionControlGroupBox(QtWidgets.QGroupBox):
 
         self.device.addConnectionStateListener(self)
         self.connectionStateChanged(self.device.isConnected)
+    
+    def changeDevicedevCommandID(self):
+        self.device.devCommandID = self.devCommandIDLetter.text()
 
     def connectDisconnectDeviceAction(self):
         if self.device.isConnected:
             self.device.disConnect()
         else:
-            connectionMode  = self.connectionModeComboBox.currentText()
+            connectionMode  = SimpleFOCDevice.PULL_CONFIG_ON_CONNECT
             self.device.connect(connectionMode)
 
     def connectionStateChanged(self, isConnected):

@@ -1,7 +1,7 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
 from PyQt5 import QtGui, QtWidgets, QtCore
-from src.gui.sharedcomnponets.sharedcomponets import ConfigQLineEdit
+from src.gui.sharedcomnponets.sharedcomponets import ConfigQLineEdit, GUIToolKit
 from src.simpleFOCConnector import SimpleFOCDevice
 
 class GeneralSettingsGroupBox(QtWidgets.QGroupBox):
@@ -24,39 +24,39 @@ class GeneralSettingsGroupBox(QtWidgets.QGroupBox):
         self.gcGridLayout = QtWidgets.QGridLayout(self)
         self.gcGridLayout.setObjectName('gcGridLayout')
 
-        self.pGainLabel = QtWidgets.QLabel(self)
-        self.pGainLabel.setObjectName('pGainLabel')
-        self.pGainLabel.setText('P gain')
-        self.gcGridLayout.addWidget(self.pGainLabel, 3, 0, 1, 1)
+        self.motionDownsample = QtWidgets.QLabel(self)
+        self.motionDownsample.setObjectName('motionDownsample')
+        self.motionDownsample.setText('Motion Downsample')
+        self.gcGridLayout.addWidget(self.motionDownsample, 2, 0, 1, 1)
+
+        self.motionDownsampleEdit = ConfigQLineEdit(self)
+        self.motionDownsampleEdit.setObjectName('motionDownsampleEdit')
+        self.motionDownsampleEdit.setValidator(onlyFloat)
+        self.motionDownsampleEdit.setAlignment(QtCore.Qt.AlignCenter)
+        self.motionDownsampleEdit.updateValue.connect(self.sendMotionDownsampleAction)
+        self.gcGridLayout.addWidget(self.motionDownsampleEdit, 2, 1, 1, 1)
+
+        self.curLimitLabel = QtWidgets.QLabel(self)
+        self.curLimitLabel.setObjectName('curLimitLabel')
+        self.curLimitLabel.setText('Current Limit')
+        self.gcGridLayout.addWidget(self.curLimitLabel, 3, 0, 1, 1)
+
+        self.velLimitlabel = QtWidgets.QLabel(self)
+        self.velLimitlabel.setObjectName('velLimitlabel')
+        self.velLimitlabel.setText('Velocity limit')
+        self.gcGridLayout.addWidget(self.velLimitlabel, 4, 0, 1, 1)
 
         self.volLimitLabel = QtWidgets.QLabel(self)
         self.volLimitLabel.setObjectName('volLimitLabel')
         self.volLimitLabel.setText('Voltage limit')
         self.gcGridLayout.addWidget(self.volLimitLabel, 6, 0, 1, 1)
 
-        self.velLimitlabel = QtWidgets.QLabel(self)
-        self.velLimitlabel.setObjectName('velLimitlabel')
-        self.velLimitlabel.setText('velocity limit')
-        self.gcGridLayout.addWidget(self.velLimitlabel, 4, 0, 1, 1)
-
-        self.lpfLabel = QtWidgets.QLabel(self)
-        self.lpfLabel.setObjectName('lpfLabel')
-        self.lpfLabel.setText('Low pass Filter')
-        self.gcGridLayout.addWidget(self.lpfLabel, 2, 0, 1, 1)
-
-        self.lpfLineEdit = ConfigQLineEdit(self)
-        self.lpfLineEdit.setObjectName('lpfLineEdit')
-        self.lpfLineEdit.setValidator(onlyFloat)
-        self.lpfLineEdit.setAlignment(QtCore.Qt.AlignCenter)
-        self.lpfLineEdit.updateValue.connect(self.sendLowPassFilterAction)
-        self.gcGridLayout.addWidget(self.lpfLineEdit, 2, 1, 1, 1)
-
-        self.pgainLineEdit = ConfigQLineEdit(self)
-        self.pgainLineEdit.setObjectName('pgainLineEdit')
-        self.pgainLineEdit.setValidator(onlyFloat)
-        self.pgainLineEdit.setAlignment(QtCore.Qt.AlignCenter)
-        self.pgainLineEdit.updateValue.connect(self.sendPGainAction)
-        self.gcGridLayout.addWidget(self.pgainLineEdit, 3, 1, 1, 1)
+        self.clLineEdit = ConfigQLineEdit(self)
+        self.clLineEdit.setObjectName('clLineEdit')
+        self.clLineEdit.setValidator(onlyFloat)
+        self.clLineEdit.setAlignment(QtCore.Qt.AlignCenter)
+        self.clLineEdit.updateValue.connect(self.sendCurrentLimitAction)
+        self.gcGridLayout.addWidget(self.clLineEdit, 3, 1, 1, 1)
 
         self.vlLineEdit = ConfigQLineEdit(self)
         self.vlLineEdit.setObjectName('vlLineEdit')
@@ -72,34 +72,7 @@ class GeneralSettingsGroupBox(QtWidgets.QGroupBox):
         self.volLLineEdit.updateValue.connect(self.sendVoltageLimitAction)
         self.gcGridLayout.addWidget(self.volLLineEdit, 6, 1, 1, 1)
 
-        self.lpfButton = QtWidgets.QPushButton(self)
-        self.lpfButton.setObjectName('lpfButton')
-        self.lpfButton.setText('Set F')
-        self.lpfButton.clicked.connect(self.sendLowPassFilterAction)
-        self.gcGridLayout.addWidget(self.lpfButton, 2, 2, 1, 1)
-
-        self.pGainButton = QtWidgets.QPushButton(self)
-        self.pGainButton.setObjectName('pGainButton')
-        self.pGainButton.setText('Set K')
-        self.pGainButton.clicked.connect(self.sendPGainAction)
-        self.gcGridLayout.addWidget(self.pGainButton, 3, 2, 1, 1)
-
-        self.velLimitButton = QtWidgets.QPushButton(self)
-        self.velLimitButton.setObjectName('velLimitButton')
-        self.velLimitButton.setText('Set N')
-        self.velLimitButton.clicked.connect(self.sendVelLimitAction)
-        self.gcGridLayout.addWidget(self.velLimitButton, 4, 2, 1, 1)
-
-        self.voltageLimitButton = QtWidgets.QPushButton( self)
-        self.voltageLimitButton.setObjectName('VoltageLimitButton')
-        self.voltageLimitButton.setText('Set L')
-        self.voltageLimitButton.clicked.connect(self.sendVoltageLimitAction)
-        self.gcGridLayout.addWidget(self.voltageLimitButton, 6, 2, 1, 1)
-
-        self.setLowPassFilter(self.device.lowPassFilter)
-        self.setPGain(self.device.anglePGain)
-        self.setVelLimit(self.device.velocityLimit)
-        self.setVoltageLimit(self.device.voltageLimit)
+        self.reloadValues()
 
         self.device.addConnectionStateListener(self)
         self.device.commProvider.commandDataReceived.connect(self.commandResponseReceived)
@@ -118,29 +91,17 @@ class GeneralSettingsGroupBox(QtWidgets.QGroupBox):
     def disableUI(self):
         self.setEnabled(False)
 
-    def setLowPassFilter(self,value):
-        self.lpfLineEdit.setText(str(value))
-
-    def setPGain(self,value):
-        self.pgainLineEdit.setText(str(value))
-
-    def setVelLimit(self,value):
-        self.vlLineEdit.setText(str(value))
-
-    def setVoltageLimit(self,value):
-        self.volLLineEdit.setText(str(value))
-
-    def sendLowPassFilterAction(self):
-        value = self.lpfLineEdit.text()
+    def sendMotionDownsampleAction(self):
+        value = self.motionDownsampleEdit.text()
         value = value.replace(',', '.')
-        self.lpfLineEdit.setText(value)
-        self.device.sendLowPassFilter(self.lpfLineEdit.text())
+        self.motionDownsampleEdit.setText(value)
+        self.device.sendMotionDownsample(value)
 
-    def sendPGainAction(self):
-        value = self.pgainLineEdit.text()
+    def sendCurrentLimitAction(self):
+        value = self.clLineEdit.text()
         value = value.replace(',', '.')
-        self.pgainLineEdit.setText(value)
-        self.device.sendPGain(self.pgainLineEdit.text())
+        self.clLineEdit.setText(value)
+        self.device.sendCurrentLimit(self.clLineEdit.text())
 
     def sendVelLimitAction(self):
         value = self.vlLineEdit.text()
@@ -155,15 +116,10 @@ class GeneralSettingsGroupBox(QtWidgets.QGroupBox):
         self.device.sendVoltageLimit(self.volLLineEdit.text())
 
     def commandResponseReceived(self, comandResponse):
-        if 'P angle|  P:' in comandResponse:
-            self.pgainLineEdit.setText(
-                comandResponse.replace('P angle|  P:', ''))
-        elif 'Limits| vel_limit:' in comandResponse:
-            self.vlLineEdit.setText(
-                comandResponse.replace('Limits| vel_limit:', ''))
-        elif 'Limits| volt_limit:' in comandResponse:
-            self.volLLineEdit.setText(
-                comandResponse.replace('Limits| volt_limit:', ''))
-        elif 'LPF velocity| Tf:' in comandResponse:
-            self.lpfLineEdit.setText(
-                comandResponse.replace('LPF velocity| Tf:', ''))
+        self.reloadValues()
+        
+    def reloadValues(self):
+        self.motionDownsampleEdit.setText(str(self.device.motionDownsample))
+        self.clLineEdit.setText(str(self.device.currentLimit))
+        self.vlLineEdit.setText(str(self.device.velocityLimit))
+        self.volLLineEdit.setText(str(self.device.voltageLimit))

@@ -8,8 +8,10 @@ from PyQt5 import QtWidgets
 
 from src.gui.commandlinetool.commandlinetool import CommandLineConsoleTool
 from src.gui.configtool.deviceConfigurationTool import DeviceConfigurationTool
-from src.gui.configtool.treeViewConfigTool import TreeViewCofigTool
+from src.gui.configtool.treeViewConfigTool import TreeViewConfigTool
+from src.gui.configtool.generatedCodeDisplay import GeneratedCodeDisplay,GenerateCodeDialog
 from src.simpleFOCConnector import SimpleFOCDevice
+from src.gui.sharedcomnponets.sharedcomponets import GUIToolKit
 
 
 class WorkAreaTabbedWidget(QtWidgets.QTabWidget):
@@ -23,7 +25,8 @@ class WorkAreaTabbedWidget(QtWidgets.QTabWidget):
         self.device = SimpleFOCDevice.getInstance()
 
         self.cmdLineTool = None
-        self.configTool = None
+        self.configDeviceTool = None
+        self.generatedCodeTab = None
         self.activeToolsList = []
 
         self.tabCloseRequested.connect(self.removeTabHandler)
@@ -31,37 +34,40 @@ class WorkAreaTabbedWidget(QtWidgets.QTabWidget):
         self.setStyleSheet(
             'QTabBar::close - button { image: url(close.png) subcontrol - position: left; }')
         self.setStyleSheet('QTabBar::tab { height: 30px; width: 150px;}')
-        fileName = str(pathlib.Path().absolute()) + os.path.sep + 'config.json'
-        with open(fileName) as json_file:
-            configurationInfo = json.load(json_file)
-            self.configToolMode = configurationInfo['configToolMode']
 
     def removeTabHandler(self, index):
         if type(self.currentWidget()) == CommandLineConsoleTool:
             self.cmdLineTool = None
         if type(self.currentWidget()) == DeviceConfigurationTool or type(
-                self.currentWidget()) == TreeViewCofigTool:
-            self.configTool = None
-        if self.configTool == None and self.cmdLineTool == None:
+                self.currentWidget()) == TreeViewConfigTool:
+            self.configDeviceTool = None
+        if type(self.currentWidget()) == GeneratedCodeDisplay:
+            self.generatedCodeTab = None
+        if self.configDeviceTool == None and self.cmdLineTool == None:
             if self.device.isConnected:
                 self.device.disConnect()
 
         self.activeToolsList.pop(index)
         self.removeTab(index)
 
-    def addDevice(self):
-        if self.configTool is None:
-            if self.configToolMode == 'FormView':
-                self.configTool = DeviceConfigurationTool()
-            elif self.configToolMode == 'TreeView':
-                self.configTool = TreeViewCofigTool()
-            self.activeToolsList.append(self.configTool)
-            self.addTab(self.configTool,
-                        self.configTool.getTabIcon(), 'Device')
+    def addDeviceForm(self):
+        if self.configDeviceTool is None:
+            self.configDeviceTool = DeviceConfigurationTool()
+            self.activeToolsList.append(self.configDeviceTool)
+            self.addTab(self.configDeviceTool,
+                        self.configDeviceTool.getTabIcon(), 'Device')
+            self.setCurrentIndex(self.currentIndex() + 1)
+            
+    def addDeviceTree(self):
+        if self.configDeviceTool is None:
+            self.configDeviceTool = TreeViewConfigTool()
+            self.activeToolsList.append(self.configDeviceTool)
+            self.addTab(self.configDeviceTool,
+                        self.configDeviceTool.getTabIcon(), 'Device')
             self.setCurrentIndex(self.currentIndex() + 1)
 
     def openDevice(self):
-        if self.configTool is None:
+        if self.configDeviceTool is None:
             dlg = QtWidgets.QFileDialog()
             dlg.setFileMode(QtWidgets.QFileDialog.AnyFile)
             filenames = None
@@ -71,37 +77,29 @@ class WorkAreaTabbedWidget(QtWidgets.QTabWidget):
                     with open(filenames[0]) as json_file:
                         configurationInfo = json.load(json_file)
                         sfd = SimpleFOCDevice.getInstance()
-                        sfd.configueDevice(configurationInfo)
-                        if self.configToolMode == 'FormView':
-                            self.configTool = DeviceConfigurationTool()
-                            self.configTool.connectionControl.connectionModeComboBox.setCurrentText(
-                                SimpleFOCDevice.PUSH_CONFG_ON_CONNECT)
-
-                        elif self.configToolMode == 'TreeView':
-                            self.configTool = TreeViewCofigTool()
-                            self.configTool.treeViewWidget.connectionControl.connectionModeComboBox.setCurrentText(
-                                SimpleFOCDevice.PUSH_CONFG_ON_CONNECT)
+                        sfd.configureDevice(configurationInfo)
+                        self.configDeviceTool = TreeViewConfigTool()
                         sfd.openedFile = filenames
-                        self.activeToolsList.append(self.configTool)
-                        tabName = self.configTool.getTabName()
+                        self.activeToolsList.append(self.configDeviceTool)
+                        tabName = self.configDeviceTool.getTabName()
                         if tabName == '':
                             tabName = 'Device'
-                        self.addTab(self.configTool,
-                                    self.configTool.getTabIcon(), tabName)
+                        self.addTab(self.configDeviceTool,
+                                    self.configDeviceTool.getTabIcon(), tabName)
                         self.setCurrentIndex(self.currentIndex() + 1)
 
                 except Exception as exception:
                     msgBox = QtWidgets.QMessageBox()
                     msgBox.setIcon(QtWidgets.QMessageBox.Warning)
                     msgBox.setText('Error while opening selected file')
-                    msgBox.setWindowTitle('SimpleFOC ConfigTool')
+                    msgBox.setWindowTitle('SimpleFOC configDeviceTool')
                     msgBox.setStandardButtons(QtWidgets.QMessageBox.Ok)
                     msgBox.exec()
 
     def saveDevice(self):
         if len(self.activeToolsList) > 0:
-            currentConfigTool = self.activeToolsList[self.currentIndex()]
-            if currentConfigTool.device.openedFile is None:
+            currentconfigDeviceTool = self.activeToolsList[self.currentIndex()]
+            if currentconfigDeviceTool.device.openedFile is None:
                 options = QtWidgets.QFileDialog.Options()
                 options |= QtWidgets.QFileDialog.DontUseNativeDialog
                 fileName, _ = QtWidgets.QFileDialog.getSaveFileName(self,
@@ -110,10 +108,20 @@ class WorkAreaTabbedWidget(QtWidgets.QTabWidget):
                                                                     'JSON configuration file (*.json)',
                                                                     options=options)
                 if fileName:
-                    self.saveToFile(currentConfigTool.device, fileName)
+                    self.saveToFile(currentconfigDeviceTool.device, fileName)
             else:
-                self.saveToFile(currentConfigTool.device,
-                                currentConfigTool.device.openedFile)
+                self.saveToFile(currentconfigDeviceTool.device,
+                                currentconfigDeviceTool.device.openedFile)
+                                
+    def generateCode(self):
+        if len(self.activeToolsList) > 0:
+            currentconfigDeviceTool = self.activeToolsList[self.currentIndex()]
+            self.generatedCodeTab = GeneratedCodeDisplay()
+            self.activeToolsList.append(self.generatedCodeTab)
+            self.addTab(self.generatedCodeTab,
+                        self.generatedCodeTab.getTabIcon(), self.generatedCodeTab.getTabName())
+            self.setCurrentIndex(self.currentIndex() + 1)
+
 
     def saveToFile(self, deviceToSave, file):
         if type(file) is list:

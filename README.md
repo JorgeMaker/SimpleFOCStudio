@@ -12,8 +12,10 @@ Graphical user interface for the [*Simple**FOC**library*](https://github.com/sim
   <img  src="./DOC/new_gif.gif">
 </p>
 
+Add the letter you used to add the motor to the commander interface, in this example ```M```
 
-devices. 
+```command.add(‘M’,doMotor,‘motor’);```
+
 <p align="center">
   <img src="./DOC/treeview.png" width="400px">
   <img src="./DOC/formview.png" width="400px">

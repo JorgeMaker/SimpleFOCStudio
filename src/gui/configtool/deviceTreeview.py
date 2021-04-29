@@ -171,7 +171,7 @@ class DeviceTreeView(QTreeWidget):
         self.setItemWidget(self.modulationCenter,1,self.selectModCenter)
         
         
-        self.header().resizeSection(0, 210) 
+        self.header().resizeSection(0, 240) 
 
         self.setAlternatingRowColors(True)
         self.header().hide()

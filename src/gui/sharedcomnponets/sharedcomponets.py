@@ -59,7 +59,12 @@ class GUIToolKit(object):
             'disconnect': 'disconnect.png',
             'configure': 'configure.png',
             'pidconfig': 'pidconfig.png',
-            'consoletool': 'consoletool.png'
+            'consoletool': 'consoletool.png',
+            'fordward': 'fordward.png',
+            'fastbackward': 'fastbackward.png',
+            'backward': 'backward.png',
+            'stopjogging': 'stopjogging.png',
+            'fastfordward': 'fastfordward.png',
         }
         currentDir = os.path.dirname(__file__)
         icon_path = os.path.join(currentDir, '../resources', file_index[icoName])

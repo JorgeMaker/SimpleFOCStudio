@@ -1,17 +1,14 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
 import json
-import os
-import pathlib
 
 from PyQt5 import QtWidgets
 
 from src.gui.commandlinetool.commandlinetool import CommandLineConsoleTool
 from src.gui.configtool.deviceConfigurationTool import DeviceConfigurationTool
+from src.gui.configtool.generatedCodeDisplay import GeneratedCodeDisplay
 from src.gui.configtool.treeViewConfigTool import TreeViewConfigTool
-from src.gui.configtool.generatedCodeDisplay import GeneratedCodeDisplay,GenerateCodeDialog
 from src.simpleFOCConnector import SimpleFOCDevice
-from src.gui.sharedcomnponets.sharedcomponets import GUIToolKit
 
 
 class WorkAreaTabbedWidget(QtWidgets.QTabWidget):

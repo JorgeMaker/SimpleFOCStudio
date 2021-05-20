@@ -1,6 +1,5 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
-import logging
 
 from PyQt5 import QtGui, QtWidgets
 
@@ -121,4 +120,3 @@ class DROGroupBox(QtWidgets.QGroupBox):
         self.signal3LCDNumber.display(self.device.targetNow)
         self.signal1LCDNumber.display(self.device.velocityNow)
         self.signal0LCDNumber.display(self.device.angleNow)
-

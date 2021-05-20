@@ -1,10 +1,14 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
 from PyQt5 import QtWidgets
+
+from src.gui.commandlinetool.configureConnectionWidget import \
+    ConfigureConnection
 from src.gui.sharedcomnponets.commandLineInterface import CommandLineWidget
-from src.gui.commandlinetool.configureConnectionWidget import ConfigureConnection
-from src.gui.sharedcomnponets.sharedcomponets import (WorkAreaTabWidget, GUIToolKit)
+from src.gui.sharedcomnponets.sharedcomponets import (WorkAreaTabWidget,
+                                                      GUIToolKit)
 from src.simpleFOCConnector import SimpleFOCDevice
+
 
 class CommandLineConsoleTool(WorkAreaTabWidget):
 

@@ -2,10 +2,13 @@
 # -*- coding: utf-8 -*-
 from PyQt5.QtCore import Qt
 from PyQt5.QtWidgets import (QVBoxLayout, QSplitter)
-from src.gui.sharedcomnponets.sharedcomponets import (WorkAreaTabWidget, GUIToolKit)
-from src.simpleFOCConnector import SimpleFOCDevice
-from src.gui.configtool.devicesInspectorTree import DevicesInspectorTree
+
 from src.gui.configtool.deviceInteractionFrame import DeviceInteractionFrame
+from src.gui.configtool.devicesInspectorTree import DevicesInspectorTree
+from src.gui.sharedcomnponets.sharedcomponets import (WorkAreaTabWidget,
+                                                      GUIToolKit)
+from src.simpleFOCConnector import SimpleFOCDevice
+
 
 class TreeViewConfigTool(WorkAreaTabWidget):
 

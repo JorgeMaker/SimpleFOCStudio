@@ -3,9 +3,11 @@
 import logging
 import threading
 import time
+
 import serial
 from PyQt5 import QtCore, QtWidgets
 from serial import SerialException
+
 
 class PIDController:
     P = 0
@@ -848,4 +850,3 @@ class StateUpdateRunner(QtCore.QThread):
 
     def stopped(self):
         return self._stop_event.is_set()
-        

@@ -1,7 +1,9 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
 from PyQt5 import QtWidgets
+
 from src.simpleFOCConnector import SimpleFOCDevice
+
 
 class TorqueGroupBox(QtWidgets.QGroupBox):
     def __init__(self, parent=None):

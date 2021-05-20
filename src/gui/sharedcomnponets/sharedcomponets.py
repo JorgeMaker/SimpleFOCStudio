@@ -1,8 +1,10 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
+import os
+
 from PyQt5 import QtGui, QtWidgets, QtCore
 from serial.tools import list_ports
-import os
+
 
 class GUIToolKit(object):
     ''' This class is used to provide icons for the rest of the application

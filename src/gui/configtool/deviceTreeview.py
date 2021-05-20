@@ -4,7 +4,7 @@ from PyQt5 import QtWidgets, QtCore
 from PyQt5.Qt import QTreeWidget
 
 from src.gui.sharedcomnponets.sharedcomponets import GUIToolKit
-from src.simpleFOCConnector import SimpleFOCDevice, PIDController, LowPassFilter
+from src.simpleFOCConnector import SimpleFOCDevice
 
 
 class DeviceTreeView(QTreeWidget):

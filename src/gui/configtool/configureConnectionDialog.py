@@ -2,8 +2,10 @@
 # -*- coding: utf-8 -*-
 import serial
 from PyQt5 import QtCore, QtGui, QtWidgets
+
 from src.gui.sharedcomnponets.sharedcomponets import SerialPortComboBox
 from src.simpleFOCConnector import SimpleFOCDevice
+
 
 class ConfigureSerailConnectionDialog(QtWidgets.QDialog):
     def __init__(self, parent=None):

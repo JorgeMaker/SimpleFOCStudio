@@ -1,15 +1,15 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
 from PyQt5 import QtWidgets
-from PyQt5.QtCore import Qt
-from PyQt5.QtWidgets import (QVBoxLayout, QSplitter)
-from src.gui.sharedcomnponets.sharedcomponets import (WorkAreaTabWidget, GUIToolKit)
-from src.simpleFOCConnector import SimpleFOCDevice
-from src.gui.configtool.devicesInspectorTree import DevicesInspectorTree
-from src.gui.configtool.deviceInteractionFrame import DeviceInteractionFrame
-
-from PyQt5.QtGui import *
 from PyQt5.QtCore import *
+from PyQt5.QtCore import Qt
+from PyQt5.QtGui import *
+from PyQt5.QtWidgets import (QVBoxLayout)
+
+from src.gui.sharedcomnponets.sharedcomponets import (WorkAreaTabWidget,
+                                                      GUIToolKit)
+from src.simpleFOCConnector import SimpleFOCDevice
+
 
 class GenerateCodeDialog(QtWidgets.QDialog):
     def __init__(self, parent=None):

@@ -1,7 +1,9 @@
 # !/usr/bin/env python
 # -*- coding: utf-8 -*-
 from PyQt5 import QtWidgets
+
 from src.gui.sharedcomnponets.sharedcomponets import GUIToolKit
+
 
 class SimpleFOCConfigToolBar(QtWidgets.QToolBar):
 

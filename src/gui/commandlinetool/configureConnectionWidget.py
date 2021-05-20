@@ -1,10 +1,12 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
 import serial
-from PyQt5 import (QtGui,QtCore,QtWidgets)
-from src.gui.sharedcomnponets.sharedcomponets import SerialPortComboBox
+from PyQt5 import (QtGui, QtCore, QtWidgets)
+
 from src.gui.sharedcomnponets.sharedcomponets import GUIToolKit
+from src.gui.sharedcomnponets.sharedcomponets import SerialPortComboBox
 from src.simpleFOCConnector import SimpleFOCDevice
+
 
 class ConfigureConnection(QtWidgets.QGroupBox):
 

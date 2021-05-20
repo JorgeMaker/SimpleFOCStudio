@@ -169,9 +169,8 @@ class DeviceTreeView(QTreeWidget):
         self.selectModCenter.addItems(['Disabled', 'Enabled'])
         self.selectModCenter.currentIndexChanged.connect(self.changeModCenter)
         self.setItemWidget(self.modulationCenter,1,self.selectModCenter)
-        
-        
-        self.header().resizeSection(0, 210) 
+
+        self.header().resizeSection(0,230)
 
         self.setAlternatingRowColors(True)
         self.header().hide()
@@ -235,8 +234,6 @@ class DeviceTreeView(QTreeWidget):
             lpfTf.flags() | QtCore.Qt.ItemIsEditable)
 
         return pidConfiguration
-
-
 
     def sendCommand(self, item, column):
         value = item.text(1)

@@ -67,6 +67,7 @@ class GUIToolKit(object):
             'backward': 'backward.png',
             'stopjogging': 'stopjogging.png',
             'fastfordward': 'fastfordward.png',
+            'customcommands':'customcommands.png'
         }
         currentDir = os.path.dirname(__file__)
         icon_path = os.path.join(currentDir, '../resources', file_index[icoName])

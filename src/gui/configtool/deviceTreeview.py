@@ -2,7 +2,7 @@
 # -*- coding: utf-8 -*-
 from PyQt5 import QtWidgets, QtCore
 from PyQt5.Qt import QTreeWidget
-
+from functools import partial
 from src.gui.sharedcomnponets.sharedcomponets import GUIToolKit
 from src.simpleFOCConnector import SimpleFOCDevice
 
@@ -170,6 +170,15 @@ class DeviceTreeView(QTreeWidget):
         self.selectModCenter.currentIndexChanged.connect(self.changeModCenter)
         self.setItemWidget(self.modulationCenter,1,self.selectModCenter)
 
+        self.customComands = QtWidgets.QTreeWidgetItem(self.sFOCDevice)
+        self.customComands.setText(0, 'Custom commands')
+        self.customComands.setIcon(0, GUIToolKit.getIconByName('customcommands'))
+        self.sFOCDevice.addChild(self.customComands)
+
+        self.installEventFilter(self)
+        self.setContextMenuPolicy(QtCore.Qt.CustomContextMenu)
+        self.customContextMenuRequested.connect(self.customCommandsMenu)
+
         self.header().resizeSection(0,230)
 
         self.setAlternatingRowColors(True)
@@ -184,6 +193,69 @@ class DeviceTreeView(QTreeWidget):
         self.itemChanged.connect(self.sendCommand)
 
         self.setEnabled(self.device.isConnected)
+
+    def customCommandsMenu(self, position):
+        indexes = self.selectedIndexes()
+        if len(indexes) > 0:
+            level = 0
+            index = indexes[0]
+            while index.parent().isValid():
+                index = index.parent()
+                level += 1
+        selectedItem = self.selectedItems()[0]
+        menu = QtWidgets.QMenu()
+        if selectedItem.text(0) == 'Custom commands':
+            addComand = QtWidgets.QAction("Add command", self)
+            addComand.triggered.connect(self.addCommandAction)
+            menu.addAction(addComand)
+        elif hasattr(selectedItem, 'isCustomCommand'):
+            executeCommand = QtWidgets.QAction("Execute", self)
+            executeCommand.triggered.connect(self.executeCustomCommandAction)
+            menu.addAction(executeCommand)
+            deleteCommand = QtWidgets.QAction("Remove", self)
+            deleteCommand.triggered.connect(self.deleteCustomCommand)
+            menu.addAction(deleteCommand)
+
+        menu.exec_(self.viewport().mapToGlobal(position))
+
+    def addCommandAction(self):
+        selectedItem = self.selectedItems()[0]
+        self.addCustomCommand(selectedItem)
+
+    def executeCustomCommandAction(self):
+        selectedItem = self.selectedItems()[0]
+        selectedCustomCommand = selectedItem.text(1)
+        self.device.sendCommand(selectedCustomCommand)
+
+    def deleteCustomCommand(self):
+        root = self.invisibleRootItem()
+        for item in self.selectedItems():
+            (item.parent() or root).removeChild(item)
+
+    def eventFilter(self, obj, event):
+        if event.type() == QtCore.QEvent.KeyPress:
+            if event.key() == QtCore.Qt.Key_Return:
+                selectedItem = self.selectedItems()[0]
+                if selectedItem.text(0) == 'Custom commands':
+                    self.addCustomCommand(selectedItem)
+            if event.key() == QtCore.Qt.Key_Space or event.key() == QtCore.Qt.Key_Right:
+                selectedItem = self.selectedItems()[0]
+                if selectedItem.parent().text(0) == 'Custom commands':
+                    self.executeCustomCommandAction()
+            if event.key() == QtCore.Qt.Key_Delete or event.key() == QtCore.Qt.Key_Backspace:
+                selectedItem = self.selectedItems()[0]
+                if selectedItem.parent().text(0) == 'Custom commands':
+                    self.deleteCustomCommand()
+        return super(DeviceTreeView, self).eventFilter(obj, event)
+
+    def addCustomCommand(sefl,selectedItem):
+        customCommand = QtWidgets.QTreeWidgetItem()
+        customCommand.isCustomCommand = True
+        customCommand.setText(0, 'Command')
+        customCommand.setIcon(0, GUIToolKit.getIconByName('gear'))
+        customCommand.setFlags(
+            customCommand.flags() | QtCore.Qt.ItemIsEditable)
+        selectedItem.addChild(customCommand)
 
     def addPIDSubtree(self, parent,  label):
         pidConfiguration = QtWidgets.QTreeWidgetItem()

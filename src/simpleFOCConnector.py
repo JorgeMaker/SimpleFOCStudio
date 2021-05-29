@@ -7,7 +7,7 @@ import time
 import serial
 from PyQt5 import QtCore, QtWidgets
 from serial import SerialException
-
+from collections import defaultdict
 
 class PIDController:
     P = 0
@@ -35,15 +35,54 @@ class PIDController:
             'outputRamp':self.outputRamp,
             'outputLimit':self.outputLimit
         }
-        
+
 
 class LowPassFilter:
     Tf = 0
     cmd =''
     cmdTf = 'F'
+
     def __init__(self, cmd):
         self.cmd = cmd
 
+
+class Command:
+    cmdName = ''
+    cmd = ''
+
+    def __init__(self,cmdname='Command', cmd=''):
+        self.cmdName = cmdname
+        self.cmd = cmd
+
+    def load(self, jsonValues):
+        self.cmdName = jsonValues['commandName']
+        self.cmd = jsonValues['commandValue']
+
+    def serialize(self):
+        return {
+            'commandName': self.cmdName,
+            'commandValue': self.cmd
+        }
+
+
+class CustomCommands:
+    customCommandsList = []
+
+    def __init__(self,commandsLis=[]):
+        for command in  commandsLis:
+            self.customCommandsList.append(command)
+    def load(self, jsonValues):
+        for commandInJson in jsonValues:
+            command = Command()
+            command.load(commandInJson)
+            self.customCommandsList.append(command)
+
+    def serialize(self):
+        serializedCustomCommands = defaultdict(list)
+        for command in self.customCommandsList:
+            serializedCommand = command.serialize()
+            serializedCustomCommands['customCommands'].append(serializedCommand)
+        return serializedCustomCommands
 
 class SimpleFOCDevice:
     __instance = None
@@ -147,8 +186,12 @@ class SimpleFOCDevice:
             self.sensorElectricalZero = 0
             self.sensorZeroOffset = 0
 
+            # list of custom commands
+            self.customCommands = CustomCommands()
+
             # return the class instance
             SimpleFOCDevice.__instance = self
+
 
     def configureDevice(self, jsonValue):
         # motion control parameters
@@ -158,10 +201,10 @@ class SimpleFOCDevice:
         self.PIDCurrentQ.load(jsonValue['PIDCurrentQ'])
         
         # low pass filters
-        self.LPFVelocity.Tf =  jsonValue['LPFVelocity']
-        self.LPFAngle.Tf =  jsonValue['LPFAngle']
-        self.LPFCurrentQ.Tf =  jsonValue['LPFCurrentQ']
-        self.LPFCurrentD.Tf =  jsonValue['LPFCurrentD']
+        self.LPFVelocity.Tf = jsonValue['LPFVelocity']
+        self.LPFAngle.Tf = jsonValue['LPFAngle']
+        self.LPFCurrentQ.Tf = jsonValue['LPFCurrentQ']
+        self.LPFCurrentD.Tf = jsonValue['LPFCurrentD']
         # limit variables
         self.velocityLimit = jsonValue['velocityLimit']
         self.voltageLimit = jsonValue['voltageLimit']
@@ -188,6 +231,15 @@ class SimpleFOCDevice:
         self.serialByteSize = jsonValue['serialByteSize']
         self.serialParity = jsonValue['serialParity']
         self.stopBits = jsonValue['stopBits']
+        try:
+            self.customCommands.customCommandsList = []
+            self.customCommands.load(jsonValue['customCommands'])
+        except KeyError:
+            pass
+        try:
+            self.devCommandID = jsonValue['devCommandID']
+        except KeyError:
+            pass
 
     def configureConnection(self, configDict):
         self.connectionID = configDict['connectionID']
@@ -222,8 +274,11 @@ class SimpleFOCDevice:
             'serialRate': self.serialRate,
             'serialByteSize': self.serialByteSize,
             'serialParity': self.serialParity,
-            'stopBits': self.stopBits
+            'stopBits': self.stopBits,
+            'devCommandID': self.devCommandID,
+
         }
+        valuesToSave.update(self.customCommands.serialize())
         return valuesToSave
 
         
@@ -378,7 +433,7 @@ class SimpleFOCDevice:
                 self.pushConfiguration()
                 if self.stateUpdater.stopped():
                     self.stateUpdater = StateUpdateRunner(self)
-                sself.stateUpdater.start()
+                self.stateUpdater.start()
                 pass
             return True
 

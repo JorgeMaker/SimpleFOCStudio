@@ -23,10 +23,12 @@ class ConnectionControlGroupBox(QtWidgets.QGroupBox):
 
         self.devCommandIDLabel = QtWidgets.QLabel("Command:")
         self.horizontalLayout.addWidget(self.devCommandIDLabel)
+
         self.devCommandIDLetter = QtWidgets.QLineEdit()
         self.devCommandIDLetter.setObjectName('devCommandIDLetter')
         self.devCommandIDLetter.editingFinished.connect(self.changeDevicedevCommandID)
         self.horizontalLayout.addWidget(self.devCommandIDLetter)
+        self.devCommandIDLetter.setText(self.device.devCommandID)
 
         self.pullConfig = QtWidgets.QPushButton()
         self.pullConfig.setObjectName('pullConfig')

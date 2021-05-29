@@ -1,1 +1,57 @@
-{"PIDVelocity": {"P": 0.05, "I": 1.0, "D": 0.0, "outputRamp": 1000.0, "outputLimit": 0.2}, "PIDAngle": {"P": 20.0, "I": 0.0, "D": 0.0, "outputRamp": 0.0, "outputLimit": 20.0}, "PIDCurrentD": {"P": 3.0, "I": 300.0, "D": 0.0, "outputRamp": 0.0, "outputLimit": 12.0}, "PIDCurrentQ": {"P": 3.0, "I": 300.0, "D": 0.0, "outputRamp": 0.0, "outputLimit": 12.0}, "LPFVelocity": 0.01, "LPFAngle": 0.0, "LPFCurrentD": 0.005, "LPFCurrentQ": 0.005, "velocityLimit": 20.0, "voltageLimit": 12.0, "currentLimit": 0.2, "controlType": 0, "motionDownsample": 0.0, "torqueType": 2, "phaseResistance": 0.0, "sensorZeroOffset": 23003.301, "sensorElectricalZero": 5.611, "initialTarget": 0, "connectionID": "", "serialPortName": "COM32", "serialRate": "115200", "serialByteSize": 8, "serialParity": "N", "stopBits": 1}
+{
+    "LPFAngle": 0.0,
+    "LPFCurrentD": 0.005,
+    "LPFCurrentQ": 0.005,
+    "LPFVelocity": 0.2,
+    "PIDAngle": {
+        "D": 0.0,
+        "I": 0.0,
+        "P": 20.0,
+        "outputLimit": 10.0,
+        "outputRamp": 0.0
+    },
+    "PIDCurrentD": {
+        "D": 0.0,
+        "I": 300.0,
+        "P": 3.0,
+        "outputLimit": 12.0,
+        "outputRamp": 0.0
+    },
+    "PIDCurrentQ": {
+        "D": 0.0,
+        "I": 300.0,
+        "P": 3.0,
+        "outputLimit": 12.0,
+        "outputRamp": 0.0
+    },
+    "PIDVelocity": {
+        "D": 0.0,
+        "I": 20.0,
+        "P": 0.2,
+        "outputLimit": 11.0,
+        "outputRamp": 1000.0
+    },
+    "connectionID": "",
+    "controlType": 2,
+    "currentLimit": 0.2,
+    "customCommands": [
+        {
+            "commandName": "Command1",
+            "commandValue": "D100"
+        }
+    ],
+    "devCommandID": "M",
+    "initialTarget": 0,
+    "motionDownsample": 0.0,
+    "phaseResistance": 0.0,
+    "sensorElectricalZero": 2.676,
+    "sensorZeroOffset": 0.0,
+    "serialByteSize": 8,
+    "serialParity": "N",
+    "serialPortName": "/dev/cu.usbserial-14140",
+    "serialRate": "115200",
+    "stopBits": 1,
+    "torqueType": 0,
+    "velocityLimit": 10.0,
+    "voltageLimit": 11.0
+}

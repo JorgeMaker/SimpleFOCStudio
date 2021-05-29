@@ -1,7 +1,6 @@
 # !/usr/bin/env python
 # -*- coding: utf-8 -*-
 from PyQt5 import QtWidgets
-
 from src.gui.sharedcomnponets.sharedcomponets import GUIToolKit
 
 
@@ -27,8 +26,6 @@ class SimpleFOCConfigToolBar(QtWidgets.QToolBar):
         self.addDeviceMenu.addAction(self.addDeviceFormView)
         self.addDeviceAction.setMenu(self.addDeviceMenu)
         self.addWidget(self.addDeviceAction)
-
-
 
         self.openDeviceAction = QtWidgets.QAction(main_window)
         self.openDeviceAction.setIcon(GUIToolKit.getIconByName('open'))
@@ -61,5 +58,3 @@ class SimpleFOCConfigToolBar(QtWidgets.QToolBar):
         self.addAction(self.openConsoleToolAction)
 
         self.addSeparator()
-
-

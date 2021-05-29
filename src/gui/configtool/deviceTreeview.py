@@ -2,10 +2,9 @@
 # -*- coding: utf-8 -*-
 from PyQt5 import QtWidgets, QtCore
 from PyQt5.Qt import QTreeWidget
-from functools import partial
 from src.gui.sharedcomnponets.sharedcomponets import GUIToolKit
 from src.simpleFOCConnector import SimpleFOCDevice
-
+from src.simpleFOCConnector import Command
 
 class DeviceTreeView(QTreeWidget):
     def __init__(self, parent=None):
@@ -78,12 +77,10 @@ class DeviceTreeView(QTreeWidget):
         self.currentLimit.setFlags(
             self.currentLimit.flags() | QtCore.Qt.ItemIsEditable)
 
-
         self.statesConfig = QtWidgets.QTreeWidgetItem(self.sFOCDevice)
         self.statesConfig.setText(0, 'States')
         self.statesConfig.setIcon(0, GUIToolKit.getIconByName('statistics'))
         self.sFOCDevice.addChild(self.statesConfig)
-
 
         self.satateTarget = QtWidgets.QTreeWidgetItem(self.statesConfig)
         self.satateTarget.setText(0, 'Target')
@@ -113,7 +110,6 @@ class DeviceTreeView(QTreeWidget):
         self.stateAngle.setText(0, 'Angle')
         self.stateAngle.setIcon(0, GUIToolKit.getIconByName('gear'))
         self.stateAngle.setText(1, '')
-
 
         self.sensorConfig = QtWidgets.QTreeWidgetItem(self.sFOCDevice)
         self.sensorConfig.setText(0, 'Sensor config')
@@ -175,6 +171,9 @@ class DeviceTreeView(QTreeWidget):
         self.customComands.setIcon(0, GUIToolKit.getIconByName('customcommands'))
         self.sFOCDevice.addChild(self.customComands)
 
+        for customCommand in self.device.customCommands.customCommandsList:
+            self.initCustomCommand(customCommand)
+
         self.installEventFilter(self)
         self.setContextMenuPolicy(QtCore.Qt.CustomContextMenu)
         self.customContextMenuRequested.connect(self.customCommandsMenu)
@@ -190,7 +189,7 @@ class DeviceTreeView(QTreeWidget):
         self.device.commProvider.commandDataReceived.connect(self.commandResponseReceived)
         self.device.commProvider.stateMonitorReceived.connect(self.stateResponseReceived)
 
-        self.itemChanged.connect(self.sendCommand)
+        self.itemChanged.connect(self.treeItemEdited)
 
         self.setEnabled(self.device.isConnected)
 
@@ -229,6 +228,8 @@ class DeviceTreeView(QTreeWidget):
 
     def deleteCustomCommand(self):
         root = self.invisibleRootItem()
+        deletedIndex = self.customComands.indexOfChild(self.selectedItems()[0])
+        self.device.customCommands.customCommandsList.pop(deletedIndex)
         for item in self.selectedItems():
             (item.parent() or root).removeChild(item)
 
@@ -253,9 +254,21 @@ class DeviceTreeView(QTreeWidget):
         customCommand.isCustomCommand = True
         customCommand.setText(0, 'Command')
         customCommand.setIcon(0, GUIToolKit.getIconByName('gear'))
+
         customCommand.setFlags(
             customCommand.flags() | QtCore.Qt.ItemIsEditable)
         selectedItem.addChild(customCommand)
+        sefl.device.customCommands.customCommandsList.append(Command('Command',''))
+
+    def initCustomCommand(sefl, command):
+        customCommand = QtWidgets.QTreeWidgetItem()
+        customCommand.isCustomCommand = True
+        customCommand.setText(0, command.cmdName)
+        customCommand.setText(1, command.cmd)
+        customCommand.setIcon(0, GUIToolKit.getIconByName('gear'))
+        customCommand.setFlags(
+            customCommand.flags() | QtCore.Qt.ItemIsEditable)
+        sefl.customComands.addChild(customCommand)
 
     def addPIDSubtree(self, parent,  label):
         pidConfiguration = QtWidgets.QTreeWidgetItem()
@@ -306,6 +319,19 @@ class DeviceTreeView(QTreeWidget):
             lpfTf.flags() | QtCore.Qt.ItemIsEditable)
 
         return pidConfiguration
+
+    def treeItemEdited(self, item, column):
+        if item.parent().text(0) == 'Custom commands':
+            updatedIndex = self.customComands.indexOfChild(item)
+            updatedValue = item.text(column)
+            if column == 0:
+                self.device.customCommands.customCommandsList[
+                    updatedIndex].cmdName = updatedValue
+            else:
+                self.device.customCommands.customCommandsList[
+                    updatedIndex].cmd = updatedValue
+        else:
+            self.sendCommand(item, column)
 
     def sendCommand(self, item, column):
         value = item.text(1)

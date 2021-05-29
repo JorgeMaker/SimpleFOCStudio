@@ -83,6 +83,13 @@ The generated code you can just copy/paste in your <code>setup()</code> function
   <img src="./DOC/gen.gif" width="700px">
 </p>
 
+#### Custom Commands
+You can define your own custom commands defined in your sketch if you extend the Commander interface as is explained [here](https://docs.simplefoc.com/commander_interface) 
+<p align="center">
+  <img src="./DOC/customCommands.gif" width="700px">
+</p>
+Once you have added each custom command in order to execute each of them you have to select it and once selected press the space key (⎵) or right arrow key (→).
+
 #### Integrated serial terminal
 
 *Simple**FOC**Studio* also has integrated serial terminal for easier debugging and monitoring.

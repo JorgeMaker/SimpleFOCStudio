@@ -126,7 +126,7 @@ class WorkAreaTabbedWidget(QtWidgets.QTabWidget):
                 f.write(json.dumps(deviceToSave.toJSON(), indent=4, sort_keys=True))
         else:
             with open(file, 'w', encoding='utf-8') as f:
-                f.write(json.dumps(deviceToSave.toJSON()))
+                f.write(json.dumps(deviceToSave.toJSON(), indent=4, sort_keys=True))
 
     def openConsoleTool(self):
         if self.cmdLineTool is None:

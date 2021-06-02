@@ -85,7 +85,7 @@ The generated code you can just copy/paste in your <code>setup()</code> function
 
 #### Custom Commands
 
-You can create your own custom commands if you [extend the Commnader interface](https://docs.simplefoc.com/commander_interface) in your sketch. This can be used for example to do things like change register settings for SPI devicesor any oyher functionality. Each custom command has a name and a value as yoy can see at the bellow image.
+You can create your own custom commands if you [extend the Commnader interface](https://docs.simplefoc.com/commander_interface) in your sketch. This can be used for example to do things like change register settings for SPI devicesor any oyher functionality. Each custom command has a name and a value as you can see at the below image.
 
 <p align="center">
   <img src="./DOC/customCommands.png">

@@ -84,11 +84,13 @@ The generated code you can just copy/paste in your <code>setup()</code> function
 </p>
 
 #### Custom Commands
-You can define your own custom commands defined in your sketch if you extend the Commander interface as is explained [here](https://docs.simplefoc.com/commander_interface) 
+
+You can create your own custom commands if you [extend the Commnader interface](https://docs.simplefoc.com/commander_interface) in your sketch. This can be used for example to do things like change register settings for SPI devicesor any oyher functionality. Each custom command has a name and a value as yoy can see at the bellow image.
+
 <p align="center">
   <img src="./DOC/customCommands.png">
 </p>
-Once you have added each custom command in order to execute each of them you have to select it and once selected press the space key (⎵) or right arrow key (→).
+Once you have added each custom command in order to execute it you just need to select it and once selected press the space key (⎵) or right arrow key (→).
 
 #### Integrated serial terminal
 

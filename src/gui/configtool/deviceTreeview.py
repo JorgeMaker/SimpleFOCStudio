@@ -350,7 +350,7 @@ class DeviceTreeView(QTreeWidget):
             lpf = self.device.LPFCurrentQ
         elif 'Current d PID' in pidLabel:
             pid = self.device.PIDCurrentD
-            lpf = self.device.LPFCurrentQ
+            lpf = self.device.LPFCurrentD
 
         if 'Proportional gain' in fieldName:
             self.device.sendProportionalGain(pid, value)

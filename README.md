@@ -2,6 +2,7 @@
 
 Graphical user interface for the [*Simple**FOC**library*](https://github.com/simplefoc). This application allows to tune and configure any BLDC/Stepper *Simple**FOC**library* controlled device, using serial port communications and the [Commander](https://docs.simplefoc.com/commander_interface) interface.
 #### The main features are:
+
 - Plug and play with the *Simple**FOC**library* version 2.1
 - Real-time tuning and configuration of the motors
 - Real-time plotting and monitoring of motor variables
@@ -101,6 +102,7 @@ Once you have added each custom command in order to execute it you just need to 
 </p>
 
 ### Arduino code
+
 Basically there are two things you need to do:
 1. Use the commander interface and add the motor to the commander
 2. Use the monitoring and add the `motor.monitor()` in the loop

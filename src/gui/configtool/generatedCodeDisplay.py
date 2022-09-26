@@ -160,7 +160,11 @@ class GeneratedCodeDisplay(WorkAreaTabWidget):
         code1 += '<font color="#d35400">motor</font><font color="#434f54">.</font><font color="#d35400">init</font><font color="#000000">(</font><font color="#000000">)</font><font color="#000000">;</font><br>'
         code1 += '<font color="#434f54">&#47;&#47; align sensor and start FOC</font><br>'
         code1 += '<font color="#d35400">motor</font><font color="#434f54">.</font><font color="#d35400">initFOC</font><font color="#000000">(</font><font color="#000000">)</font><font color="#000000">;</font><br> ...<br> }'
-        code1 += '<br><font color="#00979c">void</font> <font color="#5e6d03">loop</font><font color="#000000">(</font><font color="#000000">)</font> <font color="#000000">{</font><br>....<br>}'
+        code1 += '<br><font color="#00979c">void</font> <font color="#5e6d03">loop</font><font color="#000000">(</font><font color="#000000">)</font> <font color="#000000">{</font>'
+        code1 += '<br> .... <br>'
+        code1 += '<font color="#d35400">motor</font><font color="#434f54">.</font><font color="#d35400">move</font><font color="#000000">(</font><font color="#000000">)</font><font color="#000000">;</font><br>'
+        code1 += '<font color="#d35400">motor</font><font color="#434f54">.</font><font color="#d35400">loopFOC</font><font color="#000000">(</font><font color="#000000">)</font><font color="#000000">;</font><br>'
+        code1 += '.... <br>}'
         # MyHighlighter( self.codeDisplayAfter, "Classic" )
         self.codeDisplayAfter.setText(code1)
         self.codeDisplayAfter.setTextFormat(Qt.TextFormat.RichText)

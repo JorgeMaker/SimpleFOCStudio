@@ -93,6 +93,19 @@ You can create your own custom commands if you [extend the Commnader interface](
 </p>
 Once you have added each custom command in order to execute it you just need to select it and once selected press the space key (⎵) or right arrow key (→).
 
+#### Joggig panel
+<p align="center">
+  <img src="./DOC/JoggingPanel.png">
+</p>
+This panel is used to actuate with yor motor without having to write comands, is like using a joystick but pressing buttons. Each buton performas an action:
+
+- Fast Reverse button: reduces the current target by 2 times the specified increment. 
+- Reverse button: reduces the current target by the specified increment.
+… Fordward button: Increase the current target by the specified increment.
+- Fast Fordward button: Increase the current target by 2 times the specified increment. 
+- Stop button: in angle control mode, sets the current angle as target angle and in velocity control sets the target to zero.
+
+
 #### Integrated serial terminal
 
 *Simple**FOC**Studio* also has integrated serial terminal for easier debugging and monitoring.

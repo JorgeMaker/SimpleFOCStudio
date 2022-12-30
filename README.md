@@ -99,10 +99,10 @@ Once you have added each custom command in order to execute it you just need to 
 </p>
 This panel is used to actuate with yor motor without having to write comands, is like using a joystick but pressing buttons. Each buton performas an action:
 
-- Fast Reverse button: reduces the current target by 2 times the specified increment. 
+- Fast Reverse button: reduces the current target by 2 times the specified increment.
 - Reverse button: reduces the current target by the specified increment.
-… Fordward button: Increase the current target by the specified increment.
-- Fast Fordward button: Increase the current target by 2 times the specified increment. 
+- Fordward button: Increase the current target by the specified increment.
+- Fast Fordward button: Increase the current target by 2 times the specified increment.
 - Stop button: in angle control mode, sets the current angle as target angle and in velocity control sets the target to zero.
 
 

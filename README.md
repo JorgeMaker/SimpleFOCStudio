@@ -93,7 +93,7 @@ You can create your own custom commands if you [extend the Commnader interface](
 </p>
 Once you have added each custom command in order to execute it you just need to select it and once selected press the space key (⎵) or right arrow key (→).
 
-#### Joggig panel
+#### Jogging panel
 <p align="center">
   <img src="./DOC/JoggingPanel.png">
 </p>

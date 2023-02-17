@@ -1,7 +1,7 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
 
-from PyQt5 import QtGui, QtWidgets
+from PyQt6 import QtGui, QtWidgets
 
 from src.gui.sharedcomnponets.sharedcomponets import GUIToolKit
 from src.simpleFOCConnector import SimpleFOCDevice
@@ -100,13 +100,13 @@ class DROGroupBox(QtWidgets.QGroupBox):
         G = colorTouple[1]
         B = colorTouple[2]
         # foreground color
-        palette.setColor(palette.WindowText, QtGui.QColor(R, G, B))
+        palette.setColor(palette.ColorRole.WindowText, QtGui.QColor(R, G, B))
         # background color
-        palette.setColor(palette.Background, QtGui.QColor(R, G, B))
+        palette.setColor(palette.ColorRole.Base, QtGui.QColor(R, G, B))
         # 'light' border
-        palette.setColor(palette.Light, QtGui.QColor(R, G, B))
+        palette.setColor(palette.ColorRole.BrightText, QtGui.QColor(R, G, B))
         # 'dark' border
-        palette.setColor(palette.Dark, QtGui.QColor(R, G, B))
+        palette.setColor(palette.ColorRole.Dark, QtGui.QColor(R, G, B))
         return palette
 
     def commandResponseReceived(self, cmdRespose):        

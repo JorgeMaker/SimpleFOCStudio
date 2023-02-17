@@ -1,7 +1,7 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
-from PyQt5 import QtWidgets, QtCore
-from PyQt5.Qt import QTreeWidget
+from PyQt6 import QtWidgets, QtCore,QtGui
+from PyQt6.QtWidgets import QTreeWidget
 from src.gui.sharedcomnponets.sharedcomponets import GUIToolKit
 from src.simpleFOCConnector import SimpleFOCDevice
 from src.simpleFOCConnector import Command
@@ -44,7 +44,7 @@ class DeviceTreeView(QTreeWidget):
         self.motionDownsample.setIcon(0, GUIToolKit.getIconByName('gear'))
         self.motionDownsample.setText(1, '')
         self.motionDownsample.setFlags(
-            self.motionDownsample.flags() | QtCore.Qt.ItemIsEditable)
+            self.motionDownsample.flags() | QtCore.Qt.ItemFlag.ItemIsEditable)
         
         self.PIDVelocityConfig = self.addPIDSubtree(self.motionControl,'Velocity PID')
         self.PIDAngleConfig = self.addPIDSubtree(self.motionControl,'Angle PID')
@@ -61,21 +61,21 @@ class DeviceTreeView(QTreeWidget):
         self.velocityLimit.setIcon(0, GUIToolKit.getIconByName('gear'))
         self.velocityLimit.setText(1, '')
         self.velocityLimit.setFlags(
-            self.velocityLimit.flags() | QtCore.Qt.ItemIsEditable)
+            self.velocityLimit.flags() | QtCore.Qt.ItemFlag.ItemIsEditable)
 
         self.voltageLimit = QtWidgets.QTreeWidgetItem(self.limitsConfig)
         self.voltageLimit.setText(0, 'Voltage limit')
         self.voltageLimit.setIcon(0, GUIToolKit.getIconByName('gear'))
         self.voltageLimit.setText(1, '')
         self.voltageLimit.setFlags(
-            self.voltageLimit.flags() | QtCore.Qt.ItemIsEditable)
+            self.voltageLimit.flags() | QtCore.Qt.ItemFlag.ItemIsEditable)
 
         self.currentLimit = QtWidgets.QTreeWidgetItem(self.limitsConfig)
         self.currentLimit.setText(0, 'Current limit')
         self.currentLimit.setIcon(0, GUIToolKit.getIconByName('gear'))
         self.currentLimit.setText(1, '')
         self.currentLimit.setFlags(
-            self.currentLimit.flags() | QtCore.Qt.ItemIsEditable)
+            self.currentLimit.flags() | QtCore.Qt.ItemFlag.ItemIsEditable)
 
         self.statesConfig = QtWidgets.QTreeWidgetItem(self.sFOCDevice)
         self.statesConfig.setText(0, 'States')
@@ -121,14 +121,14 @@ class DeviceTreeView(QTreeWidget):
         self.sensorZeroOffset.setIcon(0, GUIToolKit.getIconByName('gear'))
         self.sensorZeroOffset.setText(1, '')
         self.sensorZeroOffset.setFlags(
-            self.sensorZeroOffset.flags() | QtCore.Qt.ItemIsEditable)
+            self.sensorZeroOffset.flags() | QtCore.Qt.ItemFlag.ItemIsEditable)
 
         self.sensorZeroElecOffset = QtWidgets.QTreeWidgetItem(self.sensorConfig)
         self.sensorZeroElecOffset.setText(0, 'Electrical Zero Offset')
         self.sensorZeroElecOffset.setIcon(0, GUIToolKit.getIconByName('gear'))
         self.sensorZeroElecOffset.setText(1, '')
         self.sensorZeroElecOffset.setFlags(
-            self.sensorZeroElecOffset.flags() | QtCore.Qt.ItemIsEditable)
+            self.sensorZeroElecOffset.flags() | QtCore.Qt.ItemFlag.ItemIsEditable)
 
         self.generalSettings = QtWidgets.QTreeWidgetItem(self.sFOCDevice)
         self.generalSettings.setText(0, 'General settings')
@@ -140,7 +140,7 @@ class DeviceTreeView(QTreeWidget):
         self.phaseRes.setIcon(0, GUIToolKit.getIconByName('res'))
         self.phaseRes.setText(1, '')
         self.phaseRes.setFlags(
-            self.phaseRes.flags() | QtCore.Qt.ItemIsEditable)
+            self.phaseRes.flags() | QtCore.Qt.ItemFlag.ItemIsEditable)
 
         self.deviceStatus = QtWidgets.QTreeWidgetItem(self.generalSettings)
         self.deviceStatus.setText(0, 'Motor Status')
@@ -175,7 +175,7 @@ class DeviceTreeView(QTreeWidget):
             self.initCustomCommand(customCommand)
 
         self.installEventFilter(self)
-        self.setContextMenuPolicy(QtCore.Qt.CustomContextMenu)
+        self.setContextMenuPolicy(QtCore.Qt.ContextMenuPolicy.CustomContextMenu)
         self.customContextMenuRequested.connect(self.customCommandsMenu)
 
         self.header().resizeSection(0,230)
@@ -204,14 +204,14 @@ class DeviceTreeView(QTreeWidget):
         selectedItem = self.selectedItems()[0]
         menu = QtWidgets.QMenu()
         if selectedItem.text(0) == 'Custom commands':
-            addComand = QtWidgets.QAction("Add command", self)
+            addComand = QtGui.QAction("Add command", self)
             addComand.triggered.connect(self.addCommandAction)
             menu.addAction(addComand)
         elif hasattr(selectedItem, 'isCustomCommand'):
-            executeCommand = QtWidgets.QAction("Execute", self)
+            executeCommand = QtGui.QAction("Execute", self)
             executeCommand.triggered.connect(self.executeCustomCommandAction)
             menu.addAction(executeCommand)
-            deleteCommand = QtWidgets.QAction("Remove", self)
+            deleteCommand = QtGui.QAction("Remove", self)
             deleteCommand.triggered.connect(self.deleteCustomCommand)
             menu.addAction(deleteCommand)
 
@@ -234,16 +234,16 @@ class DeviceTreeView(QTreeWidget):
             (item.parent() or root).removeChild(item)
 
     def eventFilter(self, obj, event):
-        if event.type() == QtCore.QEvent.KeyPress:
-            if event.key() == QtCore.Qt.Key_Return:
+        if event.type() == QtCore.QEvent.Type.KeyPress:
+            if event.key() == QtCore.Qt.Key.Key_Return:
                 selectedItem = self.selectedItems()[0]
                 if selectedItem.text(0) == 'Custom commands':
                     self.addCustomCommand(selectedItem)
-            if event.key() == QtCore.Qt.Key_Space or event.key() == QtCore.Qt.Key_Right:
+            if event.key() == QtCore.Qt.Key.Key_Space or event.key() == QtCore.Qt.Key.Key_Right:
                 selectedItem = self.selectedItems()[0]
                 if selectedItem.parent().text(0) == 'Custom commands':
                     self.executeCustomCommandAction()
-            if event.key() == QtCore.Qt.Key_Delete or event.key() == QtCore.Qt.Key_Backspace:
+            if event.key() == QtCore.Qt.Key.Key_Delete or event.key() == QtCore.Qt.Key.Key_Backspace:
                 selectedItem = self.selectedItems()[0]
                 if selectedItem.parent().text(0) == 'Custom commands':
                     self.deleteCustomCommand()
@@ -256,7 +256,7 @@ class DeviceTreeView(QTreeWidget):
         customCommand.setIcon(0, GUIToolKit.getIconByName('gear'))
 
         customCommand.setFlags(
-            customCommand.flags() | QtCore.Qt.ItemIsEditable)
+            customCommand.flags() | QtCore.Qt.ItemFlag.ItemIsEditable)
         selectedItem.addChild(customCommand)
         sefl.device.customCommands.customCommandsList.append(Command('Command',''))
 
@@ -267,7 +267,7 @@ class DeviceTreeView(QTreeWidget):
         customCommand.setText(1, command.cmd)
         customCommand.setIcon(0, GUIToolKit.getIconByName('gear'))
         customCommand.setFlags(
-            customCommand.flags() | QtCore.Qt.ItemIsEditable)
+            customCommand.flags() | QtCore.Qt.ItemFlag.ItemIsEditable)
         sefl.customComands.addChild(customCommand)
 
     def addPIDSubtree(self, parent,  label):
@@ -281,42 +281,42 @@ class DeviceTreeView(QTreeWidget):
         proportionalGain.setIcon(0, GUIToolKit.getIconByName('gear'))
         proportionalGain.setText(1, '')
         proportionalGain.setFlags(
-            proportionalGain.flags() | QtCore.Qt.ItemIsEditable)
+            proportionalGain.flags() | QtCore.Qt.ItemFlag.ItemIsEditable)
 
         integralGain = QtWidgets.QTreeWidgetItem(pidConfiguration)
         integralGain.setText(0, 'Integral gain')
         integralGain.setIcon(0, GUIToolKit.getIconByName('gear'))
         integralGain.setText(1, '')
         integralGain.setFlags(
-            integralGain.flags() | QtCore.Qt.ItemIsEditable)
+            integralGain.flags() | QtCore.Qt.ItemFlag.ItemIsEditable)
 
         derivativeGain = QtWidgets.QTreeWidgetItem(pidConfiguration)
         derivativeGain.setText(0, 'Derivative gain')
         derivativeGain.setIcon(0, GUIToolKit.getIconByName('gear'))
         derivativeGain.setText(1, '')
         derivativeGain.setFlags(
-            derivativeGain.flags() | QtCore.Qt.ItemIsEditable)
+            derivativeGain.flags() | QtCore.Qt.ItemFlag.ItemIsEditable)
 
         voltageRamp = QtWidgets.QTreeWidgetItem(pidConfiguration)
         voltageRamp.setText(0, 'Output Ramp')
         voltageRamp.setIcon(0, GUIToolKit.getIconByName('gear'))
         voltageRamp.setText(1, '')
         voltageRamp.setFlags(
-            voltageRamp.flags() | QtCore.Qt.ItemIsEditable)
+            voltageRamp.flags() | QtCore.Qt.ItemFlag.ItemIsEditable)
         
         limit = QtWidgets.QTreeWidgetItem(pidConfiguration)
         limit.setText(0, 'Output Limit')
         limit.setIcon(0, GUIToolKit.getIconByName('gear'))
         limit.setText(1, '')
         limit.setFlags(
-            limit.flags() | QtCore.Qt.ItemIsEditable)
+            limit.flags() | QtCore.Qt.ItemFlag.ItemIsEditable)
 
         lpfTf = QtWidgets.QTreeWidgetItem(pidConfiguration)
         lpfTf.setText(0, 'Low pass filter')
         lpfTf.setIcon(0, GUIToolKit.getIconByName('gear'))
         lpfTf.setText(1, '')
         lpfTf.setFlags(
-            lpfTf.flags() | QtCore.Qt.ItemIsEditable)
+            lpfTf.flags() | QtCore.Qt.ItemFlag.ItemIsEditable)
 
         return pidConfiguration
 
@@ -467,7 +467,7 @@ class DeviceTreeView(QTreeWidget):
         
     def setModCenter(self,value):
         self.blockSignals(True)
-        self.selectModCenter.setCurrentIndex(value)
+        self.selectModCenter.setCurrentIndex(int(value))
         self.blockSignals(False)
         
     def changeModCenter(self):

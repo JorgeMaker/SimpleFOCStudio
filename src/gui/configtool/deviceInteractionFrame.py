@@ -1,7 +1,7 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
-from PyQt5.QtCore import Qt
-from PyQt5.QtWidgets import (QVBoxLayout, QFrame, QSplitter)
+from PyQt6.QtCore import Qt
+from PyQt6.QtWidgets import (QVBoxLayout, QFrame, QSplitter)
 
 from src.gui.configtool.graphicWidget import SimpleFOCGraphicWidget
 from src.gui.sharedcomnponets.commandLineInterface import CommandLineWidget
@@ -21,7 +21,7 @@ class DeviceInteractionFrame(QFrame):
 
         self.cmdLineTollWidget.setMaximumHeight(150)
 
-        self.verticalSplitter = QSplitter(Qt.Vertical)
+        self.verticalSplitter = QSplitter(Qt.Orientation.Vertical)
         self.verticalSplitter.addWidget(self.graphicWidget)
         self.verticalSplitter.addWidget(self.cmdLineTollWidget)
         self.device.commProvider.commandDataReceived.connect(

@@ -1,7 +1,7 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
 
-from PyQt5 import QtGui, QtWidgets, QtCore
+from PyQt6 import QtGui, QtWidgets, QtCore
 
 from src.gui.sharedcomnponets.sharedcomponets import GUIToolKit
 from src.simpleFOCConnector import SimpleFOCDevice
@@ -51,11 +51,11 @@ class DeviceJoggingControl(QtWidgets.QGroupBox):
         self.incrementLabel = QtWidgets.QLabel("Increment:")
         self.horizontalLayout.addWidget(self.incrementLabel)
 
-        onlyFloat = QtGui.QRegExpValidator(
-            QtCore.QRegExp("[+-]?([0-9]*[.])?[0-9]+"))
+        onlyFloat = QtGui.QRegularExpressionValidator(
+            QtCore.QRegularExpression("[+-]?([0-9]*[.])?[0-9]+"))
         self.incrementEdit = QtWidgets.QLineEdit()
         self.incrementEdit.setValidator(onlyFloat)
-        self.incrementEdit.setAlignment(QtCore.Qt.AlignCenter)
+        self.incrementEdit.setAlignment(QtCore.Qt.AlignmentFlag.AlignCenter)
         self.incrementEdit.setText('1.0')
         self.incrementEdit.setObjectName('incrementEdit')
         self.horizontalLayout.addWidget(self.incrementEdit)

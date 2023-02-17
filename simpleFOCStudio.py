@@ -4,7 +4,7 @@
     application ta monitor, tune and configure BLDC motor controllers based on
     SimpleFOC library.
 """
-from PyQt5 import QtWidgets
+from PyQt6 import QtWidgets
 from src.gui.mainWindow import UserInteractionMainWindow
 import sys
 import logging
@@ -18,6 +18,6 @@ if __name__ == '__main__':
         userInteractionMainWindow = UserInteractionMainWindow()
         userInteractionMainWindow.setupUi(mainWindow)
         mainWindow.show()
-        sys.exit(app.exec_())
+        sys.exit(app.exec())
     except Exception as exception:\
     logging.error(exception, exc_info=True)

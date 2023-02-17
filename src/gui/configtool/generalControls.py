@@ -1,6 +1,6 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
-from PyQt5 import QtGui, QtWidgets, QtCore
+from PyQt6 import QtGui, QtWidgets, QtCore
 
 from src.gui.sharedcomnponets.sharedcomponets import GUIToolKit
 from src.simpleFOCConnector import SimpleFOCDevice
@@ -14,8 +14,8 @@ class GeneralControls(QtWidgets.QGroupBox):
 
         # self.setMaximumWidth(300)
 
-        onlyFloat = QtGui.QRegExpValidator(
-            QtCore.QRegExp("[+-]?([0-9]*[.])?[0-9]+"))
+        onlyFloat = QtGui.QRegularExpressionValidator(
+            QtCore.QRegularExpression("[+-]?([0-9]*[.])?[0-9]+"))
 
         self.device = SimpleFOCDevice.getInstance()
 

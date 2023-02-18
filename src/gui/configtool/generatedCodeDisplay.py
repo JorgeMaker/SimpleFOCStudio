@@ -1,10 +1,10 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
-from PyQt6 import QtWidgets
-from PyQt6.QtCore import *
-from PyQt6.QtCore import Qt
-from PyQt6.QtGui import *
-from PyQt6.QtWidgets import (QVBoxLayout)
+from PyQt5 import QtWidgets
+from PyQt5.QtCore import *
+from PyQt5.QtCore import Qt
+from PyQt5.QtGui import *
+from PyQt5.QtWidgets import (QVBoxLayout)
 
 from src.gui.sharedcomnponets.sharedcomponets import (WorkAreaTabWidget,
                                                       GUIToolKit)

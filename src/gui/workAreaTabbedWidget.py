@@ -2,7 +2,7 @@
 # -*- coding: utf-8 -*-
 import json
 
-from PyQt6 import QtWidgets
+from PyQt5 import QtWidgets
 
 from src.gui.commandlinetool.commandlinetool import CommandLineConsoleTool
 from src.gui.configtool.deviceConfigurationTool import DeviceConfigurationTool
@@ -66,9 +66,9 @@ class WorkAreaTabbedWidget(QtWidgets.QTabWidget):
     def openDevice(self):
         if self.configDeviceTool is None:
             dlg = QtWidgets.QFileDialog()
-            dlg.setFileMode(QtWidgets.QFileDialog.FileMode.AnyFile)
+            dlg.setFileMode(QtWidgets.QFileDialog.AnyFile)
             filenames = None
-            if dlg.exec():
+            if dlg.exec_():
                 filenames = dlg.selectedFiles()
                 try:
                     with open(filenames[0]) as json_file:

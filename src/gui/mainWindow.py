@@ -1,6 +1,6 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
-from PyQt6 import QtCore, QtWidgets
+from PyQt5 import QtCore, QtWidgets
 
 from src.gui.toolbar import SimpleFOCConfigToolBar
 from src.gui.workAreaTabbedWidget import WorkAreaTabbedWidget
@@ -27,7 +27,7 @@ class UserInteractionMainWindow(object):
 
         # Add toolbar to the main window
         self.toolBar = SimpleFOCConfigToolBar(main_window,self.tabbedToolsWidget, main_window)
-        main_window.addToolBar(QtCore.Qt.ToolBarArea.TopToolBarArea, self.toolBar)
+        main_window.addToolBar(QtCore.Qt.TopToolBarArea, self.toolBar)
 
         # Add status bar to the main window
         self.statusbar = QtWidgets.QStatusBar(main_window)

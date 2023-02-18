@@ -5,7 +5,7 @@ import threading
 import time
 
 import serial
-from PyQt6 import QtCore, QtWidgets
+from PyQt5 import QtCore, QtWidgets
 from serial import SerialException
 from collections import defaultdict
 
@@ -414,7 +414,7 @@ class SimpleFOCDevice:
             logging.warning('Stop bits=' + str(self.stopBits))
 
             msgBox = QtWidgets.QMessageBox()
-            msgBox.setIcon(QtWidgets.QMessageBox.Icon.Warning)
+            msgBox.setIcon(QtWidgets.QMessageBox.Warning)
             msgBox.setText('Error while trying to open serial port')
             msgBox.setWindowTitle('SimpleFOC ConfigTool')
             msgBox.setStandardButtons(QtWidgets.QMessageBox.Ok)

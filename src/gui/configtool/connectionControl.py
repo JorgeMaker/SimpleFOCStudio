@@ -1,6 +1,6 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
-from PyQt6 import QtWidgets
+from PyQt5 import QtWidgets
 
 from src.gui.configtool.configureConnectionDialog import \
     ConfigureSerailConnectionDialog
@@ -78,7 +78,7 @@ class ConnectionControlGroupBox(QtWidgets.QGroupBox):
 
     def configureDeviceAction(self):
         dialog = ConfigureSerailConnectionDialog()
-        result = dialog.exec()
+        result = dialog.exec_()
         if result:
             deviceConfig = dialog.getConfigValues()
             self.device.configureConnection(deviceConfig)

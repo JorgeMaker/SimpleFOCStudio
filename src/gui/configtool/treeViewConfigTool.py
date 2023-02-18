@@ -1,7 +1,7 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
-from PyQt5.QtCore import Qt
-from PyQt5.QtWidgets import (QVBoxLayout, QSplitter)
+from PyQt6.QtCore import Qt
+from PyQt6.QtWidgets import (QVBoxLayout, QSplitter)
 
 from src.gui.configtool.deviceInteractionFrame import DeviceInteractionFrame
 from src.gui.configtool.devicesInspectorTree import DevicesInspectorTree
@@ -21,7 +21,7 @@ class TreeViewConfigTool(WorkAreaTabWidget):
         self.treeViewWidget = DevicesInspectorTree(self)
         self.leftWidget = DeviceInteractionFrame(self)
 
-        self.verticalSplitter = QSplitter(Qt.Horizontal)
+        self.verticalSplitter = QSplitter(Qt.Orientation.Horizontal)
         self.verticalSplitter.addWidget(self.treeViewWidget)
         self.verticalSplitter.addWidget(self.leftWidget)
 

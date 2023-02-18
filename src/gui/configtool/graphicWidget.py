@@ -4,7 +4,7 @@ import logging
 
 import numpy as np
 import pyqtgraph as pg
-from PyQt5 import QtWidgets
+from PyQt6 import QtWidgets
 
 from src.gui.sharedcomnponets.sharedcomponets import GUIToolKit
 from src.simpleFOCConnector import SimpleFOCDevice
@@ -194,8 +194,8 @@ class ControlPlotPanel(QtWidgets.QWidget):
 
 
         spacerItem = QtWidgets.QSpacerItem(100, 20,
-                                           QtWidgets.QSizePolicy.Expanding,
-                                           QtWidgets.QSizePolicy.Maximum)
+                                           QtWidgets.QSizePolicy.Policy.Expanding,
+                                           QtWidgets.QSizePolicy.Policy.Maximum)
 
         self.horizontalLayout1.addItem(spacerItem)
         self.horizontalLayout1.addItem(spacerItem)

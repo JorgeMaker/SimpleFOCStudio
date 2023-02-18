@@ -1,6 +1,6 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
-from PyQt5 import QtGui, QtWidgets, QtCore
+from PyQt6 import QtGui, QtWidgets, QtCore
 
 from src.gui.sharedcomnponets.sharedcomponets import ConfigQLineEdit
 from src.simpleFOCConnector import SimpleFOCDevice
@@ -13,8 +13,8 @@ class PidGroupBox(QtWidgets.QGroupBox):
         super().__init__(parent)
         self.setMaximumWidth(300)
 
-        onlyFloatInputValidator = QtGui.QRegExpValidator(
-            QtCore.QRegExp("[+-]?([0-9]*[.])?[0-9]+"))
+        onlyFloatInputValidator = QtGui.QRegularExpressionValidator(
+            QtCore.QRegularExpression("[+-]?([0-9]*[.])?[0-9]+"))
 
         self.device = SimpleFOCDevice.getInstance()
 
@@ -67,35 +67,35 @@ class PidGroupBox(QtWidgets.QGroupBox):
         self.pgLineEdit = ConfigQLineEdit(self)
         self.pgLineEdit.setObjectName('pgLineEdit')
         self.pgLineEdit.setValidator(onlyFloatInputValidator)
-        self.pgLineEdit.setAlignment(QtCore.Qt.AlignCenter)
+        self.pgLineEdit.setAlignment(QtCore.Qt.AlignmentFlag.AlignCenter)
         self.pgLineEdit.editingFinished.connect(self.sendProportionalGainAction)
         self.gridLayout.addWidget(self.pgLineEdit, 1, 2, 1, 1)
 
         self.igLineEdit = ConfigQLineEdit(self)
         self.igLineEdit.setObjectName('igLineEdit')
         self.igLineEdit.setValidator(onlyFloatInputValidator)
-        self.igLineEdit.setAlignment(QtCore.Qt.AlignCenter)
+        self.igLineEdit.setAlignment(QtCore.Qt.AlignmentFlag.AlignCenter)
         self.igLineEdit.editingFinished.connect(self.sendIntegralGainAction)
         self.gridLayout.addWidget(self.igLineEdit, 2, 2, 1, 1)
 
         self.dgLineEdit = ConfigQLineEdit(self)
         self.dgLineEdit.setObjectName('dgLineEdit')
         self.dgLineEdit.setValidator(onlyFloatInputValidator)
-        self.dgLineEdit.setAlignment(QtCore.Qt.AlignCenter)
+        self.dgLineEdit.setAlignment(QtCore.Qt.AlignmentFlag.AlignCenter)
         self.dgLineEdit.editingFinished.connect(self.sendDerivativeGainAction)
         self.gridLayout.addWidget(self.dgLineEdit, 3, 2, 1, 1)
         
         self.vrLineEdit = ConfigQLineEdit(self)
         self.vrLineEdit.setObjectName('vrLineEdit')
         self.vrLineEdit.setValidator(onlyFloatInputValidator)
-        self.vrLineEdit.setAlignment(QtCore.Qt.AlignCenter)
+        self.vrLineEdit.setAlignment(QtCore.Qt.AlignmentFlag.AlignCenter)
         self.vrLineEdit.editingFinished.connect(self.sendRampAction)
         self.gridLayout.addWidget(self.vrLineEdit, 4, 2, 1, 1)
 
         self.lpfLineEdit = ConfigQLineEdit(self)
         self.lpfLineEdit.setObjectName('lpfLineEdit')
         self.lpfLineEdit.setValidator(onlyFloatInputValidator)
-        self.lpfLineEdit.setAlignment(QtCore.Qt.AlignCenter)
+        self.lpfLineEdit.setAlignment(QtCore.Qt.AlignmentFlag.AlignCenter)
         self.lpfLineEdit.editingFinished.connect(self.sendLPFAction)
         self.gridLayout.addWidget(self.lpfLineEdit, 5, 2, 1, 1)
 

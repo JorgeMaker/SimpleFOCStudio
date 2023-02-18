@@ -1,6 +1,6 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
-from PyQt5 import QtGui, QtWidgets
+from PyQt6 import QtGui, QtWidgets
 
 from src.gui.sharedcomnponets.sharedcomponets import GUIToolKit
 from src.simpleFOCConnector import SimpleFOCDevice
@@ -87,7 +87,7 @@ class CommandLineWidget(QtWidgets.QGroupBox):
 
     def publishCommandResponseData(self, data):
         self.commandLineDisplay.append(data)
-        self.commandLineDisplay.moveCursor(QtGui.QTextCursor.End)
+        self.commandLineDisplay.moveCursor(QtGui.QTextCursor.MoveOperation.End)
 
     def clearAction(self):
         self.commandLineDisplay.setPlainText('')

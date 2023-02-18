@@ -1,6 +1,6 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
-from PyQt5.QtWidgets import (QVBoxLayout, QFrame)
+from PyQt6.QtWidgets import (QVBoxLayout, QFrame)
 
 from src.gui.configtool.connectionControl import ConnectionControlGroupBox
 from src.gui.configtool.deviceJoggingControl import DeviceJoggingControl

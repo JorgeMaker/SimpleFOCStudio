@@ -1,7 +1,7 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
 import serial
-from PyQt5 import QtCore, QtGui, QtWidgets
+from PyQt6 import QtCore, QtGui, QtWidgets
 
 from src.gui.sharedcomnponets.sharedcomponets import SerialPortComboBox
 from src.simpleFOCConnector import SimpleFOCDevice
@@ -37,7 +37,7 @@ class ConfigureSerailConnectionDialog(QtWidgets.QDialog):
 
         self.bitRatelineEdit = QtWidgets.QLineEdit(self)
         self.bitRatelineEdit.setObjectName('bitRatelineEdit')
-        self.bitRatelineEdit.setValidator(QtGui.QRegExpValidator(QtCore.QRegExp("^[0-9]*$")))
+        self.bitRatelineEdit.setValidator(QtGui.QRegularExpressionValidator(QtCore.QRegularExpression("^[0-9]*$")))
         self.gridLayout.addWidget(self.bitRatelineEdit, 0, 3, 1, 1)
 
         self.parityLabel = QtWidgets.QLabel(self)
@@ -84,9 +84,9 @@ class ConfigureSerailConnectionDialog(QtWidgets.QDialog):
         self.gridLayout.addWidget(self.connectionIDlineEdit, 2, 3, 1, 1)
 
         self.buttonBox = QtWidgets.QDialogButtonBox(self)
-        self.buttonBox.setOrientation(QtCore.Qt.Horizontal)
+        self.buttonBox.setOrientation(QtCore.Qt.Orientation.Horizontal)
         self.buttonBox.setStandardButtons(
-            QtWidgets.QDialogButtonBox.Cancel | QtWidgets.QDialogButtonBox.Ok)
+            QtWidgets.QDialogButtonBox.StandardButton.Cancel | QtWidgets.QDialogButtonBox.StandardButton.Ok)
         self.buttonBox.setObjectName('buttonBox')
 
         self.gridLayout.addWidget(self.buttonBox, 3, 0, 1, 4)

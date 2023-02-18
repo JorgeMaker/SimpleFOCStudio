@@ -1,6 +1,6 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
-from PyQt5 import QtGui, QtWidgets, QtCore
+from PyQt6 import QtGui, QtWidgets, QtCore
 
 from src.gui.sharedcomnponets.sharedcomponets import ConfigQLineEdit
 from src.simpleFOCConnector import SimpleFOCDevice
@@ -14,8 +14,8 @@ class GeneralSettingsGroupBox(QtWidgets.QGroupBox):
 
         self.setMaximumWidth(300)
 
-        onlyFloat = QtGui.QRegExpValidator(
-            QtCore.QRegExp("[+-]?([0-9]*[.])?[0-9]+"))
+        onlyFloat = QtGui.QRegularExpressionValidator(
+            QtCore.QRegularExpression("[+-]?([0-9]*[.])?[0-9]+"))
 
         self.device = SimpleFOCDevice.getInstance()
 
@@ -34,7 +34,7 @@ class GeneralSettingsGroupBox(QtWidgets.QGroupBox):
         self.motionDownsampleEdit = ConfigQLineEdit(self)
         self.motionDownsampleEdit.setObjectName('motionDownsampleEdit')
         self.motionDownsampleEdit.setValidator(onlyFloat)
-        self.motionDownsampleEdit.setAlignment(QtCore.Qt.AlignCenter)
+        self.motionDownsampleEdit.setAlignment(QtCore.Qt.AlignmentFlag.AlignCenter)
         self.motionDownsampleEdit.updateValue.connect(self.sendMotionDownsampleAction)
         self.gcGridLayout.addWidget(self.motionDownsampleEdit, 2, 1, 1, 1)
 
@@ -56,21 +56,21 @@ class GeneralSettingsGroupBox(QtWidgets.QGroupBox):
         self.clLineEdit = ConfigQLineEdit(self)
         self.clLineEdit.setObjectName('clLineEdit')
         self.clLineEdit.setValidator(onlyFloat)
-        self.clLineEdit.setAlignment(QtCore.Qt.AlignCenter)
+        self.clLineEdit.setAlignment(QtCore.Qt.AlignmentFlag.AlignCenter)
         self.clLineEdit.updateValue.connect(self.sendCurrentLimitAction)
         self.gcGridLayout.addWidget(self.clLineEdit, 3, 1, 1, 1)
 
         self.vlLineEdit = ConfigQLineEdit(self)
         self.vlLineEdit.setObjectName('vlLineEdit')
         self.vlLineEdit.setValidator(onlyFloat)
-        self.vlLineEdit.setAlignment(QtCore.Qt.AlignCenter)
+        self.vlLineEdit.setAlignment(QtCore.Qt.AlignmentFlag.AlignCenter)
         self.vlLineEdit.updateValue.connect(self.sendVelLimitAction)
         self.gcGridLayout.addWidget(self.vlLineEdit, 4, 1, 1, 1)
 
         self.volLLineEdit = ConfigQLineEdit(self)
         self.volLLineEdit.setObjectName('volLLineEdit')
         self.volLLineEdit.setValidator(onlyFloat)
-        self.volLLineEdit.setAlignment(QtCore.Qt.AlignCenter)
+        self.volLLineEdit.setAlignment(QtCore.Qt.AlignmentFlag.AlignCenter)
         self.volLLineEdit.updateValue.connect(self.sendVoltageLimitAction)
         self.gcGridLayout.addWidget(self.volLLineEdit, 6, 1, 1, 1)
 

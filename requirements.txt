@@ -1,8 +1,4 @@
-<<<<<<< HEAD
-PyQt6==6.4.2
-=======
 PyQt5==5.15.2
->>>>>>> parent of 3b09dc8... upgrade to PyQt6
 pyqtgraph==0.11.1
 pyserial==3.5
 numpy

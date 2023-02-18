@@ -1,9 +1,7 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
 import json
-
 from PyQt5 import QtWidgets
-
 from src.gui.commandlinetool.commandlinetool import CommandLineConsoleTool
 from src.gui.configtool.deviceConfigurationTool import DeviceConfigurationTool
 from src.gui.configtool.generatedCodeDisplay import GeneratedCodeDisplay

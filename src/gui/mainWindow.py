@@ -1,6 +1,6 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
-from PyQt5 import QtCore, QtWidgets
+from PyQt5 import (QtCore, QtWidgets)
 
 from src.gui.toolbar import SimpleFOCConfigToolBar
 from src.gui.workAreaTabbedWidget import WorkAreaTabbedWidget

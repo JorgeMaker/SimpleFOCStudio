@@ -9,14 +9,13 @@ from PyQt5 import QtWidgets
 from src.gui.sharedcomnponets.sharedcomponets import GUIToolKit
 from src.simpleFOCConnector import SimpleFOCDevice
 
-
 class SimpleFOCGraphicWidget(QtWidgets.QGroupBox):
+
     disconnectedState = 0
     initialConnectedState = 1
     connectedPausedState = 2
     connectedPlottingStartedState = 3
 
-    
     signals = ['Target', 'Vq','Vd','Cq','Cd','Vel','Angle']
     signal_tooltip = ['Target', 'Voltage D [Volts]','Voltage D [Volts]','Current Q [miliAmps]','Current D [miliAmps]','Velocity [rad/sec]','Angle [rad]']
     signalColors = [GUIToolKit.RED_COLOR, GUIToolKit.BLUE_COLOR, GUIToolKit.PURPLE_COLOR,GUIToolKit.YELLOW_COLOR, GUIToolKit.MAROON_COLOR, GUIToolKit.ORANGE_COLOR, GUIToolKit.GREEN_COLOR]
@@ -62,7 +61,6 @@ class SimpleFOCGraphicWidget(QtWidgets.QGroupBox):
             self.signalPlotFlags.append(True)
             # add callback
             checkBox.stateChanged.connect(self.signalPlotFlagUpdate)
-
 
         self.horizontalLayout.addWidget(self.plotWidget)
         self.horizontalLayout.addWidget(self.controlPlotWidget)

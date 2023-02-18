@@ -1,6 +1,6 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
-from PyQt5 import QtGui, QtWidgets, QtCore
+from PyQt5 import (QtGui, QtWidgets, QtCore)
 
 from src.gui.sharedcomnponets.sharedcomponets import GUIToolKit
 from src.simpleFOCConnector import SimpleFOCDevice

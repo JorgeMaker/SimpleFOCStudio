@@ -1,9 +1,9 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
 from PyQt5 import QtWidgets
-from PyQt5.QtCore import *
+from PyQt5.QtCore import QRegExp
 from PyQt5.QtCore import Qt
-from PyQt5.QtGui import *
+from PyQt5.QtGui import (QSyntaxHighlighter,QTextCharFormat,QBrush,QColor)
 from PyQt5.QtWidgets import (QVBoxLayout)
 
 from src.gui.sharedcomnponets.sharedcomponets import (WorkAreaTabWidget,
@@ -151,8 +151,6 @@ class GeneratedCodeDisplay(WorkAreaTabWidget):
 
         highlighter = MyHighlighter( self.codeDisplay, "Classic" )
         self.layout.addWidget(self.codeDisplay)
-        
-
 
         self.codeDisplayAfter = QtWidgets.QLabel(self)
         self.layout.addWidget(self.codeDisplayAfter)
@@ -189,7 +187,7 @@ class MyHighlighter( QSyntaxHighlighter ):
       self.highlightingRules = []
 
       # keyword
-      brush = QBrush( QColor(211,84,0), Qt.SolidPattern )
+      brush = QBrush(QColor(211,84,0), Qt.SolidPattern )
       keyword.setForeground( brush )
       keywords = list( [ "motor",'FOCModulationType','MotionControlType','TorqueControlType'] )
       for word in keywords:

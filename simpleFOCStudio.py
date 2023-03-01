@@ -4,13 +4,15 @@
     application ta monitor, tune and configure BLDC motor controllers based on
     SimpleFOC library.
 """
-from PyQt5 import QtWidgets
+from PyQt5 import QtWidgets, QtCore
 from src.gui.mainWindow import UserInteractionMainWindow
 import sys
 import logging
 
 if __name__ == '__main__':
     try:
+        QtWidgets.QApplication.setAttribute(QtCore.Qt.AA_EnableHighDpiScaling, True) 
+        QtWidgets.QApplication.setAttribute(QtCore.Qt.AA_UseHighDpiPixmaps, True)
         logging.basicConfig(filename='.SimpleFOCConfigTool.log', filemode='w',
                          format='%(name)s - %(levelname)s - %(message)s')
         app = QtWidgets.QApplication(sys.argv)

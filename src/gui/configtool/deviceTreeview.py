@@ -467,7 +467,7 @@ class DeviceTreeView(QTreeWidget):
         
     def setModCenter(self,value):
         self.blockSignals(True)
-        self.selectModCenter.setCurrentIndex(value)
+        self.selectModCenter.setCurrentIndex(int(value))
         self.blockSignals(False)
         
     def changeModCenter(self):

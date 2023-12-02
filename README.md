@@ -20,7 +20,7 @@ There are just couple of steps to take:
     - We suggest to use Anaconda. [Here is how to install it.](https://docs.anaconda.com/anaconda/install/)
     - Once you have your Anaconda running open your terminal (on windows anaconda prompt) and run:
     ```sh
-    conda create -n simplefoc python=3.6
+    conda create -n simplefoc python=3.9.0
     ```
     - Once this is done you will never have to run that command again, from now on you will just need:
     ```sh

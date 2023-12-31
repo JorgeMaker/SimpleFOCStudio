@@ -2,8 +2,7 @@
 PyQt5==5.15.9
 pyqtgraph==0.13.1
 pyserial==3.5
-numpy
-
+numpy==1.24.0
 # Requirments for Pyinstaller packaging process:
 pyinstaller
 Pillow

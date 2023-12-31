@@ -19,14 +19,14 @@ jobs:
     steps:
     - uses: actions/checkout@v4
 
-    - name: Package Application
+    - name: Package Application for Windows
       uses: JackMcKew/pyinstaller-action-windows@python3-10-pyinstaller-5-3
       with:
         path: .
         spec: simpleFOCStudio.spec
         requirements: requirements.txt
 
-    - name: Package Application
+    - name: Package Application for Linux
       uses: JackMcKew/pyinstaller-action-linux@python3.10
       with:
         path: .
@@ -35,8 +35,8 @@ jobs:
 
     - name: Rename files with details
       run: |
-        mv dist/windows/simpleFOCStudio.exe dist/windows/simpleFOCStudio-windows-x86_64-${{ github.ref }}.exe
-        mv dist/linux/simpleFOCStudio dist/linux/simpleFOCStudio-linux-x86_64-${{ github.ref }}
+        mv dist/windows/simpleFOCStudio.exe dist/windows/simpleFOCStudio-windows-x86_64-${{ github.ref_name }}.exe
+        mv dist/linux/simpleFOCStudio dist/linux/simpleFOCStudio-linux-i386-${{ github.ref_name }}
 
     - name: Release
       uses: softprops/action-gh-release@v1

@@ -2,3 +2,6 @@
 /.idea
 **/*.log
 **/__pycache__
+
+build/
+dist/

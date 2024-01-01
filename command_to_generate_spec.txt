@@ -1,0 +1,1 @@
+pyi-makespec --onefile --noconsole --icon src/gui/resources/studioicon.icns --add-data src:src simpleFOCStudio.py

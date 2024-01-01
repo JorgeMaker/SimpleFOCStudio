@@ -1,0 +1,52 @@
+name: Package Application with Pyinstaller
+
+on:
+  push:
+    tags:
+      - "v*.*.*"
+
+jobs:
+
+  build_windows:
+    runs-on: windows-latest
+    steps:
+      - name: Create Executable
+        uses: sayyid5416/pyinstaller@v1
+        with:
+          spec: 'simpleFOCStudio.spec'
+          requirements: 'requirements.txt'
+          python_ver: '3.9'
+          python_arch: 'x64'
+          exe_path: './dist/windows'
+
+      - name: Rename file with details
+        run: mv dist/windows/simpleFOCStudio.exe dist/windows/simpleFOCStudio-windows-x86_64-${{ github.ref_name }}.exe
+      
+      - name: Release
+        uses: softprops/action-gh-release@v1
+        with:
+          files: |
+            dist/windows/**
+
+  build_linux:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Install pyqt5 dependencies
+        run: sudo apt install -y qtbase5-dev
+      - name: Create Executable
+        uses: sayyid5416/pyinstaller@v1
+        with:
+          spec: 'simpleFOCStudio.spec'
+          requirements: 'requirements.txt'
+          python_ver: '3.9'
+          python_arch: 'x64'
+          exe_path: './dist/linux'
+
+      - name: Rename file with details
+        run: mv dist/linux/simpleFOCStudio dist/linux/simpleFOCStudio-linux-x86_64-${{ github.ref_name }}
+      
+      - name: Release
+        uses: softprops/action-gh-release@v1
+        with:
+          files: |
+            dist/linux/**

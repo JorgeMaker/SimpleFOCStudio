@@ -19,29 +19,47 @@ jobs:
     steps:
     - uses: actions/checkout@v4
 
-    - name: Package Application for Windows
-      uses: JackMcKew/pyinstaller-action-windows@python3-10-pyinstaller-5-3
+    # Notes: windows works fine, but linux makes an i386 package that is difficult to run on amd64 architecture
+    # - name: Package Application for Windows
+    #   uses: JackMcKew/pyinstaller-action-windows@python3-10-pyinstaller-5-3
+    #   with:
+    #     path: .
+    #     spec: simpleFOCStudio.spec
+    #     requirements: requirements.txt
+
+    # - name: Package Application for Linux
+    #   uses: JackMcKew/pyinstaller-action-linux@python3.10
+    #   with:
+    #     path: .
+    #     spec: simpleFOCStudio.spec
+    #     requirements: requirements.txt
+
+    # - name: Rename files with details
+    #   run: |
+    #     mv dist/windows/simpleFOCStudio.exe dist/windows/simpleFOCStudio-windows-x86_64-${{ github.ref_name }}.exe
+    #     mv dist/linux/simpleFOCStudio dist/linux/simpleFOCStudio-linux-i386-${{ github.ref_name }}
+
+    - name: PyInstaller Windows x86_64
+      uses: action-python/pyinstaller-py3.8@win64
       with:
         path: .
         spec: simpleFOCStudio.spec
         requirements: requirements.txt
+        rename: simpleFOCStudio-windows-x86_64-${{ github.ref_name }}.exe
 
-    - name: Package Application for Linux
-      uses: JackMcKew/pyinstaller-action-linux@python3.10
+    - name: PyInstaller Linux amd64
+      uses: action-python/pyinstaller-py3.8@amd64
       with:
         path: .
         spec: simpleFOCStudio.spec
         requirements: requirements.txt
-
-    - name: Rename files with details
-      run: |
-        mv dist/windows/simpleFOCStudio.exe dist/windows/simpleFOCStudio-windows-x86_64-${{ github.ref_name }}.exe
-        mv dist/linux/simpleFOCStudio dist/linux/simpleFOCStudio-linux-i386-${{ github.ref_name }}
+        rename: simpleFOCStudio-linux-amd64-${{ github.ref_name }}
+    
 
     - name: Release
       uses: softprops/action-gh-release@v1
       with:
         files: |
-          dist/windows/*
-          dist/linux/*
+          dist/windows/**
+          dist/linux/**
           LICENSE

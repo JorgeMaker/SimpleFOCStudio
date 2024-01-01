@@ -57,13 +57,34 @@ jobs:
           requirements: 'requirements.txt'
           python_ver: '3.9'
           python_arch: 'x64'
-          exe_path: './dist/win64'
-          upload_exe_with_name: 'simpleFOCStudio-windows-x86_64-${{ github.ref_name }}.exe'
+          exe_path: './dist/windows'
+
+      - name: Rename file with details
+        run: mv dist/windows/simpleFOCStudio.exe dist/windows/simpleFOCStudio-windows-x86_64-${{ github.ref_name }}.exe
       
       - name: Release
         uses: softprops/action-gh-release@v1
         with:
           files: |
             dist/windows/**
-            # dist/linux/**
-            LICENSE
+
+  build_linux:
+    runs-on: linux-latest
+    steps:
+      - name: Create Executable
+        uses: sayyid5416/pyinstaller@v1
+        with:
+          spec: 'simpleFOCStudio.spec'
+          requirements: 'requirements.txt'
+          python_ver: '3.9'
+          python_arch: 'x64'
+          exe_path: './dist/linux'
+
+      - name: Rename file with details
+        run: mv dist/linux/simpleFOCStudio dist/linux/simpleFOCStudio-linux-x86_64-${{ github.ref_name }}
+      
+      - name: Release
+        uses: softprops/action-gh-release@v1
+        with:
+          files: |
+            dist/linux/**

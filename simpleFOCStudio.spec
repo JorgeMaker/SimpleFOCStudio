@@ -5,7 +5,7 @@ a = Analysis(
     ['simpleFOCStudio.py'],
     pathex=[],
     binaries=[],
-    datas=[('src/gui/resources', 'src/gui/resources')],
+    datas=[('src\\gui\\resources', 'src\\gui\\resources')],
     hiddenimports=[],
     hookspath=[],
     hooksconfig={},
@@ -34,5 +34,5 @@ exe = EXE(
     target_arch=None,
     codesign_identity=None,
     entitlements_file=None,
-    icon='src\\gui\\resources\\studioicon.icns',
+    icon=['src\\gui\\resources\\studioicon.icns'],
 )

@@ -1,7 +1,6 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
 import os
-import sys
 from PyQt5 import (QtGui, QtWidgets,QtCore)
 from serial.tools import list_ports
 
@@ -69,17 +68,8 @@ class GUIToolKit(object):
             'fastfordward': 'fastfordward.png',
             'customcommands':'customcommands.png'
         }
-        
-        # # Check if script is a pyinstaller package, and adjust icon path appropriately
-        # if getattr( sys, 'frozen', False ) :
-        #     # running in a bundle
-        #     currentDir = os.path.join(sys._MEIPASS, 'src/gui/sharedcomnponets')
-        # else :
-        #     # running live
-        #     currentDir = os.path.dirname(__file__)
-
         currentDir = os.path.dirname(__file__)
-        icon_path = os.path.join(currentDir, '..', 'resources', file_index[icoName])
+        icon_path = os.path.join(currentDir, '../resources', file_index[icoName])
         icon = QtGui.QIcon()
         icon.addPixmap(QtGui.QPixmap(icon_path), QtGui.QIcon.Normal,
                       QtGui.QIcon.Off)

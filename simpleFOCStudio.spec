@@ -5,7 +5,7 @@ a = Analysis(
     ['simpleFOCStudio.py'],
     pathex=[],
     binaries=[],
-    datas=[('src/gui/resources', 'src/gui/resources')],
+    datas=[('src', 'src')],
     hiddenimports=[],
     hookspath=[],
     hooksconfig={},

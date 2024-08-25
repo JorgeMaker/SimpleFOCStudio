@@ -4,10 +4,97 @@ import logging
 import threading
 import time
 
+from enum import Enum
+import socket
+import select
 import serial
 from PyQt5 import QtCore, QtWidgets
 from serial import SerialException
 from collections import defaultdict
+
+class ConnectionType(Enum):
+    SERIAL = "Serial"
+    WIRELESS = "Wireless"
+
+class NoResponseException(Exception):
+    """Exception raised when no response is received from the server within the timeout period."""
+    pass
+
+class WirelessTCPClient:
+    def __init__(self, ip, port):
+        self.ip = ip
+        self.port = port
+        self.wl_socket = None
+        self.connected = False
+        self.stoped = False
+
+    def connect(self):
+        """Attempts to establish a TCP connection."""
+        self.wl_socket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+        self.wl_socket.settimeout(2)  # Set connection timeout to 2 seconds
+
+        try:
+            self.wl_socket.connect((self.ip, self.port))
+            self.connected = True
+            logging.info(f"Connected to server: {self.ip}:{self.port}")
+        except (socket.timeout, socket.error) as e:
+            self.wl_socket.close()
+            self.connected = False
+            logging.error(f"Failed to connect to server: {self.ip}:{self.port}, Error: {e}")
+            raise ConnectionError(f"Failed to connect to server: {self.ip}:{self.port}, Error: {e}")
+        
+        self.wl_socket.settimeout(None)
+
+    def send(self, message):
+        """Sends a message to the server."""
+        if not self.connected:
+            raise ConnectionError("Not connected to server.")
+
+        try:
+            self.wl_socket.sendall(message)
+        except socket.error as e:
+            logging.error(f"Failed to send message. Error: {e}")
+            self.connected = False
+            self.handleDisconnect()
+            raise e
+
+    def receive(self):
+        """Receives data from the server."""
+        try:
+            data = self.wl_socket.recv(1024)
+            if not data:  # Empty data indicates the connection was closed
+                logging.warning("Connection closed by the server.")
+                self.connected = False
+                self.handleDisconnect()
+            return data
+        except socket.error as e:
+            logging.error(f"Failed to receive data. Error: {e}")
+            self.connected = False
+            self.handleDisconnect()
+            return None
+
+    def handleDisconnect(self):
+        """Handles a disconnection and attempts to reconnect."""
+        if self.stoped :
+            return
+        self.wl_socket.close()
+        while not self.connected:
+            try:
+                logging.info("Attempting to reconnect...")
+                self.connect()
+            except ConnectionError:
+                logging.info("Reconnection failed, retrying in 5 seconds...")
+                time.sleep(5)  # Wait before retrying
+
+    def isConnected(self):
+        return self.connected
+    
+    def close(self):
+        """Closes the connection."""
+        self.stoped = True
+        self.wl_socket.close()
+        self.connected = False
+        logging.info("Connection closed.")
 
 class PIDController:
     P = 0
@@ -124,7 +211,9 @@ class SimpleFOCDevice:
             raise Exception("This class is a singleton!")
         else:
             # serial connection variables
+            self.connType = ConnectionType.SERIAL.value
             self.serialPort = None
+            self.wl_client = None
             self.responseThread = None
             self.isConnected = False
             self.openedFile = None
@@ -136,10 +225,12 @@ class SimpleFOCDevice:
             self.serialByteSize = serial.EIGHTBITS
             self.serialParity = serial.PARITY_NONE
             self.stopBits = serial.STOPBITS_ONE
-            self.commProvider = SerialPortReceiveHandler()
+            self.commProvider = ProviderReceiveHandler()
             self.commProvider.commandDataReceived.connect(self.parseResponses)
             self.commProvider.stateMonitorReceived.connect(self.parseStateResponses)
             self.connectionID = ""
+            self.ip = "192.168.1.12"
+            self.port = "4242"
 
             # command id of the device
             self.devCommandID = ''
@@ -241,13 +332,19 @@ class SimpleFOCDevice:
         except KeyError:
             pass
 
-    def configureConnection(self, configDict):
-        self.connectionID = configDict['connectionID']
-        self.serialPortName = configDict['serialPortName']
-        self.serialRate = configDict['serialRate']
-        self.serialByteSize = configDict['serialByteSize']
-        self.serialParity = configDict['serialParity']
-        self.stopBits = configDict['stopBits']
+    def configureConnection(self, connType, configDict):
+        if connType == ConnectionType.SERIAL.value :
+            self.connectionID = configDict['connectionID']
+            self.serialPortName = configDict['serialPortName']
+            self.serialRate = configDict['serialRate']
+            self.serialByteSize = configDict['serialByteSize']
+            self.serialParity = configDict['serialParity']
+            self.stopBits = configDict['stopBits']
+            self.connType = ConnectionType.SERIAL.value
+        else:
+            self.ip = configDict['ip']
+            self.port = configDict['port']
+            self.connType = ConnectionType.WIRELESS.value
 
     def toJSON(self):
         valuesToSave = {
@@ -390,17 +487,32 @@ class SimpleFOCDevice:
         return code
 
     def __initCommunications(self):
-        self.serialPort = serial.Serial(self.serialPortName,
-                                        self.serialRate,
-                                        self.serialByteSize,
-                                        self.serialParity,
-                                        self.stopBits)
-
-        self.commProvider.serialComm = self.serialPort
+        
+        if self.connType == ConnectionType.SERIAL.value:
+            self.serialPort = serial.Serial(self.serialPortName,
+                                            self.serialRate,
+                                            self.serialByteSize,
+                                            self.serialParity,
+                                            self.stopBits)
+            self.commProvider.serialComm = self.serialPort
+            self.commProvider.wl_client = None
+        elif self.connType == ConnectionType.WIRELESS.value:
+            self.wl_client = WirelessTCPClient(self.ip, int(self.port))
+            try:
+                self.wl_client.connect()
+            except ConnectionError as serEx:
+                raise NoResponseException("No response from server.")
+            
+            self.commProvider.wl_client = self.wl_client
+            self.commProvider.serialComm =None
+        
         self.commProvider.start()
 
     def __closeCommunication(self):
-        self.serialPort.close()
+        if self.connType == ConnectionType.SERIAL.value:
+            self.serialPort.close()
+        elif self.connType == ConnectionType.WIRELESS.value:
+            self.wl_client.close()
 
     def connect(self, connectionMode):
         try:
@@ -416,6 +528,18 @@ class SimpleFOCDevice:
             msgBox = QtWidgets.QMessageBox()
             msgBox.setIcon(QtWidgets.QMessageBox.Warning)
             msgBox.setText('Error while trying to open serial port')
+            msgBox.setWindowTitle('SimpleFOC ConfigTool')
+            msgBox.setStandardButtons(QtWidgets.QMessageBox.Ok)
+            msgBox.exec()
+            return False
+        except NoResponseException as serEx:
+            logging.warning('Is not possible to connect SimpleFOC HW via Wireless network')
+            logging.warning('IP =' + self.ip)
+            logging.warning('Port =' + self.port)
+
+            msgBox = QtWidgets.QMessageBox()
+            msgBox.setIcon(QtWidgets.QMessageBox.Warning)
+            msgBox.setText('Error while trying to connect SimpleFOC HW via Wireless network')
             msgBox.setWindowTitle('SimpleFOC ConfigTool')
             msgBox.setStandardButtons(QtWidgets.QMessageBox.Ok)
             msgBox.exec()
@@ -439,8 +563,9 @@ class SimpleFOCDevice:
 
     def disConnect(self):
         self.isConnected = False
-        self.__closeCommunication()
         self.stateUpdater.stop()
+        self.commProvider.stop()
+        self.__closeCommunication()
         for listener in self.connectionStateListenerList:
             listener.connectionStateChanged(False)
 
@@ -449,8 +574,14 @@ class SimpleFOCDevice:
 
     def sendCommand(self, command):
         if self.isConnected:
-            self.serialPort.write((str(command) + '\n').encode('utf-8'))
-
+            if self.connType == ConnectionType.SERIAL.value:
+                self.serialPort.write((str(command) + '\n').encode('utf-8'))
+            elif self.connType == ConnectionType.WIRELESS.value:
+                try:
+                    self.wl_client.send((str(command) + '\n').encode('utf-8'))
+                except socket.error as e:
+                    logging.error(f"Failed to send message. Error: {e}")
+                
     def setCommand(self, command, value):
         if self.isConnected:
            self.sendCommand(str(self.devCommandID) + str(command) + str(value))
@@ -818,17 +949,18 @@ class SimpleFOCDevice:
             comandResponse = comandResponse.replace('Monitor |', '')
             self.parseMonitorResponse(comandResponse)
 
-
-class SerialPortReceiveHandler(QtCore.QThread):
+class ProviderReceiveHandler(QtCore.QThread):
     monitoringDataReceived = QtCore.pyqtSignal(list)
     commandDataReceived = QtCore.pyqtSignal(str)
     stateMonitorReceived = QtCore.pyqtSignal(str)
     rawDataReceived = QtCore.pyqtSignal(str)
-
-    def __init__(self, serial_port=None, *args,**kwargs):
-        super(SerialPortReceiveHandler, self).__init__(*args, **kwargs)
-        self._stop_event = threading.Event()
+    def __init__(self, client=None, serial_port=None, *args,**kwargs):
+        super(ProviderReceiveHandler, self).__init__(*args, **kwargs)
         self.serialComm = serial_port
+        self.wl_client = client
+        self._stop_event = threading.Event()
+        self.buffer = b''  # Buffer to store incoming data
+        self.maxMsgSize = 1024
 
     def handle_received_data(self, data):
         if not data:
@@ -861,8 +993,49 @@ class SerialPortReceiveHandler(QtCore.QThread):
             return True
         else:
             return False
+        
+    def isOpen(self):
+        
+        if self.serialComm:
+            return self.serialComm.isOpen()
+        
+        if self.wl_client:
+            return self.wl_client.isConnected()
+        
+        return False
 
-    def run(self):
+    def readline(self):
+        """Read a line from the buffered data."""
+        if b'\n' in self.buffer:
+            line, self.buffer = self.buffer.split(b'\n', 1)
+            return line + b'\n'
+        return b''
+    
+    def wirelessRun(self):
+        try:
+            while not self.stopped():
+                if self.wl_client is not None:
+                    data = self.wl_client.receive()
+                    # logging.debug("receive data: %s", str(data, encoding='utf-8') )
+                    if data:
+                        self.buffer += data
+                    else:
+                        # reset buffer
+                        self.buffer = b''
+
+                    while True:
+                        line = self.readline()
+                        if line:
+                            # logging.debug("line: %s", str(line, encoding='utf-8') )
+                            self.handle_received_data(line.decode())
+                        else:
+                            break
+        except socket.error as socketException:
+            logging.error(socketException, exc_info=True)
+        except Exception as ex:
+            logging.error(ex, exc_info=True)
+
+    def serialRun(self):
         try:
             while not self.stopped():
                 if self.serialComm is not None:
@@ -875,7 +1048,17 @@ class SerialPortReceiveHandler(QtCore.QThread):
         except TypeError as typeError:
             logging.error(typeError, exc_info=True)
         except AttributeError as ae:
-            logging.error(ae, exc_info=True)            
+            logging.error(ae, exc_info=True)
+
+    def run(self):
+        if self.serialComm:
+            self.serialRun()
+        if self.wl_client:
+            self.wirelessRun()
+
+    def start(self):
+        self._stop_event.clear()
+        super(ProviderReceiveHandler, self).start()
 
     def stop(self):
         self._stop_event.set()
@@ -894,7 +1077,7 @@ class StateUpdateRunner(QtCore.QThread):
         try:
             while not self.stopped():
                 if self.deviceConnector is not None:
-                    if self.deviceConnector.commProvider.serialComm.isOpen():
+                    if self.deviceConnector.commProvider.isOpen():
                         self.deviceConnector.updateStates()
                         time.sleep(1)
         except SerialException as serialException:

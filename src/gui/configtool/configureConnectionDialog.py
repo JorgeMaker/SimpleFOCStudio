@@ -83,13 +83,6 @@ class ConfigureSerailConnectionDialog(QtWidgets.QDialog):
         self.connectionIDlineEdit.setObjectName('connectionNameEdit')
         self.gridLayout.addWidget(self.connectionIDlineEdit, 2, 3, 1, 1)
 
-        self.buttonBox = QtWidgets.QDialogButtonBox(self)
-        self.buttonBox.setOrientation(QtCore.Qt.Horizontal)
-        self.buttonBox.setStandardButtons(
-            QtWidgets.QDialogButtonBox.Cancel | QtWidgets.QDialogButtonBox.Ok)
-        self.buttonBox.setObjectName('buttonBox')
-
-        self.gridLayout.addWidget(self.buttonBox, 3, 0, 1, 4)
 
         self.setWindowTitle('Configure serial connection')
         self.portNameLabel.setText('Port Name')
@@ -99,8 +92,6 @@ class ConfigureSerailConnectionDialog(QtWidgets.QDialog):
         self.stopBitsLabel.setText('Stop bits')
         self.connectionIDLabel.setText('Conn ID')
 
-        self.buttonBox.accepted.connect(self.accept)
-        self.buttonBox.rejected.connect(self.reject)
 
         QtCore.QMetaObject.connectSlotsByName(self)
 
@@ -131,3 +122,98 @@ class ConfigureSerailConnectionDialog(QtWidgets.QDialog):
             return float(self.stopBitsComboBox.currentText())
         else:
             return int(self.stopBitsComboBox.currentText())
+        
+class ConfigureWirelessConnectionDialog(QtWidgets.QDialog):
+    def __init__(self, parent=None):
+        super().__init__(parent)
+
+        self.setupUI(SimpleFOCDevice.getInstance())
+
+    def setupUI(self, device=None):
+        self.layout = QtWidgets.QFormLayout()
+
+        self.ip = QtWidgets.QLineEdit()
+        self.port = QtWidgets.QLineEdit()
+        
+        self.layout.addRow("IP:", self.ip)
+        self.layout.addRow("tcp port:", self.port)
+        self.setLayout(self.layout)
+        self.setWindowTitle('Configure tcp connection')
+        if device is not None:
+            self.fillForm(device)
+
+    def fillForm(self, deviceConnector):
+        self.ip.setText(deviceConnector.ip)
+        self.port.setText(deviceConnector.port)
+
+    def getConfigValues(self):
+        values = {
+            'ip': self.ip.text(),
+            'port': self.port.text(),
+        }
+        return values
+
+class ConfigureConnectionDialog(QtWidgets.QDialog):
+    def __init__(self):
+        super().__init__()
+        self.stackIndex = 0
+        self.setupUi(SimpleFOCDevice.getInstance())
+
+    def setupUi(self, device=None):
+         
+        self.layout = QtWidgets.QVBoxLayout()
+        self.configType = "Serial"
+        self.comboBox = QtWidgets.QComboBox()
+        self.comboBox.addItem("Serial")
+        self.comboBox.addItem("Wireless")
+        self.layout.addWidget(QtWidgets.QLabel("Please select a configuration type"))
+        self.layout.addWidget(self.comboBox)
+
+        self.stackedWidget = QtWidgets.QStackedWidget()
+        self.serialConfigWidget = ConfigureSerailConnectionDialog()
+        self.wirelessConfigWidget = ConfigureWirelessConnectionDialog()
+
+        self.stackedWidget.addWidget(self.serialConfigWidget)
+        self.stackedWidget.addWidget(self.wirelessConfigWidget)
+
+        self.buttonBox = QtWidgets.QDialogButtonBox(self)
+        self.buttonBox.setOrientation(QtCore.Qt.Horizontal)
+        self.buttonBox.setStandardButtons(
+            QtWidgets.QDialogButtonBox.Cancel | QtWidgets.QDialogButtonBox.Ok)
+        self.buttonBox.setObjectName('buttonBox')
+
+        self.layout.addWidget(self.stackedWidget)
+        self.layout.addWidget(self.buttonBox)
+        self.comboBox.currentIndexChanged.connect(self.displayConfigWidget)
+
+        self.buttonBox.accepted.connect(self.acceptCallback)
+        self.buttonBox.rejected.connect(self.reject)
+        self.stackedWidget.setCurrentIndex(self.stackIndex)
+        
+        self.setLayout(self.layout)
+        self.setWindowTitle('Configure connection')
+
+    def displayConfigWidget(self, index):
+        self.stackedWidget.setCurrentIndex(index)
+
+    def getConfigValues(self):
+        currentIndex = self.stackedWidget.currentIndex()
+        if self.configType == "Serial":  # Serial Config Selected
+            config = self.serialConfigWidget.getConfigValues()
+        else:  # Wireless Config Selected
+            config = self.wirelessConfigWidget.getConfigValues()
+
+        return self.configType, config
+    
+    def acceptCallback(self):
+        # Custom logic here
+        currentIndex = self.stackedWidget.currentIndex()
+        if currentIndex == 0:  # Serial Config Selected
+            self.configType = "Serial"
+        else:  # Wireless Config Selected
+            self.configType = "Wireless"
+            
+        self.stackIndex = currentIndex
+        # After custom logic, call accept() to close the dialog
+        self.accept()
+

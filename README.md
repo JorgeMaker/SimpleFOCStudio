@@ -135,7 +135,7 @@ void setup(){
   ....
   // add the motor to the commander interface
   // The letter (here 'M') you will provide to the SimpleFOCStudio
-  command.add('M',doMotor,'motor');
+  command.add('M',doMotor,"motor");
   // tell the motor to use the monitoring
   motor.useMonitoring(Serial);
   motor.monitor_downsample = 0; // disable monitor at first - optional

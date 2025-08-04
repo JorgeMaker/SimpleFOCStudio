@@ -51,7 +51,7 @@ class SimpleFOCGraphicWidget(QtWidgets.QGroupBox):
             # define signal plot data array
             self.signalDataArrays.append(np.zeros(self.numberOfSamples))
             # configure signal plot parameters
-            signalPen = pg.mkPen(color=sigColor, width=1.5)
+            signalPen = pg.mkPen(color=sigColor, width=1)
             self.signalPlots.append(pg.PlotDataItem(self.timeArray,
                                             self.signalDataArrays[-1],
                                             pen=signalPen, name=tooltip))

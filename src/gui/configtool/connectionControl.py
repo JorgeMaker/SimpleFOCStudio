@@ -3,7 +3,7 @@
 from PyQt5 import QtWidgets
 
 from src.gui.configtool.configureConnectionDialog import \
-    ConfigureSerailConnectionDialog
+    ConfigureConnectionDialog
 from src.gui.sharedcomnponets.sharedcomponets import GUIToolKit
 from src.simpleFOCConnector import SimpleFOCDevice
 
@@ -77,8 +77,8 @@ class ConnectionControlGroupBox(QtWidgets.QGroupBox):
             self.connectDisconnectButton.setText('Connect')
 
     def configureDeviceAction(self):
-        dialog = ConfigureSerailConnectionDialog()
+        dialog = ConfigureConnectionDialog()
         result = dialog.exec_()
         if result:
-            deviceConfig = dialog.getConfigValues()
-            self.device.configureConnection(deviceConfig)
+            connType, deviceConfig = dialog.getConfigValues()
+            self.device.configureConnection(connType, deviceConfig)

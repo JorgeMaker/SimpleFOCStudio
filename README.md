@@ -1,6 +1,6 @@
 ## *Simple**FOC**Studio*
 
-Graphical user interface for the [*Simple**FOC**library*](https://github.com/simplefoc). This application allows to tune and configure any BLDC/Stepper *Simple**FOC**library* controlled device, using serial port communications and the [Commander](https://docs.simplefoc.com/commander_interface) interface.
+Graphical user interface for the [*Simple**FOC**library*](https://github.com/simplefoc). This application allows to tune and configure any BLDC/Stepper *Simple**FOC**library* controlled device, using serial port communications or wireless connections with the the [Commander](https://docs.simplefoc.com/commander_interface) interface.
 #### The main features are:
 
 - Plug and play with the *Simple**FOC**library* version 2.1
